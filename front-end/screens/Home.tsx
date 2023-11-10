@@ -1,7 +1,4 @@
 import {View, Text, Button} from 'react-native';
-import {useAppDispatch, useAppSelector} from "../hooks/reduxHooks";
-import {useEffect, useState} from "react";
-import {addUser} from "../redux/actions/testUserActions";
 
 export default function Home () {
 

@@ -9,11 +9,11 @@ const Stack = createNativeStackNavigator()
 export default function App() {
   return (
       <NavigationContainer>
-          <Provider store={store}>
-              <Stack.Navigator initialRouteName={"Home"}>
-                  <Stack.Screen name={"Home"} component={Home} options={{headerShown: false, gestureEnabled: false}}/>
-              </Stack.Navigator>
-          </Provider>
+        <Provider store={store}>
+          <Stack.Navigator initialRouteName={"Home"}>
+            <Stack.Screen name={"Home"} component={Home} options={{headerShown: false, gestureEnabled: false}}/>
+          </Stack.Navigator>
+        </Provider>
       </NavigationContainer>
   );
 }
