@@ -27,27 +27,7 @@ export const styles = StyleSheet.create({
       borderRadius: 20,
       alignItems: 'center'
     },
-    arrowImage: {
-      width: '10%',
-      height: '40%'
-  
-    },
-    eraserImage: {
-      width: '10%',
-      height: '40%'
-  
-    },
-    penImage: {
-      width: '10%',
-      height: '40%'
-  
-    },
-    maillotImage: {
-      width: '10%',
-      height: '40%'
-  
-    },
-    ballImage: {
+    menuImage: {
       width: '10%',
       height: '40%'
   

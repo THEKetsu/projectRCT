@@ -9,6 +9,8 @@ import gomme from '../../assets/la-gomme.png'
 import crayon from '../../assets/crayon.png'
 import maillot from '../../assets/maillot-de-foot.png'
 import ballon from '../../assets/ballon-de-rugby.png'
+
+
 const AnimatedBottomBar = () => {
   // Déclaration des états 'collapsed' et 'animation' via useState de React Hooks
   const [collapsed, setCollapsed] = useState(false); // État pour suivre l'état de la barre (repliée ou non)
@@ -36,6 +38,8 @@ const AnimatedBottomBar = () => {
     outputRange: [20, 100], // Hauteur initiale et finale de la barre
   });
 
+  const itemMenu = [fleche,gomme,crayon,maillot,ballon]
+  
   // Rendu du composant
   return (
     <View style={styles.container}>
@@ -44,39 +48,47 @@ const AnimatedBottomBar = () => {
       <Animated.View style={[styles.bar, { height: barHeight }]}>
         {/* Bouton pour déclencher l'animation */}
       
-      <TouchableOpacity onPress={toggleBar} style={styles.button}>
-      { collapsed && (<Image
-        style={styles.displayBottomImage}
-        source={chevronBas}
-      /> )}
-       { !collapsed && (<Image
-        style={styles.displayBottomImage}
-        source={chevronHaut}
-      /> )}
-      </TouchableOpacity>
+        <TouchableOpacity onPress={toggleBar} style={styles.button}>
         { collapsed && (<Image
-        style={styles.arrowImage}
-        source={fleche}
-      /> )}
-      { collapsed && (<Image
-        style={styles.eraserImage}
-        source={gomme}
-      />)}
-      { collapsed && (<Image
-        style={styles.penImage}
-        source={crayon}
-      /> )}
-      { collapsed && (<Image
-        style={styles.maillotImage}
-        source={maillot}
-      />)}
-      { collapsed && (<Image
-        style={styles.ballImage}
-        source={ballon}
-      />)} 
+          style={styles.displayBottomImage}
+          source={chevronBas}
+        /> )}
+        { !collapsed && (<Image
+          style={styles.displayBottomImage}
+          source={chevronHaut}
+        /> )}
+
+        </TouchableOpacity>
+          {collapsed && itemMenu.map((item, index) => (
+            <>
+                <Image
+                  style={styles.menuImage}
+                  source={item}
+                  key={index}
+                /> 
+            </>
+          ))}
+          {/* { collapsed && (<Image
+          style={styles.arrowImage}
+          source={fleche}
+        /> )}
+        { collapsed && (<Image
+          style={styles.eraserImage}
+          source={gomme}
+        />)}
+        { collapsed && (<Image
+          style={styles.penImage}
+          source={crayon}
+        /> )}
+        { collapsed && (<Image
+          style={styles.maillotImage}
+          source={maillot}
+        />)}
+        { collapsed && (<Image
+          style={styles.ballImage}
+          source={ballon}
+        />)}  */}
       </Animated.View>
-      
-      
     </View>
   );
 };
