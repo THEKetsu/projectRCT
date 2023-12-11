@@ -1,7 +1,8 @@
 import { React, useState } from 'react';
 import { View, TouchableOpacity, Animated, StyleSheet, Text, Image, Touchable } from 'react-native';
 import { Directions } from 'react-native-gesture-handler';
-import { styles } from './bottomBarStyle.js'
+import { styles } from './bottomBarStyle.js';
+import MenuPosition from '../MenuPosition/MenuPosition'
 import chevronBas from '../../assets/vers-le-bas.png'
 import chevronHaut from '../../assets/chevron-haut.png'
 import fleche from '../../assets/fleches.png'
@@ -47,7 +48,7 @@ const AnimatedBottomBar = () => {
       {/* Barre inférieure animée */}
       <Animated.View style={[styles.bar, { height: barHeight }]}>
         {/* Bouton pour déclencher l'animation */}
-      
+        <MenuPosition></MenuPosition>
         <TouchableOpacity onPress={toggleBar} style={styles.button}>
         { collapsed && (<Image
           style={styles.displayBottomImage}
@@ -68,26 +69,6 @@ const AnimatedBottomBar = () => {
                 /> 
             </>
           ))}
-          {/* { collapsed && (<Image
-          style={styles.arrowImage}
-          source={fleche}
-        /> )}
-        { collapsed && (<Image
-          style={styles.eraserImage}
-          source={gomme}
-        />)}
-        { collapsed && (<Image
-          style={styles.penImage}
-          source={crayon}
-        /> )}
-        { collapsed && (<Image
-          style={styles.maillotImage}
-          source={maillot}
-        />)}
-        { collapsed && (<Image
-          style={styles.ballImage}
-          source={ballon}
-        />)}  */}
       </Animated.View>
     </View>
   );
