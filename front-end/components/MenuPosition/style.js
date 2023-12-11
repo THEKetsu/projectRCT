@@ -10,6 +10,7 @@ export const styles = StyleSheet.create({
     },
     pageContainer: {
       width: "100%",
+      flexDirection: "row"
     },
     pageContent: {
       flex: 1,
