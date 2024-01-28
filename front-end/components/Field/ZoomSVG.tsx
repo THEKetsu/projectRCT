@@ -13,9 +13,6 @@ import Player from '../../classes/Player';
 
 import data from '../../assets/data2.json';
 
-
-
-
 type PlayerPath = {
   id: string;
   path: string;
@@ -58,18 +55,12 @@ export function ZoomableSVG(props: ZoomableSVGProps) {
   const [centerDiff, setcenterDiff] = useState([0,0]);
   const [boolLock, setLock] = useState(false);
 
-  
-
-
   //useEffectConst
   const [zoomMode, setZoomMode] = useState(false);
   const [addMode, setAddMode] = useState(false);
 
-
   const [selected, setSelected] = useState(true);
   let animationEnCours = false;
-  
-
 
   //Locker
   const [distance1, setDistance1] = useState<number[]>([]);

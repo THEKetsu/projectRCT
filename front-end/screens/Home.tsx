@@ -1,12 +1,11 @@
-import {View, Text, Button, Pressable} from 'react-native';
+import {View, Button} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-export default function Home () {
+export default function Home ({navigation}) {
 
-    const navigation = useNavigation();
     return (
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-            <Pressable onPress={()=> navigation.navigate('Strategy')}>GO TO STRAT</Pressable>
+            <Button onPress={() => navigation.navigate("Strategy")} title={"GO TO STRATEGY"}/>
         </View>
     )
 }

@@ -12,10 +12,6 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import ComponentPosition from '../ToolBar/Position';
 import Player from '../../classes/Player';
 
-
-
-
-
 const dimWidth = Dimensions.get('window').width;
 const dimHeight = Dimensions.get('window').height;
 
