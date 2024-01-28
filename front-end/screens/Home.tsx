@@ -1,14 +1,12 @@
-import {View, Text, Button} from 'react-native';
-import { MyComponent } from '../components/Test';
-import Momo from '../components/Momo';
+import {View, Text, Button, Pressable} from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 export default function Home () {
 
+    const navigation = useNavigation();
     return (
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-            <Text>SALUT</Text>
-            <Momo/>
-            
+            <Pressable onPress={()=> navigation.navigate('Strategy')}>GO TO STRAT</Pressable>
         </View>
     )
 }

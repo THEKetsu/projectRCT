@@ -4,18 +4,37 @@ import { StyleSheet, Text, View, Dimensions, PanResponder, Pressable, TouchableO
    TextStyle, StyleProp, TouchableWithoutFeedback, Image } from 'react-native';
 
 import { Video } from 'expo-av';
-import { MyComponent } from './Test';
 
 import ViewShot from 'react-native-view-shot';
 import ImageSequence from 'react-native-image-sequence';
+import { ZoomableSVG } from './ZoomSVG';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import ComponentPosition from '../ToolBar/Position';
+import Player from '../../classes/Player';
+
+
+
+
 
 const dimWidth = Dimensions.get('window').width;
 const dimHeight = Dimensions.get('window').height;
 
-export default function Momo() {
+export default function FieldHandler() {
   const videoRef = useRef<Video>(null);
   const viewShotRef = useRef<ViewShot>(null); // Initialize viewShotRef
   const [isVideoVisible, setVideoVisible] = useState(false);
+  //Pour le button zoom lien avec ZoomButton.tsx
+  let [buttonZoom, setButtonValue] = useState(false);
+  let [buttonADDPlayer, setButtonValueADD] = useState(false);
+
+
+  const [dataFromA, setDataFromA] = useState(0);
+  const [dataForPosition, setDataForPosition] = useState(0);
+  let stupidPlayer = Player.createPlayer([0,0],"0B",[],[],1,"false");
+  const [dataForSave, setDataForSave] = useState<[number, Player[]][]>([[0,[stupidPlayer]]]);
+  const [dataForReturn, setDataForReturn] = useState<[number, Player[]][]>([[0,[stupidPlayer]]]);
+
+
 
 
   const captureScreen = async () => {
@@ -28,6 +47,31 @@ export default function Momo() {
     } catch (error) {
       console.error('Capture failed', error);
     }
+  };
+
+  const handleDataFromA = (data : number) => {
+    // Do something with the data received from ComponentA
+    setDataFromA(data);
+  };
+
+  const handleSaveForZoomSVG= (data : [number, Player[]][]) => {
+
+    setDataForReturn(data);
+  };
+
+  const handleDataForPosition = (data : number) => {
+    // Do something with the data received from ComponentA
+    setDataForPosition(data);
+  };
+
+  const handleDataForSavingPosition = (data : [number, Player[]][]) => {
+    // Do something with the data received from ComponentA
+    setDataForSave(data);
+  };
+
+  const handleDataFromB = (data : string) => {
+    // Do something with the data received from ComponentB
+    return(data);
   };
 
   const playVideo = async () => {
@@ -46,6 +90,17 @@ export default function Momo() {
     }
   };
 
+  const handleClickZoom = () => {
+    console.log("CLICK");
+    setButtonValueADD(false);
+    setButtonValue(true);
+  };
+
+  const handleClickADD = () => {
+    setButtonValue(false);
+    setButtonValueADD(true);
+  };
+
   return (
     <ViewShot
         ref={viewShotRef}
@@ -53,9 +108,25 @@ export default function Momo() {
         style={styles.viewShot}
       > 
     <View style={styles.container}>
-      {!isVideoVisible && <MyComponent />}
+      {!isVideoVisible && 
+       <GestureHandlerRootView style={{ flex: 1 }}>
+        <ZoomableSVG buttonValue={buttonZoom} buttonADDPlayer={buttonADDPlayer} sendDataToA={dataFromA} 
+        sendNewsToPosition={handleDataForPosition} sendSaveOfPosition={handleDataForSavingPosition} receiveSavedPosition={dataForReturn}/>
+        <ComponentPosition sendDataToB={handleDataFromA}  receivedData={dataForPosition} receivedPosition={dataForSave}
+        sendSavedData={handleSaveForZoomSVG} />
+        </GestureHandlerRootView>}
       <StatusBar backgroundColor="auto" />
 
+      <Pressable onPress={handleClickZoom}>
+      <Text>Mode ZOOM</Text>
+      </Pressable>
+
+      <Pressable onPress={handleClickADD}>
+      <Text>ADD Player</Text>
+      </Pressable>
+
+
+      
       {!isVideoVisible && (
         <Pressable
           onPress={playVideo}
@@ -72,15 +143,6 @@ export default function Momo() {
         </Pressable>
       )}
 
-      
-        {/* {isVideoVisible && (
-          <Video
-            ref={videoRef}
-            source={require('./assets/ussr.mp4')}
-            style={styles.video}
-            useNativeControls
-          />
-        )} */}
       
 
       {isVideoVisible && (
