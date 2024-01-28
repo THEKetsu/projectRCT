@@ -1,0 +1,43 @@
+[
+    {
+        "position" : 1,
+
+        "data": 
+        [
+            {
+                "id": "B1",
+                "position": [[0.5],[0.5]],
+                "ballon": "false",
+                "array": []
+            },
+            {
+                "id": "B2",
+                "position": [[0.2],[0.3]],
+                "ballon": "true",
+                "array": []
+            }
+        ]
+    },
+    {
+        "position" : 2,
+
+        "data": 
+        [
+            {
+                "id": "R1",
+                "position": [[0.5],[0.5]],
+                "ballon": "false",
+                "array": []
+            },
+            {
+                "id": "B2",
+                "position": [[0.8],[0.7]],
+                "ballon": "true",
+                "array": []
+            }
+        ]
+    }
+    
+
+
+]
