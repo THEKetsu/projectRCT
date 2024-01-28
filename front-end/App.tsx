@@ -4,8 +4,7 @@ import Home from "./screens/Home";
 import {Provider} from "react-redux";
 import {store} from "./redux/store";
 
-const Stack = createNativeStackNavigator()
-
+const Stack = createNativeStackNavigator();
 export default function App() {
   return (
       <NavigationContainer>
