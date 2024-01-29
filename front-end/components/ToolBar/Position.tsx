@@ -1,65 +1,96 @@
-import React, { useEffect, useState } from 'react';
-import { View, Pressable, Text } from 'react-native';
-import Player from '../../classes/Player';
-
-import data from '../../assets/data2.json';
-
-interface ComponentPositionProps {
-  sendDataToB: (data: number) => void;
-  receivedData: number;
-  receivedPosition: [number, Player[]][];
-  sendSavedData: (data: [number, Player[]][]) => void;
-}
-
-const ComponentPosition: React.FC<ComponentPositionProps> = ({ sendDataToB, receivedData, receivedPosition, sendSavedData }) => {
-
-  const [numberOfPosition, setmyNumberOfPosition] = useState<number[]>([1,2]);
-  // data.map((item) => {
-    
-  //   setmyNumberOfPosition(prevPositions => [...prevPositions, item.position]);
-  // });
+import React, {useEffect, useState} from 'react';
+import {View, Text, TouchableOpacity, StyleSheet, Dimensions} from 'react-native';
 
 
-  useEffect(() => {
-    console.log(receivedData);
-    let different = true;
-    numberOfPosition.map((i) => {
-      if(i==receivedData){
-        different = false;
-      }
-    })
-    if(receivedData != 0 && different){
-      setmyNumberOfPosition(prevPositions => [...prevPositions, receivedData]);
-    }
-  }, [receivedData]);
+const dimWidth = Dimensions.get('window').width;
+const dimHeight = Dimensions.get('window').height;
 
+export default function Position({
+                                     sendDataToB,
+                                     receivedData,
+                                     receivedPosition,
+                                     sendSavedData,
+                                     handleClickZoom,
+                                     handleClickAdd
+                                 }) {
 
+    const [numberOfPosition, setNumberOfPosition] = useState<number[]>([1, 2]);
 
+    useEffect(() => {
+        console.log(receivedData);
 
+        let different = true;
+        numberOfPosition.map((i) => {
+            if (i == receivedData) {
+                different = false;
+            }
+        })
+        if (receivedData != 0 && different) {
+            setNumberOfPosition(prevPositions => [...prevPositions, receivedData]);
+        }
+    }, [receivedData]);
 
+    const handlePress = (item: number) => {
+        sendDataToB(item);
 
-  const handlePress = (item: number) => {
+        if (receivedPosition[0][0] != 0) {
+            console.log("Position reçu", receivedPosition)
+            sendSavedData(receivedPosition);
+        }
+    };
 
-    //On envoye l'information de quel position sera la current, et on envoie la sauvegarde des positions (pour reset)
-    sendDataToB(item);
+    return (
+        <View style={styles.container}>
+            <View style={{flexDirection: "row", position: "absolute", alignSelf: "flex-start", top: 0, left: 0}}>
+                {numberOfPosition.map((item, index) => (
+                    <TouchableOpacity
+                        activeOpacity={0.7}
+                        key={index}
+                        onPress={() => handlePress(item)}
+                        style={styles.buttonPos}
+                    >
+                        <Text>{item}</Text>
+                    </TouchableOpacity>
+                ))}
+            </View>
 
-    //On verifie qu'on envoie pas la donnée vide
-    if(receivedPosition[0][0] != 0){
-      console.log("Position reçu",receivedPosition)
-      sendSavedData(receivedPosition);
-    }
-    
-  };
+            <TouchableOpacity onPress={handleClickZoom} style={styles.buttonBase}>
+                <Text>Mode ZOOM</Text>
+            </TouchableOpacity>
 
-  return (
-    <View>
-      {numberOfPosition.map((item,index) => (
-        <Pressable key={index} onPress={() => handlePress(item)}>
-        <Text>{item}</Text>
-        </Pressable>
-      ))}
-    </View>
-  );
+            <TouchableOpacity onPress={handleClickAdd} style={styles.buttonBase}>
+                <Text>Add Player</Text>
+            </TouchableOpacity>
+        </View>
+    );
 };
 
-export default ComponentPosition;
+
+const styles = StyleSheet.create({
+    container: {
+        height: dimHeight / 4,
+        width: dimWidth,
+        backgroundColor: "#D9D9D9",
+        justifyContent: "center",
+        alignItems: "center",
+        flexDirection: "row"
+    },
+    buttonPos: {
+        height: 20,
+        width: 100,
+        backgroundColor: "green",
+        borderRadius: 20,
+        justifyContent: "center",
+        alignItems: "center"
+    },
+    buttonBase: {
+        height: 30,
+        width: 100,
+        backgroundColor: "#959595",
+        borderRadius: 10,
+        justifyContent: "center",
+        alignItems: "center",
+        marginLeft: 10
+    }
+
+})
