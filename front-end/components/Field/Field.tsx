@@ -114,7 +114,6 @@ export function Field(props: ZoomableSVGProps) {
     }, [props.buttonBallMode]);
 
 
-
     useEffect(() => {
         if (props.receiveSavedPosition[0][0] != 0) {
             setPositionList((prevPositionList) => {
@@ -352,7 +351,7 @@ export function Field(props: ZoomableSVGProps) {
                 scale = event.nativeEvent.scale;
 
                 //\\
-                let newDelta = scale < 1 ? 0.9 : 1.1;
+                let newDelta = scale < 1 ? 0.95 : 1.05;
 
                 newDelta = newDelta * delta;
 

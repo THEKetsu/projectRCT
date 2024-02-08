@@ -3,13 +3,11 @@ class Ballon {
     position: number[];
     svg_ballon : number[];
     idJoueur: string;
-
   
     constructor(position : number[], svg_ballon: number[], idJoueur: string) {
       this.position = position;
       this.svg_ballon = svg_ballon;
       this.idJoueur = idJoueur;
-
     }
   
     static createBallon(position : number[], svg_ballon : number[], idJoueur: string): Ballon {
