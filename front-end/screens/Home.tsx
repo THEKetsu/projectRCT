@@ -1,6 +1,7 @@
 import {View, Button} from 'react-native';
 
-export default function Home ({navigation}) {
+// @ts-ignore
+export default function Home ({navigation }) {
 
     return (
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>

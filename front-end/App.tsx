@@ -4,10 +4,11 @@ import Home from "./screens/Home";
 import {Provider} from "react-redux";
 import {store} from "./redux/store";
 import Strategy from "./screens/Strategy";
+import React from "react";
 
 const Stack = createNativeStackNavigator()
 
-export default function App() {
+export default function App() : React.JSX.Element {
   return (
       <NavigationContainer>
         <Provider store={store}>

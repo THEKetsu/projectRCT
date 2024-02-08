@@ -2,15 +2,14 @@ import React, {useEffect, useState} from 'react';
 import {View, Text, TouchableOpacity, StyleSheet, Dimensions} from 'react-native';
 import Player from '../../classes/Player';
 import Ballon from '../../classes/Ballon';
+import {useAppSelector} from "../../hooks/reduxHooks";
+import {RootState} from "../../redux/store";
 
 const dimWidth = Dimensions.get('window').width;
 const dimHeight = Dimensions.get('window').height;
 
 interface PositionProps {
     sendDataToB: React.Dispatch<React.SetStateAction<number>>;
-    receivedData: number;
-    receivedPosition: [number, Player[], Ballon[]][];
-    sendSavedData: React.Dispatch<React.SetStateAction<[number, Player[], Ballon[]][]>>;
     handleClickZoom: () => void;
     handleClickAdd: () => void;
     handleCLickBallMode: () => void;
@@ -18,35 +17,31 @@ interface PositionProps {
 
 export default function Position({
     sendDataToB,
-    receivedData,
-    receivedPosition,
-    sendSavedData,
     handleClickZoom,
     handleClickAdd,
     handleCLickBallMode
   }: PositionProps) {
     const [numberOfPosition, setNumberOfPosition] = useState<number[]>([1, 2]);
+    const toolbar = useAppSelector((state: RootState) => state.toolbar)
 
     useEffect(() => {
-        console.log(receivedData);
 
         let different = true;
         numberOfPosition.map((i) => {
-            if (i == receivedData) {
+            if (toolbar.positionList.some((item : [number, Player[], Ballon[]]) => item[0] === i)) {
                 different = false;
             }
         })
-        if (receivedData != 0 && different) {
-            setNumberOfPosition(prevPositions => [...prevPositions, receivedData]);
+        if (toolbar.positionList[0][0] != 0 && different) {
+            setNumberOfPosition(toolbar.positionList.map((item : [number, Player[], Ballon[]]) => item[0]));
         }
-    }, [receivedData]);
+    }, [toolbar.positionList[0][0]]);
 
     const handlePress = (item: number) => {
         sendDataToB(item);
 
-        if (receivedPosition[0][0] != 0) {
-            console.log("Position reçu", receivedPosition)
-            sendSavedData(receivedPosition);
+        if (toolbar.positionList[0][0] != 0) {
+            console.log("Position reçu", toolbar.positionList)
         }
     };
 

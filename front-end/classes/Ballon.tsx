@@ -1,4 +1,7 @@
 class Ballon {
+    static Ballon(arg0: number[], arg1: never[], arg2: string): Ballon[] {
+        throw new Error("Method not implemented.");
+    }
 
     position: number[];
     svg_ballon : number[];
