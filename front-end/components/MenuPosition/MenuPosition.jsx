@@ -35,7 +35,7 @@ export default function MenuPosition() {
         <Button title="Nouvelle Page" onPress={createNewPage} />
       </ScrollView>
 
-      <View style={styles.pageContainer}>
+      {/* <View style={styles.pageContainer}>
         <View style={styles.pageContent}>
           {currentPage === 'page1' && pageCount === 1 && <PositionJoueur />}
           {currentPage !== 'page1' && (
@@ -44,7 +44,7 @@ export default function MenuPosition() {
             </View>
           )}
         </View>
-      </View>
+      </View> */}
     </View>
   );
 };

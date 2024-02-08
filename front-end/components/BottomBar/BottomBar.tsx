@@ -44,11 +44,11 @@ const AnimatedBottomBar = () => {
   // Rendu du composant
   return (
     <View style={styles.container}>
-
+      <MenuPosition></MenuPosition>
       {/* Barre inférieure animée */}
       <Animated.View style={[styles.bar, { height: barHeight }]}>
         {/* Bouton pour déclencher l'animation */}
-        <MenuPosition></MenuPosition>
+        
         <TouchableOpacity onPress={toggleBar} style={styles.button}>
         { collapsed && (<Image
           style={styles.displayBottomImage}
