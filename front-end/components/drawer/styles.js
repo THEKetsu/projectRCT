@@ -62,37 +62,102 @@ let styles = StyleSheet.create({
     },
     drawerLeft: {
         position: 'absolute',
-        width: '20%',
+        width: '40%',
         height: '100%',
-        opacity: 0.8,
+        opacity: 1,
         zIndex:2,
       },
       drawerLeftContent: {
-        flex:1,
         width: '100%',
-        height: '100%',
         flexDirection: 'column',
-        backgroundColor: 'red',
       },
+
+
       menuDrawerLeft: {
-        flex: 1,
-        marginTop: 20,
-        backgroundColor: 'blue',
-        flexDirection: 'row',
-        justifyContent: 'flex-start',
-        alignItems: 'flex-start',
-        marginLeft: 10,
-        marginRight: 5,
-      },
-      listDrawerLeft: {
-        flex: 1,
+        height: '10%',
         backgroundColor: '#D9D9D9',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        flexDirection: 'row',
+        paddingHorizontal: '2%'
+      },
+
+      textTop: {
+      flexDirection: 'row',
+      alignItems: 'center'
+      },
+
+      textTopContent:{
+        fontSize: 10,
+        color: '#373737',
+      },
+
+      imagesTop: {
+        marginRight: '10%'
+      },
+      
+
+      listDrawerLeft: {
+        height: '80%',
+        backgroundColor: '#959595',
         flexDirection: 'list',
         alignItems: 'center',
-        justifyContent: 'center',
-        marginLeft: 10,
-        marginRight: 5,
+        opacity: 0.9,
+
       },
+      bottomDrawerLeft: {
+        height: '10%',
+        backgroundColor: '#D9D9D9',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between', // Pour espacer les éléments
+        paddingHorizontal: 10, // Ajouter un padding horizontal pour espacer du bord de l'écran
+      },
+      
+      buttonBottomDrawerLeft: {
+        marginLeft: 15,
+        marginBottom: 5,
+        justifyContent: 'center',
+        alignItems: 'start',
+      },
+
+      textBottom: {
+        marginRight: 10,
+        justifyContent: 'center',
+        alignItems: 'end',
+      },
+      textBottomContent:{
+        fontSize: 15,
+        fontWeight: 'bold',
+        fontFamily: 'Arial',
+        color: '#373737',
+        textAlign: 'right', // Aligner le texte à droite
+      },
+      textTop: {
+        marginRight: 10,
+      },
+      listItem:{
+        borderRadius: 10,
+        padding: 10,
+        backgroundColor: '#D9D9D9',
+        margin: 5,
+        width: '90%',
+      },
+      textView: {
+        marginLeft: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+
+      scrollStyle: {
+        width: '100%',
+        marginLeft: 10
+      },
+
+      Field:{
+        borderRadius: 10,
+        width:'100%'
+      }
 })
 
 export default styles;
