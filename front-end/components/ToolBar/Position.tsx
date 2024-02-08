@@ -130,6 +130,14 @@ export default function Position({
                                     color={"black"}
                                 />
             </TouchableOpacity>
+            <TouchableOpacity onPress={handleCLickBallMode} style={[styles.buttonBase, !collapsed && {display: 'none'}]}>
+                {/* Mode crayon */}
+                <FontAwesome
+                                    name={"pencil"}
+                                    size={'200%'}
+                                    color={"black"}
+                                />
+            </TouchableOpacity>
             </Animated.View>
         </Animated.View>
     );
