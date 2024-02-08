@@ -26,27 +26,63 @@ export default function FieldHandler() {
     const [buttonZoom, setButtonZoom] = useState(true);
     const [buttonADDPlayer, setButtonValueAdd] = useState(false);
     const [buttonBallMode, setballMode] = useState(false);
+    const [buttonDrawMode, setdrawMode] = useState(false);
     const [dataFromA, setDataFromA] = useState(0);
     const [dataForPosition, setDataForPosition] = useState(0);
     const [dataForSave, setDataForSave] = useState<[number, Player[], Ballon[]][]>([[0, [stupidPlayer],[stupidBallon]]]);
     const [dataForReturn, setDataForReturn] = useState<[number, Player[], Ballon[]][]>([[0, [stupidPlayer],[stupidBallon]]]);
 
     const handleClickZoom = () => {
-        setButtonValueAdd(false);
-        setButtonZoom(true);
-        setballMode(false);
+        if(buttonZoom){
+            setButtonValueAdd(false);
+            setButtonZoom(false);
+            setballMode(false);
+        }else{
+            setButtonValueAdd(false);
+            setButtonZoom(true);
+            setballMode(false);
+        }
+        
+    };
+    const handleClickDraw = () => {
+        if(buttonDrawMode){
+            setButtonValueAdd(false);
+            setButtonZoom(false);
+            setballMode(false);
+            setdrawMode(false);
+        }else{
+            setButtonValueAdd(false);
+            setButtonZoom(false);
+            setballMode(false);
+            setdrawMode(true);
+        }
+        
     };
 
     const handleClickAdd = () => {
-        setButtonZoom(false);
-        setButtonValueAdd(true);
-        setballMode(false);
+        if(buttonADDPlayer){
+            setButtonZoom(false);
+            setButtonValueAdd(false);
+            setballMode(false);
+        }else{
+            setButtonZoom(false);
+            setButtonValueAdd(true);
+            setballMode(false);
+        }
+        
     };
 
     const handleClickBallMode = () => {
-        setButtonZoom(false);
-        setButtonValueAdd(false);
-        setballMode(true);
+        if(buttonBallMode){
+            setButtonZoom(false);
+            setButtonValueAdd(false);
+            setballMode(false);
+        }else{
+            setButtonZoom(false);
+            setButtonValueAdd(false);
+            setballMode(true);
+        }
+        
         
     };
 
@@ -57,6 +93,7 @@ export default function FieldHandler() {
                     buttonValue={buttonZoom}
                     buttonADDPlayer={buttonADDPlayer}
                     buttonBallMode={buttonBallMode}
+                    buttonDrawMode={buttonDrawMode}
                     sendDataToA={dataFromA}
                     sendNewsToPosition={setDataForPosition}
                     sendSaveOfPosition={setDataForSave}
@@ -70,6 +107,7 @@ export default function FieldHandler() {
                     handleClickZoom={handleClickZoom}
                     handleClickAdd={handleClickAdd}
                     handleCLickBallMode={handleClickBallMode}
+                    handleClickDrawMode={handleClickDraw}
                 />
             </GestureHandlerRootView>
         </View>

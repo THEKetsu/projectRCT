@@ -16,6 +16,7 @@ interface PositionProps {
     handleClickZoom: () => void;
     handleClickAdd: () => void;
     handleCLickBallMode: () => void;
+    handleClickDrawMode: () => void;
   }
 
   
@@ -26,7 +27,8 @@ export default function Position({
     sendSavedData,
     handleClickZoom,
     handleClickAdd,
-    handleCLickBallMode
+    handleCLickBallMode,
+    handleClickDrawMode
   }: PositionProps) {
     const [numberOfPosition, setNumberOfPosition] = useState<number[]>([1, 2]);
     const [collapsed, setCollapsed] = useState(false); // État pour suivre l'état de la barre (repliée ou non)
@@ -130,7 +132,7 @@ export default function Position({
                                     color={"black"}
                                 />
             </TouchableOpacity>
-            <TouchableOpacity onPress={handleCLickBallMode} style={[styles.buttonBase, !collapsed && {display: 'none'}]}>
+            <TouchableOpacity onPress={handleClickDrawMode} style={[styles.buttonBase, !collapsed && {display: 'none'}]}>
                 {/* Mode crayon */}
                 <FontAwesome
                                     name={"pencil"}

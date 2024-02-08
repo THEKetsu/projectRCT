@@ -37,6 +37,7 @@ interface ZoomableSVGProps {
     buttonValue: boolean;
     buttonADDPlayer: boolean;
     buttonBallMode : boolean;
+    buttonDrawMode: boolean;
     //Entre component
     sendDataToA: number;
     sendNewsToPosition: (data: number) => void;
@@ -51,6 +52,7 @@ export function Field(props: ZoomableSVGProps) {
     const [zoomMode, setZoomMode] = useState(false);
     const [addMode, setAddMode] = useState(false);
     const [ballMode, setballMode] = useState(false);
+    const [drawMode, setDrawMode] = useState(false);
     const [delta, setDelta] = useState(1);
     const [centerForP, setCenterForP] = useState([0, 0]);
     const [proportion, setProportion] = useState(1.0);
@@ -58,6 +60,9 @@ export function Field(props: ZoomableSVGProps) {
     const [translationIncrement, setTranslationInc] = useState([0, 0]);
     const [indexPosition, setIndexPosition] = useState(1);
     const [closestPlayer, setClosestPlayer] = useState<[string,number[]]>(["",[]])
+
+    //const [checkForEnd,]
+
     const [svgSize, setSvgSize] = useState({
         width: useWindowDimensions().width,
         height: useWindowDimensions().height
@@ -78,11 +83,25 @@ export function Field(props: ZoomableSVGProps) {
 
     useEffect(() => {
         if (props.buttonADDPlayer) {
-            setZoomMode(false);
+            
             setAddMode(true);
+            setZoomMode(false);
             setballMode(false);
+            setDrawMode(false);
         }
+        
     }, [props.buttonADDPlayer]);
+
+    useEffect(() => {
+        if (props.buttonDrawMode) {
+            
+            setAddMode(false);
+            setZoomMode(false);
+            setballMode(false);
+            setDrawMode(true);
+        }
+        
+    }, [props.buttonDrawMode]);
 
     useEffect(() => {
 
@@ -93,24 +112,36 @@ export function Field(props: ZoomableSVGProps) {
             setIndexPosition(0);
         } else {
             setIndexPosition(props.sendDataToA - 1);
+            
         }
+        
+       
+
 
     }, [props.sendDataToA]);
 
     useEffect(() => {
         if (props.buttonValue) {
+            
+            setZoomMode(true);
             setAddMode(false);
             setballMode(false);
-            setZoomMode(true);
+            setDrawMode(false);
         }
+        
+        
     }, [props.buttonValue]);
 
     useEffect(() => {
         if (props.buttonBallMode) {
-            setAddMode(false);
+            
             setballMode(true);
+            setAddMode(false);
             setZoomMode(false);
+            setDrawMode(false);
         }
+        
+        
     }, [props.buttonBallMode]);
 
 
@@ -362,24 +393,23 @@ export function Field(props: ZoomableSVGProps) {
             }
 
             //ZOOM
+            // let b = [superSvg_Field[0][0],superSvg_Field[0][1]];
+            // let c = [b[0]*Number(scale.toFixed(2)),b[1]*Number(scale.toFixed(2))]
+            // console.log(b,c);
+            // diffSVGAll(myBase);
 
             proportionAll(Number(scale.toFixed(2)))
 
             setProportion(Number(scale.toFixed(2)));
 
-            // if(distance1.length > 1){
-            //   setDistance2([distance1[0] * Number(scale.toFixed(2)),distance1[1] * Number(scale.toFixed(2))]);
-            // }
 
             let center0 = [((superSvg_Field[0][0] + superSvg_Field[0][2] + superSvg_Field[0][4] + superSvg_Field[0][5]) / 4), ((superSvg_Field[0][1] + superSvg_Field[0][3] + superSvg_Field[0][3] + superSvg_Field[0][6]) / 4)]
             if (boolLock) {
 
                 diffMovingAll([translationIncrement[0], translationIncrement[1]]);
-
-            } else {
-
-                diffSVGAll(myBase);
+                
             }
+
 
             //On refresh le svg
 
@@ -917,7 +947,7 @@ export function Field(props: ZoomableSVGProps) {
     const showBallon = (move: number[]) => {
         if (move[0] != -100 || move[1] != -100) {
 
-            move = [move[0]-move[0]*0.005,move[1]-move[1]*0.005];
+            move = [move[0]-move[0]*0.01,move[1]-move[1]*0.008];
 
             //La position est déjà reset dans l'animation, on ne le fait pas 2 fois
             if(!animationEnCours){
@@ -1103,7 +1133,7 @@ export function Field(props: ZoomableSVGProps) {
                 });
 
                 //LE else if suivant devrais être remplacer par un drawMode (plus logique)
-            } else if (!zoomMode && svgRef.current) {
+            } else if (drawMode && svgRef.current) {
                 //Selection check (modif speed)
                 let onPlayer = false;
                 positionList[indexPosition][1].map((joueur) => {
@@ -1131,7 +1161,7 @@ export function Field(props: ZoomableSVGProps) {
                     })
                 });
 
-                if (!onPlayer) {
+                if (!onPlayer && drawMode) {
                     svgRef.current.measure((fx: number, fy: number, width: number, height: number, px: number, py: number) => {
 
                         px1 = px;
@@ -1164,11 +1194,7 @@ export function Field(props: ZoomableSVGProps) {
 
     };
 
-    const lockAddAndZoom = () => {
-        setAddMode(false);
-        setZoomMode(false);
-        setballMode(false);
-    };
+  
 
     function comparePositions(positionA: number[], positionB: number[]): boolean {
         // Replace this logic with your actual comparison logic
@@ -1176,6 +1202,7 @@ export function Field(props: ZoomableSVGProps) {
     }
 
     let copyOfPositionList = positionList;
+
     useEffect(() => {
         if (addMode || zoomMode) {
             copyOfPositionList = positionList;
@@ -1190,6 +1217,8 @@ export function Field(props: ZoomableSVGProps) {
         setAddMode(false);
         setballMode(false);
         setZoomMode(false);
+        setDrawMode(false);
+
         setPathDrawing(false);
 
         
@@ -1246,6 +1275,7 @@ export function Field(props: ZoomableSVGProps) {
 
         if(ballonMove){
             //On construit un array de déplacement
+            positionList[indexPosition][2][0].idChange("");
             let listNumb = [[-100, -100], [positionList[indexPosition][2][0].position[0], 1 - positionList[indexPosition][2][0].position[1]]];
             let addCx = 1;
             let addCy = 1;
@@ -1267,6 +1297,7 @@ export function Field(props: ZoomableSVGProps) {
 
             let [finalX, finalY] =  positionList[indexPosition + 1][2][0].position;
 
+            console.log("OK:",[finalX,finalY],"Current:",[currentX,currentY]);
             let antiCrashIndex = 0;//Dans le cas où qqun met de mauvaise valeur JSON
             //On continue tant que x et y ne sont pas assez proche du final
 
@@ -1313,7 +1344,7 @@ export function Field(props: ZoomableSVGProps) {
 
             const newAnimationPathBallon = listNumb.slice(1);
 
-            let getXYListStart = getPourcentageCenter(newAnimationPathBallon[0][0],newAnimationPathBallon[0][1]);
+            let getXYListStart = getPourcentageCenter(newAnimationPathBallon[0][0],1-newAnimationPathBallon[0][1]);
             let getXYListEnd = getPourcentageCenter(newAnimationPathBallon[newAnimationPathBallon.length - 1][0],1-newAnimationPathBallon[newAnimationPathBallon.length - 1][1]);
             setAnimationPathBallon([getXYListStart,getXYListEnd]);
             
@@ -1331,7 +1362,7 @@ export function Field(props: ZoomableSVGProps) {
 
     const animateSuite = (atLeastOneChange : boolean, listJoueurModify: [string, number[]][] ) => {
 
-        positionList[indexPosition][1].map((joueur) => {
+        positionList[indexPosition][1].map((joueur,index) => {
             //Check if ID === an ID of listJoueurModify, recup its index on listJoueurModify
             const modifyIndex = listJoueurModify.findIndex(([id]) => id === joueur.id);
 
@@ -1415,6 +1446,10 @@ export function Field(props: ZoomableSVGProps) {
 
 
                 goAnimation(joueur, 0);
+
+                // if(index == positionList[indexPosition][1].length - 1){
+                //     console.log("FIN");
+                // }
             }
 
         });
@@ -2082,20 +2117,7 @@ export function Field(props: ZoomableSVGProps) {
                 />)}
                 
 
-                <Pressable
-                    onPress={lockAddAndZoom}
-                    style={({pressed}: { pressed: any }) => [
-                        {
-                            backgroundColor: pressed ? 'rgb(210, 230, 255)' : 'rgb(65, 105, 225)',
-                            padding: 10,
-                            borderRadius: 5,
-                        },
-                    ]}
-                >
-                    <Text>
-                        Draw
-                    </Text>
-                </Pressable>
+              
 
 
                 { ballMode && (<Pressable
