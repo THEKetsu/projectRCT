@@ -1,19 +1,30 @@
 import React, {useEffect, useState} from 'react';
 import {View, Text, TouchableOpacity, StyleSheet, Dimensions} from 'react-native';
-
+import Player from '../../classes/Player';
+import Ballon from '../../classes/Ballon';
 
 const dimWidth = Dimensions.get('window').width;
 const dimHeight = Dimensions.get('window').height;
 
-export default function Position({
-                                     sendDataToB,
-                                     receivedData,
-                                     receivedPosition,
-                                     sendSavedData,
-                                     handleClickZoom,
-                                     handleClickAdd
-                                 }) {
+interface PositionProps {
+    sendDataToB: React.Dispatch<React.SetStateAction<number>>;
+    receivedData: number;
+    receivedPosition: [number, Player[], Ballon[]][];
+    sendSavedData: React.Dispatch<React.SetStateAction<[number, Player[], Ballon[]][]>>;
+    handleClickZoom: () => void;
+    handleClickAdd: () => void;
+    handleCLickBallMode: () => void;
+  }
 
+export default function Position({
+    sendDataToB,
+    receivedData,
+    receivedPosition,
+    sendSavedData,
+    handleClickZoom,
+    handleClickAdd,
+    handleCLickBallMode
+  }: PositionProps) {
     const [numberOfPosition, setNumberOfPosition] = useState<number[]>([1, 2]);
 
     useEffect(() => {
@@ -60,6 +71,10 @@ export default function Position({
 
             <TouchableOpacity onPress={handleClickAdd} style={styles.buttonBase}>
                 <Text>Add Player</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity onPress={handleCLickBallMode} style={styles.buttonBase}>
+                <Text>Mode Ballon</Text>
             </TouchableOpacity>
         </View>
     );
