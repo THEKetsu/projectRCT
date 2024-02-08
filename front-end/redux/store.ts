@@ -1,10 +1,12 @@
 import { configureStore } from '@reduxjs/toolkit'
 import {testUserSlice} from "./slices/testUserSlice";
+import {toolbarSlice} from "./slices/toolbarSlice";
 // ...
 
 export const store = configureStore({
     reducer: {
-        testUser: testUserSlice.reducer
+        testUser: testUserSlice.reducer,
+        toolbar: toolbarSlice.reducer
     },
 })
 
