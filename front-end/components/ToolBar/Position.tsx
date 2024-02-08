@@ -106,7 +106,7 @@ export default function Position({
             </Animated.View>
             <Animated.View style={styles.buttonContainer}>
 
-            <TouchableOpacity onPress={handleClickZoom} style={[styles.buttonBase, !collapsed && {display: 'none'}]}>
+            <TouchableOpacity onPress={handleClickAdd} style={[styles.buttonBase, !collapsed && {display: 'none'}]}>
                 {/* Mode ZOOM */}
                 <Ionicons
                                     name={"shirt-sharp"}
@@ -115,7 +115,7 @@ export default function Position({
                                 />
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={handleClickAdd} style={[styles.buttonBase, !collapsed && {display: 'none'}]}>
+            <TouchableOpacity onPress={handleClickZoom} style={[styles.buttonBase, !collapsed && {display: 'none'}]}>
                 {/* Add Player */}
                 <FontAwesome
                                     name={"arrows"}
