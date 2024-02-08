@@ -14,6 +14,7 @@ interface PositionProps {
     handleClickZoom: () => void;
     handleClickAdd: () => void;
     handleCLickBallMode: () => void;
+    handleClickDrawMode: () => void;
   }
 
 export default function Position({
@@ -23,7 +24,8 @@ export default function Position({
     sendSavedData,
     handleClickZoom,
     handleClickAdd,
-    handleCLickBallMode
+    handleCLickBallMode,
+    handleClickDrawMode
   }: PositionProps) {
     const [numberOfPosition, setNumberOfPosition] = useState<number[]>([1, 2]);
 
@@ -75,6 +77,10 @@ export default function Position({
             
             <TouchableOpacity onPress={handleCLickBallMode} style={styles.buttonBase}>
                 <Text>Mode Ballon</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={handleClickDrawMode} style={styles.buttonBase}>
+                <Text>Mode Draw</Text>
             </TouchableOpacity>
         </View>
     );
