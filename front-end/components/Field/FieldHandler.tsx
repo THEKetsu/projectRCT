@@ -19,17 +19,10 @@ const dimWidth = Dimensions.get('window').width;
 const dimHeight = Dimensions.get('window').height;
 
 export default function FieldHandler() {
-    //On ne peut pas donner de liste vide pour init alors on le remplit de valeur inutile, qui ne seront même pas utilisé :/
-    let stupidPlayer = Player.createPlayer([0, 0], "0B", [], [], 1);
-    let stupidBallon = Ballon.createBallon([0,0],[],"");
-
     const [buttonZoom, setButtonZoom] = useState(true);
     const [buttonADDPlayer, setButtonValueAdd] = useState(false);
     const [buttonBallMode, setballMode] = useState(false);
     const [dataFromA, setDataFromA] = useState(0);
-    const [dataForPosition, setDataForPosition] = useState(0);
-    const [dataForSave, setDataForSave] = useState<[number, Player[], Ballon[]][]>([[0, [stupidPlayer],[stupidBallon]]]);
-    const [dataForReturn, setDataForReturn] = useState<[number, Player[], Ballon[]][]>([[0, [stupidPlayer],[stupidBallon]]]);
 
     const handleClickZoom = () => {
         setButtonValueAdd(false);
@@ -58,15 +51,9 @@ export default function FieldHandler() {
                     buttonADDPlayer={buttonADDPlayer}
                     buttonBallMode={buttonBallMode}
                     sendDataToA={dataFromA}
-                    sendNewsToPosition={setDataForPosition}
-                    sendSaveOfPosition={setDataForSave}
-                    receiveSavedPosition={dataForReturn}
                 />
                 <Position
                     sendDataToB={setDataFromA}
-                    receivedData={dataForPosition}
-                    receivedPosition={dataForSave}
-                    sendSavedData={setDataForReturn}
                     handleClickZoom={handleClickZoom}
                     handleClickAdd={handleClickAdd}
                     handleCLickBallMode={handleClickBallMode}

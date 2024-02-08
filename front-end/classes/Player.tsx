@@ -1,4 +1,7 @@
 class Player {
+  static Player(arg0: number[], arg1: string, arg2: never[], arg3: never[], arg4: number): Player[] {
+      throw new Error("Method not implemented.");
+  }
 
   id: string;
   position: number[];
@@ -16,8 +19,7 @@ class Player {
   }
 
   static createPlayer(position : number[], id: string, myArray: number[][], svg_player : number[], speed : number): Player {
-    const player = new Player(position, id, myArray,svg_player,speed);
-    return player;
+    return new Player(position, id, myArray, svg_player, speed);
   }
 
   svgValue(svg: number[]): void{
