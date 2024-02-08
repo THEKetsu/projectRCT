@@ -5,20 +5,18 @@ class Player {
   myArray: number[][];
   svg_player : number[];
   speed : number;
-  ballonOn : string;
 
 
-  constructor(position : number[], id: string, myArray: number[][], svg_player: number[],speed : number, ballonOn: string) {
+  constructor(position : number[], id: string, myArray: number[][], svg_player: number[],speed : number) {
     this.position = position;
     this.id = id;
     this.myArray = myArray;
     this.svg_player = svg_player;
     this.speed = speed;
-    this.ballonOn = ballonOn;
   }
 
-  static createPlayer(position : number[], id: string, myArray: number[][], svg_player : number[], speed : number, ballonOn :string): Player {
-    const player = new Player(position, id, myArray,svg_player,speed,ballonOn);
+  static createPlayer(position : number[], id: string, myArray: number[][], svg_player : number[], speed : number): Player {
+    const player = new Player(position, id, myArray,svg_player,speed);
     return player;
   }
 
