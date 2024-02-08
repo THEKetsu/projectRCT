@@ -1,0 +1,44 @@
+[
+    {
+        "position" : 1,
+        "data": 
+        [
+            {
+                "id": "B1",
+                "position": [[0.5],[0.5]],
+                "array": []
+            },
+            {
+                "id": "B2",
+                "position": [[0.2],[0.3]],
+                "array": []
+            }
+        ],
+        "ballon" :
+        [ 
+            {
+                "position": [[0.6],[0.6]],
+                "idJoueur": ""
+            }
+        ]
+    },
+    {
+        "position" : 2,
+        "data": 
+        [
+            {
+                "id": "R1",
+                "position": [[0.5],[0.5]],
+                "array": []
+            },
+            {
+                "id": "B2",
+                "position": [[0.8],[0.7]],
+                "array": []
+            }
+        ],
+        "ballon" :
+        [ 
+        ]
+    }
+]
