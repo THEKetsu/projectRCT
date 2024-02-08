@@ -58,10 +58,13 @@ export function Field(props: ZoomableSVGProps) {
     const [proportion, setProportion] = useState(1.0);
     const [translationPrev, setTranslationPrev] = useState([1.0, 1.0]);
     const [translationIncrement, setTranslationInc] = useState([0, 0]);
+
+    const [translationPrevPlayer, setTranslationPrevPlayer] = useState([1.0, 1.0]);
+    const [translationIncrementPlayer, setTranslationIncPlayer] = useState([0, 0]);
     const [indexPosition, setIndexPosition] = useState(1);
     const [closestPlayer, setClosestPlayer] = useState<[string,number[]]>(["",[]])
 
-    //const [checkForEnd,]
+    const [checkForEnd, setcheckForEnd] = useState<Boolean[]>([]);
 
     const [svgSize, setSvgSize] = useState({
         width: useWindowDimensions().width,
@@ -447,14 +450,14 @@ export function Field(props: ZoomableSVGProps) {
 
     };
 
-    //Un compteur pour réduire la vitesse de prise de valeur (translation) qui créer des bugs d'affichage
-    let receivedTranslationsCounter = 0;
+    
 
     const [currentID, setCurrentID] = useState('');
     const [freeID, setFreeID] = useState(-1);
 
     const onGestureEvent = (event: PanGestureHandlerGestureEvent) => {
-
+        //Un compteur pour réduire la vitesse de prise de valeur (translation) qui créer des bugs d'affichage
+        let receivedTranslationsCounter = 0;
         if (pathDrawing) {
             const {translationX, translationY, velocityX, velocityY} = event.nativeEvent;
             playerPaths.map((chemin) => {
@@ -630,11 +633,39 @@ export function Field(props: ZoomableSVGProps) {
                     //---Fin du mouv joueur
 
 
-                    receivedTranslationsCounter = 0;
                 }
             }
             ;
-        } 
+            //On bouge un joueur en DRAG & DROP
+        }else if(addMode && currentID != "" ){
+            const {translationX, translationY, velocityX, velocityY} = event.nativeEvent;
+
+            if (event.nativeEvent.state === State.ACTIVE && (translationX > -1000 && translationX < 1000 &&
+                translationY > -1000 && translationY < 1000) && (translationPrev[0] != translationX && translationPrev[1] != translationY)) {
+                receivedTranslationsCounter++;
+
+                if (receivedTranslationsCounter === 3) {
+
+                    setTranslationPrevPlayer([translationX, translationY]);
+
+                    setTranslationIncPlayer([translationIncrementPlayer[0] + (translationX - translationPrevPlayer[0]),
+                        translationIncrementPlayer[1] + (translationY - translationPrevPlayer[1])]);
+
+                        //diffMovingAll([translationIncrement[0], translationIncrement[1]]);
+                        positionList[indexPosition][1].map((j) => {
+                            if(j.id == currentID){
+                            j.svgValue(diffMoving(j.svg_player,xArrayPlayer,[translationIncrementPlayer[0], 
+                                translationIncrementPlayer[1]]));
+                            }
+                        })
+
+                        showPlayer();
+                        
+
+                }
+
+            }
+        }
     };
 
     const onHandlerStateChange = (event: PanGestureHandlerGestureEvent) => {
@@ -644,6 +675,9 @@ export function Field(props: ZoomableSVGProps) {
             setPathDrawing(false);
             setCurrentID('');
             setFreeID(-1);
+
+            setTranslationPrevPlayer([1.0, 1.0]);
+            setTranslationIncPlayer([0, 0]);
 
             setPrevPourcent([0, 0]);
 
@@ -1101,7 +1135,6 @@ export function Field(props: ZoomableSVGProps) {
 
                     const isInside: boolean = pointInPolygon([adjustedX, adjustedY], polygonPoints);
                     if (isInside) {
-
                         let pourcentX = (adjustedX - superField[0][0]) / (superField[0][5] - superField[0][0]);
                         let pourcentY = (adjustedY - superField[0][3]) / (superField[0][1] - superField[0][3]);
                         addPlayer([pourcentX, 1 - pourcentY], playerId);
@@ -1361,6 +1394,7 @@ export function Field(props: ZoomableSVGProps) {
     };
 
     const animateSuite = (atLeastOneChange : boolean, listJoueurModify: [string, number[]][] ) => {
+        let indexCheck = -1;
 
         positionList[indexPosition][1].map((joueur,index) => {
             //Check if ID === an ID of listJoueurModify, recup its index on listJoueurModify
@@ -1370,7 +1404,8 @@ export function Field(props: ZoomableSVGProps) {
             if (joueur.myArray.length > 0) {
                 //On start l'animation
                 atLeastOneChange = true;
-                goAnimation(joueur, 0);
+                setcheckForEnd((...prevCheck) => [false]);
+                goAnimation(joueur, 0, indexCheck);
 
                 //On reset le chemin dessiné pour l'effacer [NOPE echec]
                 const existingIndex = playerPaths.findIndex((p) => p.id === joueur.id + 'P');
@@ -1444,12 +1479,11 @@ export function Field(props: ZoomableSVGProps) {
                 listNumb.push([listJoueurModify[modifyIndex][1][0], 1 - listJoueurModify[modifyIndex][1][1]])
                 joueur.pathArraySetup(listNumb);
 
+                setcheckForEnd((...prevCheck) => [false]);
+                indexCheck = indexCheck + 1;
+                goAnimation(joueur, 0, indexCheck);
 
-                goAnimation(joueur, 0);
-
-                // if(index == positionList[indexPosition][1].length - 1){
-                //     console.log("FIN");
-                // }
+             
             }
 
         });
@@ -1490,7 +1524,7 @@ export function Field(props: ZoomableSVGProps) {
 
     };
 
-    const goAnimation = (j: Player, index: number) => {
+    const goAnimation = (j: Player, index: number, indexCheck: number) => {
         //La speed devra dépendre d'une distance à calculé selon l'array.
         let timingAnimation = 100;//ms
         if (j.myArray.length > index) {
@@ -1520,16 +1554,45 @@ export function Field(props: ZoomableSVGProps) {
             if (j.myArray.length == index + 1 && j.myArray[index][0] != -100) {
                 j.positionChange([j.myArray[index][0], 1 - j.myArray[index][1]])
             }
-            setTimeout(() => goAnimation(j, index + 1), timingAnimation / (j.speed + 1));
+            setTimeout(() => goAnimation(j, index + 1, indexCheck), timingAnimation / (j.speed + 1));
         } else {
             if (j.myArray[0][0] != -100) {
                 j.positionChange([j.myArray[0][0], 1 - j.myArray[0][1]]);
+
+                
             } else {
                 j.positionChange([j.myArray[1][0], 1 - j.myArray[1][1]]);
                 j.pathArraySetup([]);
+                
             }
-        }
+            //Prevenir de la fin
+            setcheckForEnd((prevCheck) => {
+                let changeCheck = prevCheck;
+                changeCheck[indexCheck] = true;
+                return(changeCheck);
+            });
 
+            checkEndingAnimation();
+        }
+    };
+
+    const checkEndingAnimation = () => {
+       
+        if(checkForEnd.some((item) => item === false)){
+            //Pas fini
+        }else{
+            //Fini
+            //Passage position suivante
+            if(positionList.length - 1 > indexPosition){
+                setIndexPosition(indexPosition +1);
+
+                //Si on anime tout jusqu'à la fin
+                // if(superAnimation){
+                //     animate();
+                // }
+            }
+            
+        }
     };
 
     const prioAnimation = (j: number[][], index: number, atLeastOneChange : boolean, listJoueurModify: [string, number[]][]) => {
