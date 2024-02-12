@@ -28,7 +28,7 @@ class Ballon {
     idChange(id: string): void{
       this.idJoueur = id;
     }
-  
+
   }
   
   export default Ballon;

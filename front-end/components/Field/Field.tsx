@@ -1,5 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Dimensions, Platform, Pressable, StyleSheet, Text, TextInput, useWindowDimensions, View} from 'react-native';
+import {Dimensions, Platform, Pressable, StyleSheet, Text, 
+    TextInput, useWindowDimensions, View} from 'react-native';
 import Svg, {Path} from 'react-native-svg';
 import {
     HandlerStateChangeEvent,
@@ -31,6 +32,7 @@ type numberMaillot = {
     id: string;
     position: number[];
     textContent: string;
+    textSize : number;
 }
 
 interface ZoomableSVGProps {
@@ -48,21 +50,26 @@ interface ZoomableSVGProps {
 
 export function Field(props: ZoomableSVGProps) {
     const [prevPourcent, setPrevPourcent] = useState([0, 0]);
+    const [autoLink, setAutoLink] = useState(true);
     const [boolLock, setLock] = useState(false);
     const [zoomMode, setZoomMode] = useState(false);
     const [addMode, setAddMode] = useState(false);
     const [ballMode, setballMode] = useState(false);
     const [drawMode, setDrawMode] = useState(false);
+    const [grabEnCours, setgrabEnCours] = useState(false);
+
     const [delta, setDelta] = useState(1);
     const [centerForP, setCenterForP] = useState([0, 0]);
     const [proportion, setProportion] = useState(1.0);
     const [translationPrev, setTranslationPrev] = useState([1.0, 1.0]);
     const [translationIncrement, setTranslationInc] = useState([0, 0]);
 
+
     const [translationPrevPlayer, setTranslationPrevPlayer] = useState([1.0, 1.0]);
-    const [translationIncrementPlayer, setTranslationIncPlayer] = useState([0, 0]);
     const [indexPosition, setIndexPosition] = useState(1);
     const [closestPlayer, setClosestPlayer] = useState<[string,number[]]>(["",[]])
+    const [listMaillot,setlistMaillot] = useState<numberMaillot[]>([]);
+
 
     const [checkForEnd, setcheckForEnd] = useState<Boolean[]>([]);
 
@@ -81,7 +88,7 @@ export function Field(props: ZoomableSVGProps) {
     let animationEnCours = false;
 
     useEffect(() => {
-        retrievePlayer()
+        retrievePlayer();
     }, []);
 
     useEffect(() => {
@@ -115,12 +122,11 @@ export function Field(props: ZoomableSVGProps) {
             setIndexPosition(0);
         } else {
             setIndexPosition(props.sendDataToA - 1);
+           
+            //simulateMouveRefresh();
             
         }
-        
-       
-
-
+ 
     }, [props.sendDataToA]);
 
     useEffect(() => {
@@ -131,8 +137,7 @@ export function Field(props: ZoomableSVGProps) {
             setballMode(false);
             setDrawMode(false);
         }
-        
-        
+ 
     }, [props.buttonValue]);
 
     useEffect(() => {
@@ -162,6 +167,8 @@ export function Field(props: ZoomableSVGProps) {
             });
         }
     }, [props.receiveSavedPosition]);
+
+  
 
 
     let [px1, py1] = [0, 0];
@@ -217,9 +224,10 @@ export function Field(props: ZoomableSVGProps) {
     const [currentDraw, setCurrentDraw] = useState<freeDraw[]>([]);
     let letDraw = currentDraw;
 
+    
+
 
     const setAll = () => {
-
         setSuperField(superSvg_Field);
 
         if (currentDraw) {
@@ -248,13 +256,15 @@ export function Field(props: ZoomableSVGProps) {
 
     const proportionAll = (prop: number) => {
 
+        center = [((superSvg_Field[0][0] + superSvg_Field[0][2] + superSvg_Field[0][4] + superSvg_Field[0][5]) / 4), ((superSvg_Field[0][1] + superSvg_Field[0][3] + superSvg_Field[0][3] + superSvg_Field[0][6]) / 4)]
 
-        lineSize = proportionSVG(lineSize, prop);
-
-
+        
         superSvg_Field.map((Thefield, index) => {
-            superSvg_Field[index] = proportionSVG(Thefield, prop);
+            superSvg_Field[index] = proportionSVG2(Thefield, prop, center,superXArray[index]);
+            //superSvg_Field[index] = proportionSVG(Thefield, prop);
         });
+        
+        lineSize = proportionSVG(lineSize, prop);
 
     };
 
@@ -273,6 +283,18 @@ export function Field(props: ZoomableSVGProps) {
 
     };
 
+    const proportionSVG2 = (svgArray: number[], proportionScale: number, center: number[], xArray: number[]) => {
+        return svgArray.map((value, index) => {
+            const isXCoordinate = xArray.includes(index);
+    
+            // Apply scaling based on whether it's an x or y coordinate
+            const diff = value - center[isXCoordinate ? 0 : 1];
+            const scaledDiff = diff * proportionScale;
+    
+            // Adjust the value based on whether it's an x or y coordinate
+            return center[isXCoordinate ? 0 : 1] + scaledDiff;
+        });
+    };
     const proportionSVG = (svgArray: number[], proportionScale: number) => {
 
         return svgArray.map((value) => value * proportionScale);
@@ -317,7 +339,7 @@ export function Field(props: ZoomableSVGProps) {
     const diffMoving = (svgArray: number[], xArray: number[], numb: number[]) => {
         svgArray = svgArray.map((value, index) => {
             if (xArray.includes(index)) {
-                // Subtract numb from the value
+                
                 return value + numb[0];
             } else {
                 return value + numb[1];
@@ -395,29 +417,33 @@ export function Field(props: ZoomableSVGProps) {
                 //\\
             }
 
-            //ZOOM
-            // let b = [superSvg_Field[0][0],superSvg_Field[0][1]];
-            // let c = [b[0]*Number(scale.toFixed(2)),b[1]*Number(scale.toFixed(2))]
-            // console.log(b,c);
-            // diffSVGAll(myBase);
+            let mcenter = [((superField[0][0] + superField[0][2] + superField[0][4] + superField[0][5]) / 4), ((superField[0][1] + superField[0][3] + superField[0][3] + superField[0][6]) / 4)]
+
+            let before = [mcenter[0],mcenter[1]];
+            let after = [mcenter[0]*Number(scale.toFixed(2)),mcenter[1]*Number(scale.toFixed(2))]
+
+            let midDiff = [before[0]-after[0],before[1]-after[1]];
 
             proportionAll(Number(scale.toFixed(2)))
 
+            diffMovingAll([translationIncrement[0],translationIncrement[1]]);
+            
+            // diffMovingAll([midDiff[0],
+            //     midDiff[1]]);
+
+            // let mcenter = [((superField[0][0] + superField[0][2] + superField[0][4] + superField[0][5]) / 4), ((superField[0][1] + superField[0][3] + superField[0][3] + superField[0][6]) / 4)]
+
+            // diffSVGAll(mcenter);
+
+            //A save for the proportion
             setProportion(Number(scale.toFixed(2)));
 
 
-            let center0 = [((superSvg_Field[0][0] + superSvg_Field[0][2] + superSvg_Field[0][4] + superSvg_Field[0][5]) / 4), ((superSvg_Field[0][1] + superSvg_Field[0][3] + superSvg_Field[0][3] + superSvg_Field[0][6]) / 4)]
-            if (boolLock) {
-
-                diffMovingAll([translationIncrement[0], translationIncrement[1]]);
-                
-            }
-
-
             //On refresh le svg
-
             setAll();
+            
 
+            //There we refresh the component on the field (baloon and player)
             center = [((superSvg_Field[0][0] + superSvg_Field[0][2] + superSvg_Field[0][4] + superSvg_Field[0][5]) / 4), ((superSvg_Field[0][1] + superSvg_Field[0][3] + superSvg_Field[0][3] + superSvg_Field[0][6]) / 4)]
             let svg_Mode = proportionSVG(player, ((superSvg_Field[0][5] - superSvg_Field[0][0]) / (svg_fieldUNCHANGED[5] - svg_fieldUNCHANGED[0])))
 
@@ -431,10 +457,10 @@ export function Field(props: ZoomableSVGProps) {
                 svg_Mode = diffSVG(svg_Mode, getCenterBallon(svg_Mode), xBallon_Array, getPourcentageCenter(ball.position[0], ball.position[1]))
                 ball.svgValue(svg_Mode);
             });
-            showPlayer();
-            //addElementsToSVG2(svg_field,svg_field2,svg_field3);
+            showPlayer(false);
         }
     };
+    
 
 
     const handleWheel = (event: React.WheelEvent) => {
@@ -453,11 +479,13 @@ export function Field(props: ZoomableSVGProps) {
     
 
     const [currentID, setCurrentID] = useState('');
+    const [changeID, setchangeID] = useState('');
     const [freeID, setFreeID] = useState(-1);
+    let receivedTranslationsCounter = 0;
+
 
     const onGestureEvent = (event: PanGestureHandlerGestureEvent) => {
         //Un compteur pour réduire la vitesse de prise de valeur (translation) qui créer des bugs d'affichage
-        let receivedTranslationsCounter = 0;
         if (pathDrawing) {
             const {translationX, translationY, velocityX, velocityY} = event.nativeEvent;
             playerPaths.map((chemin) => {
@@ -590,29 +618,34 @@ export function Field(props: ZoomableSVGProps) {
 
         } else if (zoomMode) {
             const {translationX, translationY, velocityX, velocityY} = event.nativeEvent;
-
+            
             if (event.nativeEvent.state === State.ACTIVE && (translationX > -1000 && translationX < 1000 &&
                 translationY > -1000 && translationY < 1000) && (translationPrev[0] != translationX && translationPrev[1] != translationY)) {
                 receivedTranslationsCounter++;
                 //On réduit les bug d'affichage du déplacement SVG (3 est arbitraire, sur mon pc marche bien ^^)
                 if (receivedTranslationsCounter === 3) {
-
                     setTranslationPrev([translationX, translationY]);
 
-                    setTranslationInc([translationIncrement[0] + (translationX - translationPrev[0]),
-                        translationIncrement[1] + (translationY - translationPrev[1])]);
+                    setTranslationInc([(translationIncrement[0]+ (translationX - translationPrev[0])),
+                        (translationIncrement[1] + (translationY - translationPrev[1]))]);
                     setLock(true);
 
 
                     //Conserve la proportion modifié du pinch (car @proportion est set)
 
+
+                    // let mcenter = [((superField[0][0] + superField[0][2] + superField[0][4] + superField[0][5]) / 4), ((superField[0][1] + superField[0][3] + superField[0][3] + superField[0][6]) / 4)]
+
+                    // diffSVGAll(center);
+
+
                     proportionAll(proportion);
 
-                    diffMovingAll([translationIncrement[0], translationIncrement[1]]);
+                    diffMovingAll([translationIncrement[0], 
+                        translationIncrement[1]]);
 
-
+                    
                     setAll();
-                    //addElementsToSVG2(svg_field,svg_field2,svg_field3);
 
                     //On fait suivre les joueurs, le center est reset pour le getPourcentageCenter (pour le mettre au bon endroit)
                     center = [((superSvg_Field[0][0] + superSvg_Field[0][2] + superSvg_Field[0][4] + superSvg_Field[0][5]) / 4), ((superSvg_Field[0][1] + superSvg_Field[0][3] + superSvg_Field[0][3] + superSvg_Field[0][6]) / 4)]
@@ -628,7 +661,8 @@ export function Field(props: ZoomableSVGProps) {
                         ball.svgValue(svg_Mode);
                     });
 
-                    showPlayer();
+                    showPlayer(false);
+                    receivedTranslationsCounter = 0;
 
                     //---Fin du mouv joueur
 
@@ -646,23 +680,94 @@ export function Field(props: ZoomableSVGProps) {
 
                 if (receivedTranslationsCounter === 3) {
 
+                    let grabB = false;
+
                     setTranslationPrevPlayer([translationX, translationY]);
 
-                    setTranslationIncPlayer([translationIncrementPlayer[0] + (translationX - translationPrevPlayer[0]),
-                        translationIncrementPlayer[1] + (translationY - translationPrevPlayer[1])]);
-
-                        //diffMovingAll([translationIncrement[0], translationIncrement[1]]);
+                   
+                    
                         positionList[indexPosition][1].map((j) => {
                             if(j.id == currentID){
-                            j.svgValue(diffMoving(j.svg_player,xArrayPlayer,[translationIncrementPlayer[0], 
-                                translationIncrementPlayer[1]]));
+
+                            let centerPlayer = [(j.svg_player[74] + j.svg_player[139] + (translationX - translationPrevPlayer[0])*2 ) / 2, 
+                            (j.svg_player[9] + j.svg_player[105] + (translationY - translationPrevPlayer[1])*2) / 2]
+
+                            //Check if centerPlayer is still inside the field (if not block it)
+
+                            const polygonPoints: number[][] = [
+                                [superField[0][0], superField[0][1]],
+                                [superField[0][2], superField[0][3]],
+                                [superField[0][4], superField[0][3]],
+                                [superField[0][5], superField[0][6]],
+                            ];
+    
+                            const isInside: boolean = pointInPolygon(centerPlayer, polygonPoints);
+
+                            if(isInside){
+                                setgrabEnCours(true);
+                                grabB = true;
+                                
+                                // if(positionList[indexPosition][2].length > 0){
+                                //     positionList[indexPosition][2][0].idChange("");
+                                // }
+
+                                j.svgValue(diffMoving(j.svg_player,xArrayPlayer,
+                                    [translationX - translationPrevPlayer[0], translationY - translationPrevPlayer[1]]));
+                                }
+
+                                //On efface le chemin, evite des bugs
+                                j.pathArraySetup([]);
+                                setPlayerPaths([]);
+
+
+
+                                positionList[indexPosition][1].map((joueur, index) => {
+                                    if(currentID == joueur.id){
+                                        let centerXY = getCenter(joueur.svg_player);
+                                        let pourcentX = (centerXY[0] - superField[0][0]) / (superField[0][5] - superField[0][0]);
+                                            let pourcentY = (centerXY[1] - superField[0][3]) / (superField[0][1] - superField[0][3]);
+                                        joueur.positionChange([pourcentX,1-pourcentY]);
+                                    }
+
+                                    if(positionList[indexPosition][2].length > 0){
+                                        if(j.id == positionList[indexPosition][2][0].idJoueur){
+                                         //let svg_Mode = proportionSVG(ballon_svg, ((superSvg_Field[0][5] - superSvg_Field[0][0]) / (svg_fieldUNCHANGED[5] - svg_fieldUNCHANGED[0])))
+                                         let svg_Mode = positionList[indexPosition][2][0].svg_ballon;
+                   
+                                         svg_Mode = diffSVG(svg_Mode, getCenterBallon(svg_Mode), xBallon_Array, getPourcentageCenter2(j.position[0], j.position[1]));
+                                         positionList[indexPosition][2][0].svgValue(svg_Mode);
+
+                                         let centerXY = getCenterBallon(svg_Mode);
+                                         let pourcentX = (centerXY[0] - superField[0][0]) / (superField[0][5] - superField[0][0]);
+                                         let pourcentY = (centerXY[1] - superField[0][3]) / (superField[0][1] - superField[0][3]);
+                                         positionList[indexPosition][2][0].positionChange([pourcentX,1-pourcentY]);
+
+                                       
+                                    }
+                                   }
+                                })
+
+                                
+
+                                 
+
+                            }else{
+                                
+                                return;
                             }
+    
+
+                            
+
                         })
 
-                        showPlayer();
+                        showPlayer(grabB);
+                        receivedTranslationsCounter = 0;
                         
 
                 }
+
+
 
             }
         }
@@ -671,18 +776,30 @@ export function Field(props: ZoomableSVGProps) {
     const onHandlerStateChange = (event: PanGestureHandlerGestureEvent) => {
         if (event.nativeEvent.state === State.END) {
 
+            
             setTranslationPrev([0, 0]);
             setPathDrawing(false);
-            setCurrentID('');
+            setgrabEnCours(false);
+            
             setFreeID(-1);
 
             setTranslationPrevPlayer([1.0, 1.0]);
-            setTranslationIncPlayer([0, 0]);
+
+            //When we drop the player, we set its position
+            positionList[indexPosition][1].map((joueur) => {
+                if(currentID == joueur.id){
+                    let centerXY = getCenter(joueur.svg_player);
+                    let pourcentX = (centerXY[0] - superField[0][0]) / (superField[0][5] - superField[0][0]);
+                        let pourcentY = (centerXY[1] - superField[0][3]) / (superField[0][1] - superField[0][3]);
+                    joueur.positionChange([pourcentX,1-pourcentY]);
+                }
+            })
+
+            setCurrentID('');
 
             setPrevPourcent([0, 0]);
 
             console.log('Gesture ended');
-
         }
     };
 
@@ -836,9 +953,14 @@ export function Field(props: ZoomableSVGProps) {
                     ]);
                 }
 
-                proportionAll(proportion);
 
-                diffMovingAll([translationIncrement[0], translationIncrement[1]]);
+                let mcenter = [((superField[0][0] + superField[0][2] + superField[0][4] + superField[0][5]) / 4), ((superField[0][1] + superField[0][3] + superField[0][3] + superField[0][6]) / 4)]
+
+                diffSVGAll(mcenter);
+
+                proportionAll(proportion);
+                
+                
                 setAll();
 
                 let svg_Mode = proportionSVG(player, ((superSvg_Field[0][5] - superSvg_Field[0][0]) / (svg_fieldUNCHANGED[5] - svg_fieldUNCHANGED[0])))
@@ -852,7 +974,7 @@ export function Field(props: ZoomableSVGProps) {
                     svg_Mode = diffSVG(svg_Mode, getCenterBallon(svg_Mode), xBallon_Array, getPourcentageCenter(ball.position[0], ball.position[1]))
                     ball.svgValue(svg_Mode);
                 });
-                showPlayer();
+                showPlayer(false);
 
 
             }
@@ -860,12 +982,16 @@ export function Field(props: ZoomableSVGProps) {
 
     };
 
+    
+
     let ballonShown = false;
-    const showPlayer = () => {
+    const showPlayer = (grab: boolean) => {
+        console.log("Grab",grab)
         ballonShown = false
         setSvgPlayers([]);
         setSvgBallon([]);
-        //const listMaillot : numberMaillot[] = [];
+        let maillot : numberMaillot[] = [];
+
         let moveBallon = [-100, -100];
 
 
@@ -886,19 +1012,11 @@ export function Field(props: ZoomableSVGProps) {
                 colorSpeed = "black";
             }
             if(positionList[indexPosition][2].length > 0){
-                 if (joueur.id == positionList[indexPosition][2][0].idJoueur) {
+                 if (joueur.id == positionList[indexPosition][2][0].idJoueur && !grab) {
                     ballonShown = true;
                     
-
-
-                if(animationEnCours){
-                    let getXY = getPourcentageCenter(joueur.position[0],1-joueur.position[1]);
-                    moveBallon = getXY;
-
-                }else{
                     moveBallon = getCenter(joueur.svg_player);
-                    
-                }
+                
             }
            
                 
@@ -906,9 +1024,9 @@ export function Field(props: ZoomableSVGProps) {
 
 
             //Si il y'a une flèche de prévue on la dessine
-            //AJOUT SI IL N Y A PAS DANIMATION EN COURS
+            
             let getXY = getPourcentageCenter(joueur.position[0], joueur.position[1]);
-            if (joueur.myArray.length > 0 && !animationEnCours) {
+            if (joueur.myArray.length > 0 && !animationEnCours && !grab) {
                 //superSvg_Field = superField;
                 let drawnPath = ``;
                 for (let i = 0; i < joueur.myArray.length; i++) {
@@ -948,20 +1066,47 @@ export function Field(props: ZoomableSVGProps) {
             setSvgPlayers((prevSvgPlayers) => [...prevSvgPlayers, svgPlayer]);
 
 
-            //Gestion du nombre maillot PREMIER ESSAIE ECHEC
             // getXY = [joueur.svg_player[0],joueur.svg_player[1]];
-            // let textM = joueur.id.substring(1);
-            // let module : numberMaillot = {id:joueur.id, position:getXY, textContent: textM}
-            // listMaillot.push(module);
+            let textM = joueur.id.substring(1);
+            let position = getCenter(joueur.svg_player);
 
+            //[(svgP[74] + svgP[139]) / 2, (svgP[9] + svgP[105]) / 2]
+
+            let textSizing = 30;
+   
+
+            let proportionPlayerX = (player[74] - player[139])/(joueur.svg_player[74] - joueur.svg_player[139]);
+            //let proportionPlayerY = (player[9] - player[105])/(joueur.svg_player[9] - joueur.svg_player[105]);
+      
+            textSizing = textSizing / proportionPlayerX;
+           
+            
+
+            if(joueur.id.length > 2){
+                position[0] = position[0] - (position[0]/1.77 - joueur.svg_player[74]/1.77);
+            }else{
+                position[0] = position[0] - (position[0]/3.7 - joueur.svg_player[74]/3.7);
+            }
+            
+            position[1] = position[1] - (position[1]*1.7 - joueur.svg_player[75]*1.7);
+            
+           
+
+            //textSize variation
+            
+            let module : numberMaillot = {id:joueur.id, position:position, 
+                textContent: textM, textSize: textSizing}
+            maillot.push(module);
         });
+
+        setlistMaillot(maillot);
 
         //BALLON
         if(!ballonShown){
         positionList[indexPosition][2].map((ball) => {
 
             //Gestion de la couleur ici, plus tard
-
+           
             const svgBall = [<Path
                 d={`M${ball.svg_ballon[0]} ${ball.svg_ballon[1]}C${ball.svg_ballon[2]} ${ball.svg_ballon[3]} ${ball.svg_ballon[4]} ${ball.svg_ballon[5]} ${ball.svg_ballon[6]} ${ball.svg_ballon[7]}C${ball.svg_ballon[8]} ${ball.svg_ballon[9]} ${ball.svg_ballon[10]} ${ball.svg_ballon[11]} ${ball.svg_ballon[12]} ${ball.svg_ballon[13]}C${ball.svg_ballon[14]} ${ball.svg_ballon[15]} ${ball.svg_ballon[16]} ${ball.svg_ballon[17]} ${ball.svg_ballon[18]} ${ball.svg_ballon[19]}C${ball.svg_ballon[20]} ${ball.svg_ballon[21]} ${ball.svg_ballon[22]} ${ball.svg_ballon[23]} ${ball.svg_ballon[24]} ${ball.svg_ballon[25]}C${ball.svg_ballon[26]} ${ball.svg_ballon[27]} ${ball.svg_ballon[28]} ${ball.svg_ballon[29]} ${ball.svg_ballon[30]} ${ball.svg_ballon[31]}C${ball.svg_ballon[32]} ${ball.svg_ballon[33]} ${ball.svg_ballon[34]} ${ball.svg_ballon[35]} ${ball.svg_ballon[36]} ${ball.svg_ballon[37]}C${ball.svg_ballon[38]} ${ball.svg_ballon[39]} ${ball.svg_ballon[40]} ${ball.svg_ballon[41]} ${ball.svg_ballon[42]} ${ball.svg_ballon[43]}C${ball.svg_ballon[44]} ${ball.svg_ballon[45]} ${ball.svg_ballon[46]} ${ball.svg_ballon[47]} ${ball.svg_ballon[48]} ${ball.svg_ballon[49]}C${ball.svg_ballon[50]} ${ball.svg_ballon[51]} ${ball.svg_ballon[52]} ${ball.svg_ballon[53]} ${ball.svg_ballon[54]} ${ball.svg_ballon[55]}ZM${ball.svg_ballon[56]} ${ball.svg_ballon[57]}C${ball.svg_ballon[58]} ${ball.svg_ballon[59]} ${ball.svg_ballon[60]} ${ball.svg_ballon[61]} ${ball.svg_ballon[62]} ${ball.svg_ballon[63]}C${ball.svg_ballon[64]} ${ball.svg_ballon[65]} ${ball.svg_ballon[66]} ${ball.svg_ballon[67]} ${ball.svg_ballon[68]} ${ball.svg_ballon[69]}C${ball.svg_ballon[70]} ${ball.svg_ballon[71]} ${ball.svg_ballon[72]} ${ball.svg_ballon[73]} ${ball.svg_ballon[74]} ${ball.svg_ballon[75]}L${ball.svg_ballon[76]} ${ball.svg_ballon[77]}C${ball.svg_ballon[78]} ${ball.svg_ballon[79]} ${ball.svg_ballon[80]} ${ball.svg_ballon[81]} ${ball.svg_ballon[82]} ${ball.svg_ballon[83]}ZM${ball.svg_ballon[84]} ${ball.svg_ballon[85]}L${ball.svg_ballon[86]} ${ball.svg_ballon[87]}L${ball.svg_ballon[88]} ${ball.svg_ballon[89]}C${ball.svg_ballon[90]} ${ball.svg_ballon[91]} ${ball.svg_ballon[92]} ${ball.svg_ballon[93]} ${ball.svg_ballon[94]} ${ball.svg_ballon[95]}C${ball.svg_ballon[96]} ${ball.svg_ballon[97]} ${ball.svg_ballon[98]} ${ball.svg_ballon[99]} ${ball.svg_ballon[100]} ${ball.svg_ballon[101]}C${ball.svg_ballon[102]} ${ball.svg_ballon[103]} ${ball.svg_ballon[104]} ${ball.svg_ballon[105]} ${ball.svg_ballon[106]} ${ball.svg_ballon[107]}C${ball.svg_ballon[108]} ${ball.svg_ballon[109]} ${ball.svg_ballon[110]} ${ball.svg_ballon[111]} ${ball.svg_ballon[112]} ${ball.svg_ballon[113]}C${ball.svg_ballon[114]} ${ball.svg_ballon[115]} ${ball.svg_ballon[116]} ${ball.svg_ballon[117]} ${ball.svg_ballon[118]} ${ball.svg_ballon[119]}C${ball.svg_ballon[120]} ${ball.svg_ballon[121]} ${ball.svg_ballon[122]} ${ball.svg_ballon[123]} ${ball.svg_ballon[124]} ${ball.svg_ballon[125]}C${ball.svg_ballon[126]} ${ball.svg_ballon[127]} ${ball.svg_ballon[128]} ${ball.svg_ballon[129]} ${ball.svg_ballon[130]} ${ball.svg_ballon[131]}C${ball.svg_ballon[132]} ${ball.svg_ballon[133]} ${ball.svg_ballon[134]} ${ball.svg_ballon[135]} ${ball.svg_ballon[136]} ${ball.svg_ballon[137]}L${ball.svg_ballon[138]} ${ball.svg_ballon[139]}L${ball.svg_ballon[140]} ${ball.svg_ballon[141]}L${ball.svg_ballon[142]} ${ball.svg_ballon[143]}C${ball.svg_ballon[144]} ${ball.svg_ballon[145]} ${ball.svg_ballon[146]} ${ball.svg_ballon[147]} ${ball.svg_ballon[148]} ${ball.svg_ballon[149]}C${ball.svg_ballon[150]} ${ball.svg_ballon[151]} ${ball.svg_ballon[152]} ${ball.svg_ballon[153]} ${ball.svg_ballon[154]} ${ball.svg_ballon[155]}C${ball.svg_ballon[156]} ${ball.svg_ballon[157]} ${ball.svg_ballon[158]} ${ball.svg_ballon[159]} ${ball.svg_ballon[160]} ${ball.svg_ballon[161]}C${ball.svg_ballon[162]} ${ball.svg_ballon[163]} ${ball.svg_ballon[164]} ${ball.svg_ballon[165]} ${ball.svg_ballon[166]} ${ball.svg_ballon[167]}C${ball.svg_ballon[168]} ${ball.svg_ballon[169]} ${ball.svg_ballon[170]} ${ball.svg_ballon[171]} ${ball.svg_ballon[172]} ${ball.svg_ballon[173]}C${ball.svg_ballon[174]} ${ball.svg_ballon[175]} ${ball.svg_ballon[176]} ${ball.svg_ballon[177]} ${ball.svg_ballon[178]} ${ball.svg_ballon[179]}C${ball.svg_ballon[180]} ${ball.svg_ballon[181]} ${ball.svg_ballon[182]} ${ball.svg_ballon[183]} ${ball.svg_ballon[184]} ${ball.svg_ballon[185]}C${ball.svg_ballon[186]} ${ball.svg_ballon[187]} ${ball.svg_ballon[188]} ${ball.svg_ballon[189]} ${ball.svg_ballon[190]} ${ball.svg_ballon[191]}L${ball.svg_ballon[192]} ${ball.svg_ballon[193]}L${ball.svg_ballon[194]} ${ball.svg_ballon[195]}C${ball.svg_ballon[196]} ${ball.svg_ballon[197]} ${ball.svg_ballon[198]} ${ball.svg_ballon[199]} ${ball.svg_ballon[200]} ${ball.svg_ballon[201]}C${ball.svg_ballon[202]} ${ball.svg_ballon[203]} ${ball.svg_ballon[204]} ${ball.svg_ballon[205]} ${ball.svg_ballon[206]} ${ball.svg_ballon[207]}C${ball.svg_ballon[208]} ${ball.svg_ballon[209]} ${ball.svg_ballon[210]} ${ball.svg_ballon[211]} ${ball.svg_ballon[212]} ${ball.svg_ballon[213]}C${ball.svg_ballon[214]} ${ball.svg_ballon[215]} ${ball.svg_ballon[216]} ${ball.svg_ballon[217]} ${ball.svg_ballon[218]} ${ball.svg_ballon[219]}C${ball.svg_ballon[220]} ${ball.svg_ballon[221]} ${ball.svg_ballon[222]} ${ball.svg_ballon[223]} ${ball.svg_ballon[224]} ${ball.svg_ballon[225]}C${ball.svg_ballon[226]} ${ball.svg_ballon[227]} ${ball.svg_ballon[228]} ${ball.svg_ballon[229]} ${ball.svg_ballon[230]} ${ball.svg_ballon[231]}C${ball.svg_ballon[232]} ${ball.svg_ballon[233]} ${ball.svg_ballon[234]} ${ball.svg_ballon[235]} ${ball.svg_ballon[236]} ${ball.svg_ballon[237]}C${ball.svg_ballon[238]} ${ball.svg_ballon[239]} ${ball.svg_ballon[240]} ${ball.svg_ballon[241]} ${ball.svg_ballon[242]} ${ball.svg_ballon[243]}L${ball.svg_ballon[244]} ${ball.svg_ballon[245]}L${ball.svg_ballon[246]} ${ball.svg_ballon[247]}C${ball.svg_ballon[248]} ${ball.svg_ballon[249]} ${ball.svg_ballon[250]} ${ball.svg_ballon[251]} ${ball.svg_ballon[252]} ${ball.svg_ballon[253]}C${ball.svg_ballon[254]} ${ball.svg_ballon[255]} ${ball.svg_ballon[256]} ${ball.svg_ballon[257]} ${ball.svg_ballon[258]} ${ball.svg_ballon[259]}C${ball.svg_ballon[260]} ${ball.svg_ballon[261]} ${ball.svg_ballon[262]} ${ball.svg_ballon[263]} ${ball.svg_ballon[264]} ${ball.svg_ballon[265]}C${ball.svg_ballon[266]} ${ball.svg_ballon[267]} ${ball.svg_ballon[268]} ${ball.svg_ballon[269]} ${ball.svg_ballon[270]} ${ball.svg_ballon[271]}L${ball.svg_ballon[272]} ${ball.svg_ballon[273]}L${ball.svg_ballon[274]} ${ball.svg_ballon[275]}L${ball.svg_ballon[276]} ${ball.svg_ballon[277]}C${ball.svg_ballon[278]} ${ball.svg_ballon[279]} ${ball.svg_ballon[280]} ${ball.svg_ballon[281]} ${ball.svg_ballon[282]} ${ball.svg_ballon[283]}C${ball.svg_ballon[284]} ${ball.svg_ballon[285]} ${ball.svg_ballon[286]} ${ball.svg_ballon[287]} ${ball.svg_ballon[288]} ${ball.svg_ballon[289]}C${ball.svg_ballon[290]} ${ball.svg_ballon[291]} ${ball.svg_ballon[292]} ${ball.svg_ballon[293]} ${ball.svg_ballon[294]} ${ball.svg_ballon[295]}C${ball.svg_ballon[296]} ${ball.svg_ballon[297]} ${ball.svg_ballon[298]} ${ball.svg_ballon[299]} ${ball.svg_ballon[300]} ${ball.svg_ballon[301]}L${ball.svg_ballon[302]} ${ball.svg_ballon[303]}L${ball.svg_ballon[304]} ${ball.svg_ballon[305]}C${ball.svg_ballon[306]} ${ball.svg_ballon[307]} ${ball.svg_ballon[308]} ${ball.svg_ballon[309]} ${ball.svg_ballon[310]} ${ball.svg_ballon[311]}C${ball.svg_ballon[312]} ${ball.svg_ballon[313]} ${ball.svg_ballon[314]} ${ball.svg_ballon[315]} ${ball.svg_ballon[316]} ${ball.svg_ballon[317]}C${ball.svg_ballon[318]} ${ball.svg_ballon[319]} ${ball.svg_ballon[320]} ${ball.svg_ballon[321]} ${ball.svg_ballon[322]} ${ball.svg_ballon[323]}C${ball.svg_ballon[324]} ${ball.svg_ballon[325]} ${ball.svg_ballon[326]} ${ball.svg_ballon[327]} ${ball.svg_ballon[328]} ${ball.svg_ballon[329]}C${ball.svg_ballon[330]} ${ball.svg_ballon[331]} ${ball.svg_ballon[332]} ${ball.svg_ballon[333]} ${ball.svg_ballon[334]} ${ball.svg_ballon[335]}C${ball.svg_ballon[336]} ${ball.svg_ballon[337]} ${ball.svg_ballon[338]} ${ball.svg_ballon[339]} ${ball.svg_ballon[340]} ${ball.svg_ballon[341]}C${ball.svg_ballon[342]} ${ball.svg_ballon[343]} ${ball.svg_ballon[344]} ${ball.svg_ballon[345]} ${ball.svg_ballon[346]} ${ball.svg_ballon[347]}C${ball.svg_ballon[348]} ${ball.svg_ballon[349]} ${ball.svg_ballon[350]} ${ball.svg_ballon[351]} ${ball.svg_ballon[352]} ${ball.svg_ballon[353]}H${ball.svg_ballon[354]}ZM${ball.svg_ballon[355]} ${ball.svg_ballon[356]}L${ball.svg_ballon[357]} ${ball.svg_ballon[358]}C${ball.svg_ballon[359]} ${ball.svg_ballon[360]} ${ball.svg_ballon[361]} ${ball.svg_ballon[362]} ${ball.svg_ballon[363]} ${ball.svg_ballon[364]}C${ball.svg_ballon[365]} ${ball.svg_ballon[366]} ${ball.svg_ballon[367]} ${ball.svg_ballon[368]} ${ball.svg_ballon[369]} ${ball.svg_ballon[370]}C${ball.svg_ballon[371]} ${ball.svg_ballon[372]} ${ball.svg_ballon[373]} ${ball.svg_ballon[374]} ${ball.svg_ballon[375]} ${ball.svg_ballon[376]}C${ball.svg_ballon[377]} ${ball.svg_ballon[378]} ${ball.svg_ballon[379]} ${ball.svg_ballon[380]} ${ball.svg_ballon[381]} ${ball.svg_ballon[382]}C${ball.svg_ballon[383]} ${ball.svg_ballon[384]} ${ball.svg_ballon[385]} ${ball.svg_ballon[386]} ${ball.svg_ballon[387]} ${ball.svg_ballon[388]}Z`}
                 fill="#A65000"/>];
@@ -969,28 +1114,36 @@ export function Field(props: ZoomableSVGProps) {
             setSvgBallon(svgBall[0]);
         });
         }else{
+            
             showBallon(moveBallon);
         }
 
-        closestPlayerToBallon();
-
-
-        //setmaillotNumbers(listMaillot);
+        if(!animationEnCours){
+            closestPlayerToBallon();
+        }
+        
 
     }
+    
     const showBallon = (move: number[]) => {
         if (move[0] != -100 || move[1] != -100) {
 
-            move = [move[0]-move[0]*0.01,move[1]-move[1]*0.008];
+            
+            //On prend la distance xMin xMax et yMin yMax
+            let distX = (positionList[indexPosition][2][0].svg_ballon[20] - positionList[indexPosition][2][0].svg_ballon[50]); 
+            let distY = (positionList[indexPosition][2][0].svg_ballon[17] - positionList[indexPosition][2][0].svg_ballon[43]);
 
+            //Le ballon va être à Move = Centre du joueur, on le décale de la moitié de sa longueur, et 1/3 de sa largeur
+            //Pour qu'il apparaisse sur le bras (tout étant proportionnelle pas besoin de changer)
+            move = [move[0]+distX/2,move[1]+distY/3];
             //La position est déjà reset dans l'animation, on ne le fait pas 2 fois
-            if(!animationEnCours){
+            if(!animationEnCours && !grabEnCours){
                 
                 positionList[indexPosition][2][0].svgValue(diffSVG(positionList[indexPosition][2][0].svg_ballon,move,xBallon_Array,getCenterBallon(positionList[indexPosition][2][0].svg_ballon)));
              }
             
-            positionList[indexPosition][2].map((ball) => {
 
+            positionList[indexPosition][2].map((ball) => {
     
                 const svgBall = [<Path
                     d={`M${ball.svg_ballon[0]} ${ball.svg_ballon[1]}C${ball.svg_ballon[2]} ${ball.svg_ballon[3]} ${ball.svg_ballon[4]} ${ball.svg_ballon[5]} ${ball.svg_ballon[6]} ${ball.svg_ballon[7]}C${ball.svg_ballon[8]} ${ball.svg_ballon[9]} ${ball.svg_ballon[10]} ${ball.svg_ballon[11]} ${ball.svg_ballon[12]} ${ball.svg_ballon[13]}C${ball.svg_ballon[14]} ${ball.svg_ballon[15]} ${ball.svg_ballon[16]} ${ball.svg_ballon[17]} ${ball.svg_ballon[18]} ${ball.svg_ballon[19]}C${ball.svg_ballon[20]} ${ball.svg_ballon[21]} ${ball.svg_ballon[22]} ${ball.svg_ballon[23]} ${ball.svg_ballon[24]} ${ball.svg_ballon[25]}C${ball.svg_ballon[26]} ${ball.svg_ballon[27]} ${ball.svg_ballon[28]} ${ball.svg_ballon[29]} ${ball.svg_ballon[30]} ${ball.svg_ballon[31]}C${ball.svg_ballon[32]} ${ball.svg_ballon[33]} ${ball.svg_ballon[34]} ${ball.svg_ballon[35]} ${ball.svg_ballon[36]} ${ball.svg_ballon[37]}C${ball.svg_ballon[38]} ${ball.svg_ballon[39]} ${ball.svg_ballon[40]} ${ball.svg_ballon[41]} ${ball.svg_ballon[42]} ${ball.svg_ballon[43]}C${ball.svg_ballon[44]} ${ball.svg_ballon[45]} ${ball.svg_ballon[46]} ${ball.svg_ballon[47]} ${ball.svg_ballon[48]} ${ball.svg_ballon[49]}C${ball.svg_ballon[50]} ${ball.svg_ballon[51]} ${ball.svg_ballon[52]} ${ball.svg_ballon[53]} ${ball.svg_ballon[54]} ${ball.svg_ballon[55]}ZM${ball.svg_ballon[56]} ${ball.svg_ballon[57]}C${ball.svg_ballon[58]} ${ball.svg_ballon[59]} ${ball.svg_ballon[60]} ${ball.svg_ballon[61]} ${ball.svg_ballon[62]} ${ball.svg_ballon[63]}C${ball.svg_ballon[64]} ${ball.svg_ballon[65]} ${ball.svg_ballon[66]} ${ball.svg_ballon[67]} ${ball.svg_ballon[68]} ${ball.svg_ballon[69]}C${ball.svg_ballon[70]} ${ball.svg_ballon[71]} ${ball.svg_ballon[72]} ${ball.svg_ballon[73]} ${ball.svg_ballon[74]} ${ball.svg_ballon[75]}L${ball.svg_ballon[76]} ${ball.svg_ballon[77]}C${ball.svg_ballon[78]} ${ball.svg_ballon[79]} ${ball.svg_ballon[80]} ${ball.svg_ballon[81]} ${ball.svg_ballon[82]} ${ball.svg_ballon[83]}ZM${ball.svg_ballon[84]} ${ball.svg_ballon[85]}L${ball.svg_ballon[86]} ${ball.svg_ballon[87]}L${ball.svg_ballon[88]} ${ball.svg_ballon[89]}C${ball.svg_ballon[90]} ${ball.svg_ballon[91]} ${ball.svg_ballon[92]} ${ball.svg_ballon[93]} ${ball.svg_ballon[94]} ${ball.svg_ballon[95]}C${ball.svg_ballon[96]} ${ball.svg_ballon[97]} ${ball.svg_ballon[98]} ${ball.svg_ballon[99]} ${ball.svg_ballon[100]} ${ball.svg_ballon[101]}C${ball.svg_ballon[102]} ${ball.svg_ballon[103]} ${ball.svg_ballon[104]} ${ball.svg_ballon[105]} ${ball.svg_ballon[106]} ${ball.svg_ballon[107]}C${ball.svg_ballon[108]} ${ball.svg_ballon[109]} ${ball.svg_ballon[110]} ${ball.svg_ballon[111]} ${ball.svg_ballon[112]} ${ball.svg_ballon[113]}C${ball.svg_ballon[114]} ${ball.svg_ballon[115]} ${ball.svg_ballon[116]} ${ball.svg_ballon[117]} ${ball.svg_ballon[118]} ${ball.svg_ballon[119]}C${ball.svg_ballon[120]} ${ball.svg_ballon[121]} ${ball.svg_ballon[122]} ${ball.svg_ballon[123]} ${ball.svg_ballon[124]} ${ball.svg_ballon[125]}C${ball.svg_ballon[126]} ${ball.svg_ballon[127]} ${ball.svg_ballon[128]} ${ball.svg_ballon[129]} ${ball.svg_ballon[130]} ${ball.svg_ballon[131]}C${ball.svg_ballon[132]} ${ball.svg_ballon[133]} ${ball.svg_ballon[134]} ${ball.svg_ballon[135]} ${ball.svg_ballon[136]} ${ball.svg_ballon[137]}L${ball.svg_ballon[138]} ${ball.svg_ballon[139]}L${ball.svg_ballon[140]} ${ball.svg_ballon[141]}L${ball.svg_ballon[142]} ${ball.svg_ballon[143]}C${ball.svg_ballon[144]} ${ball.svg_ballon[145]} ${ball.svg_ballon[146]} ${ball.svg_ballon[147]} ${ball.svg_ballon[148]} ${ball.svg_ballon[149]}C${ball.svg_ballon[150]} ${ball.svg_ballon[151]} ${ball.svg_ballon[152]} ${ball.svg_ballon[153]} ${ball.svg_ballon[154]} ${ball.svg_ballon[155]}C${ball.svg_ballon[156]} ${ball.svg_ballon[157]} ${ball.svg_ballon[158]} ${ball.svg_ballon[159]} ${ball.svg_ballon[160]} ${ball.svg_ballon[161]}C${ball.svg_ballon[162]} ${ball.svg_ballon[163]} ${ball.svg_ballon[164]} ${ball.svg_ballon[165]} ${ball.svg_ballon[166]} ${ball.svg_ballon[167]}C${ball.svg_ballon[168]} ${ball.svg_ballon[169]} ${ball.svg_ballon[170]} ${ball.svg_ballon[171]} ${ball.svg_ballon[172]} ${ball.svg_ballon[173]}C${ball.svg_ballon[174]} ${ball.svg_ballon[175]} ${ball.svg_ballon[176]} ${ball.svg_ballon[177]} ${ball.svg_ballon[178]} ${ball.svg_ballon[179]}C${ball.svg_ballon[180]} ${ball.svg_ballon[181]} ${ball.svg_ballon[182]} ${ball.svg_ballon[183]} ${ball.svg_ballon[184]} ${ball.svg_ballon[185]}C${ball.svg_ballon[186]} ${ball.svg_ballon[187]} ${ball.svg_ballon[188]} ${ball.svg_ballon[189]} ${ball.svg_ballon[190]} ${ball.svg_ballon[191]}L${ball.svg_ballon[192]} ${ball.svg_ballon[193]}L${ball.svg_ballon[194]} ${ball.svg_ballon[195]}C${ball.svg_ballon[196]} ${ball.svg_ballon[197]} ${ball.svg_ballon[198]} ${ball.svg_ballon[199]} ${ball.svg_ballon[200]} ${ball.svg_ballon[201]}C${ball.svg_ballon[202]} ${ball.svg_ballon[203]} ${ball.svg_ballon[204]} ${ball.svg_ballon[205]} ${ball.svg_ballon[206]} ${ball.svg_ballon[207]}C${ball.svg_ballon[208]} ${ball.svg_ballon[209]} ${ball.svg_ballon[210]} ${ball.svg_ballon[211]} ${ball.svg_ballon[212]} ${ball.svg_ballon[213]}C${ball.svg_ballon[214]} ${ball.svg_ballon[215]} ${ball.svg_ballon[216]} ${ball.svg_ballon[217]} ${ball.svg_ballon[218]} ${ball.svg_ballon[219]}C${ball.svg_ballon[220]} ${ball.svg_ballon[221]} ${ball.svg_ballon[222]} ${ball.svg_ballon[223]} ${ball.svg_ballon[224]} ${ball.svg_ballon[225]}C${ball.svg_ballon[226]} ${ball.svg_ballon[227]} ${ball.svg_ballon[228]} ${ball.svg_ballon[229]} ${ball.svg_ballon[230]} ${ball.svg_ballon[231]}C${ball.svg_ballon[232]} ${ball.svg_ballon[233]} ${ball.svg_ballon[234]} ${ball.svg_ballon[235]} ${ball.svg_ballon[236]} ${ball.svg_ballon[237]}C${ball.svg_ballon[238]} ${ball.svg_ballon[239]} ${ball.svg_ballon[240]} ${ball.svg_ballon[241]} ${ball.svg_ballon[242]} ${ball.svg_ballon[243]}L${ball.svg_ballon[244]} ${ball.svg_ballon[245]}L${ball.svg_ballon[246]} ${ball.svg_ballon[247]}C${ball.svg_ballon[248]} ${ball.svg_ballon[249]} ${ball.svg_ballon[250]} ${ball.svg_ballon[251]} ${ball.svg_ballon[252]} ${ball.svg_ballon[253]}C${ball.svg_ballon[254]} ${ball.svg_ballon[255]} ${ball.svg_ballon[256]} ${ball.svg_ballon[257]} ${ball.svg_ballon[258]} ${ball.svg_ballon[259]}C${ball.svg_ballon[260]} ${ball.svg_ballon[261]} ${ball.svg_ballon[262]} ${ball.svg_ballon[263]} ${ball.svg_ballon[264]} ${ball.svg_ballon[265]}C${ball.svg_ballon[266]} ${ball.svg_ballon[267]} ${ball.svg_ballon[268]} ${ball.svg_ballon[269]} ${ball.svg_ballon[270]} ${ball.svg_ballon[271]}L${ball.svg_ballon[272]} ${ball.svg_ballon[273]}L${ball.svg_ballon[274]} ${ball.svg_ballon[275]}L${ball.svg_ballon[276]} ${ball.svg_ballon[277]}C${ball.svg_ballon[278]} ${ball.svg_ballon[279]} ${ball.svg_ballon[280]} ${ball.svg_ballon[281]} ${ball.svg_ballon[282]} ${ball.svg_ballon[283]}C${ball.svg_ballon[284]} ${ball.svg_ballon[285]} ${ball.svg_ballon[286]} ${ball.svg_ballon[287]} ${ball.svg_ballon[288]} ${ball.svg_ballon[289]}C${ball.svg_ballon[290]} ${ball.svg_ballon[291]} ${ball.svg_ballon[292]} ${ball.svg_ballon[293]} ${ball.svg_ballon[294]} ${ball.svg_ballon[295]}C${ball.svg_ballon[296]} ${ball.svg_ballon[297]} ${ball.svg_ballon[298]} ${ball.svg_ballon[299]} ${ball.svg_ballon[300]} ${ball.svg_ballon[301]}L${ball.svg_ballon[302]} ${ball.svg_ballon[303]}L${ball.svg_ballon[304]} ${ball.svg_ballon[305]}C${ball.svg_ballon[306]} ${ball.svg_ballon[307]} ${ball.svg_ballon[308]} ${ball.svg_ballon[309]} ${ball.svg_ballon[310]} ${ball.svg_ballon[311]}C${ball.svg_ballon[312]} ${ball.svg_ballon[313]} ${ball.svg_ballon[314]} ${ball.svg_ballon[315]} ${ball.svg_ballon[316]} ${ball.svg_ballon[317]}C${ball.svg_ballon[318]} ${ball.svg_ballon[319]} ${ball.svg_ballon[320]} ${ball.svg_ballon[321]} ${ball.svg_ballon[322]} ${ball.svg_ballon[323]}C${ball.svg_ballon[324]} ${ball.svg_ballon[325]} ${ball.svg_ballon[326]} ${ball.svg_ballon[327]} ${ball.svg_ballon[328]} ${ball.svg_ballon[329]}C${ball.svg_ballon[330]} ${ball.svg_ballon[331]} ${ball.svg_ballon[332]} ${ball.svg_ballon[333]} ${ball.svg_ballon[334]} ${ball.svg_ballon[335]}C${ball.svg_ballon[336]} ${ball.svg_ballon[337]} ${ball.svg_ballon[338]} ${ball.svg_ballon[339]} ${ball.svg_ballon[340]} ${ball.svg_ballon[341]}C${ball.svg_ballon[342]} ${ball.svg_ballon[343]} ${ball.svg_ballon[344]} ${ball.svg_ballon[345]} ${ball.svg_ballon[346]} ${ball.svg_ballon[347]}C${ball.svg_ballon[348]} ${ball.svg_ballon[349]} ${ball.svg_ballon[350]} ${ball.svg_ballon[351]} ${ball.svg_ballon[352]} ${ball.svg_ballon[353]}H${ball.svg_ballon[354]}ZM${ball.svg_ballon[355]} ${ball.svg_ballon[356]}L${ball.svg_ballon[357]} ${ball.svg_ballon[358]}C${ball.svg_ballon[359]} ${ball.svg_ballon[360]} ${ball.svg_ballon[361]} ${ball.svg_ballon[362]} ${ball.svg_ballon[363]} ${ball.svg_ballon[364]}C${ball.svg_ballon[365]} ${ball.svg_ballon[366]} ${ball.svg_ballon[367]} ${ball.svg_ballon[368]} ${ball.svg_ballon[369]} ${ball.svg_ballon[370]}C${ball.svg_ballon[371]} ${ball.svg_ballon[372]} ${ball.svg_ballon[373]} ${ball.svg_ballon[374]} ${ball.svg_ballon[375]} ${ball.svg_ballon[376]}C${ball.svg_ballon[377]} ${ball.svg_ballon[378]} ${ball.svg_ballon[379]} ${ball.svg_ballon[380]} ${ball.svg_ballon[381]} ${ball.svg_ballon[382]}C${ball.svg_ballon[383]} ${ball.svg_ballon[384]} ${ball.svg_ballon[385]} ${ball.svg_ballon[386]} ${ball.svg_ballon[387]} ${ball.svg_ballon[388]}Z`}
@@ -1006,7 +1159,7 @@ export function Field(props: ZoomableSVGProps) {
 
 
     const isValidString = (input: string): boolean => {
-        const regex = /^[RB][1-9]\d*$/;// /^[RB]\d+$/ means it should start with R or B, followed by one or more digits
+        const regex = /^[RrBb][1-9](?:[0-9])?$/;// /^[RB]\d+$/ means it should start with R or B, followed by one or two digits
 
         return regex.test(input);
     };
@@ -1071,7 +1224,8 @@ export function Field(props: ZoomableSVGProps) {
 
 
             }
-            showPlayer();
+            setPlayerId("");
+            showPlayer(false);
         }
 
 
@@ -1104,7 +1258,7 @@ export function Field(props: ZoomableSVGProps) {
             return newPositionList;
         }); 
 
-        showPlayer();
+        showPlayer(false);
 
 
     };
@@ -1114,13 +1268,44 @@ export function Field(props: ZoomableSVGProps) {
         const x = event.nativeEvent.x;
         const y = event.nativeEvent.y;
 
+        
+
         const state = event.nativeEvent.state;
 
         if (state == 2) {
+            setCurrentID(''); //New action => reset the current ID
             if (addMode && svgRef.current) {
+                let onPlayer = false;
+                positionList[indexPosition][1].map((joueur) => {
 
-                //on veut px et py qui sont les 5 et 6e valeur de measure (les autres sont inutile mais on doit les demandé pour atteindre px et py)
-                svgRef.current.measure((fx: number, fy: number, width: number, height: number, px: number, py: number) => {
+                    const polygonPoints: number[][] = [
+                        [joueur.svg_player[74], joueur.svg_player[9]],
+                        [joueur.svg_player[74], joueur.svg_player[105]],
+                        [joueur.svg_player[139], joueur.svg_player[105]],
+                        [joueur.svg_player[139], joueur.svg_player[9]],
+                    ];
+
+
+                    svgRef.current.measure(() => {
+                        // Adjust x and y based on the position of the SVG
+
+                        const adjustedX = x;
+                        const adjustedY = y;
+
+                        const isInside: boolean = pointInPolygon([adjustedX, adjustedY], polygonPoints);
+                        if (isInside) {
+                            onPlayer = true;
+                            setCurrentID(joueur.id);
+                            
+                        }
+
+                    })
+                });
+
+                if(!onPlayer){
+                    
+                    //on veut px et py qui sont les 5 et 6e valeur de measure (les autres sont inutile mais on doit les demandé pour atteindre px et py)
+                    svgRef.current.measure((fx: number, fy: number, width: number, height: number, px: number, py: number) => {
                     // Adjust x and y based on the position of the SVG
                     const adjustedX = x;
                     const adjustedY = y;
@@ -1134,12 +1319,15 @@ export function Field(props: ZoomableSVGProps) {
                     ];
 
                     const isInside: boolean = pointInPolygon([adjustedX, adjustedY], polygonPoints);
-                    if (isInside) {
+                    //onPlayer is put again because of reload time :)
+                    if (isInside && !onPlayer) {
                         let pourcentX = (adjustedX - superField[0][0]) / (superField[0][5] - superField[0][0]);
                         let pourcentY = (adjustedY - superField[0][3]) / (superField[0][1] - superField[0][3]);
                         addPlayer([pourcentX, 1 - pourcentY], playerId);
                     }
                 });
+                }
+                
             }else if(ballMode && svgRef.current){
 
                 //on veut px et py qui sont les 5 et 6e valeur de measure (les autres sont inutile mais on doit les demandé pour atteindre px et py)
@@ -1165,7 +1353,6 @@ export function Field(props: ZoomableSVGProps) {
                     }
                 });
 
-                //LE else if suivant devrais être remplacer par un drawMode (plus logique)
             } else if (drawMode && svgRef.current) {
                 //Selection check (modif speed)
                 let onPlayer = false;
@@ -1242,6 +1429,7 @@ export function Field(props: ZoomableSVGProps) {
         }
     }, [positionList]);
 
+
     const animate = () => {
         props.sendSaveOfPosition(copyOfPositionList);//On envoie une sauvegarde des positions à Position.tsx
         //On ne peut rien faire pendant l'animation
@@ -1280,12 +1468,21 @@ export function Field(props: ZoomableSVGProps) {
             });
 
             //Le ballon est lançable par un joueur ? La position suivante a t-elle un ballon ? 
-            if(positionList[indexPosition][2][0].idJoueur != "" && positionList[indexPosition +1][2].length > 0){
-                //Si OUI, l'a sa position varie t-elle ?
-                if(positionList[indexPosition][2][0].position != positionList[indexPosition + 1][2][0].position){
-                    ballonMove = true;
+            if(positionList[indexPosition][2].length > 0){
+                if(positionList[indexPosition][2][0].idJoueur != "" && positionList[indexPosition +1][2].length > 0){
+                    //Si OUI, l'a sa position varie t-elle ?
+                    if(positionList[indexPosition][2][0].position != positionList[indexPosition + 1][2][0].position){
+                        let indexIDJoueur = positionList[indexPosition][1].findIndex((joueur) => joueur.id === positionList[indexPosition][2][0].idJoueur);
+                        if(indexIDJoueur != -1){
+                            if(positionList[indexPosition][1][indexIDJoueur].myArray.length <= 1){
+                                ballonMove = true;
+                            }
+                        }
+                        
+                    }
                 }
             }
+            
             
 
             //On check dans A (le current) ce qu'il y'a de comparable (donc same ID)
@@ -1300,12 +1497,6 @@ export function Field(props: ZoomableSVGProps) {
 
 
         }
-
-
-        
-
-        
-
         if(ballonMove){
             //On construit un array de déplacement
             positionList[indexPosition][2][0].idChange("");
@@ -1330,7 +1521,6 @@ export function Field(props: ZoomableSVGProps) {
 
             let [finalX, finalY] =  positionList[indexPosition + 1][2][0].position;
 
-            console.log("OK:",[finalX,finalY],"Current:",[currentX,currentY]);
             let antiCrashIndex = 0;//Dans le cas où qqun met de mauvaise valeur JSON
             //On continue tant que x et y ne sont pas assez proche du final
 
@@ -1443,15 +1633,15 @@ export function Field(props: ZoomableSVGProps) {
                 let absolueY = Math.abs(currentY - listJoueurModify[modifyIndex][1][1]);
 
                 //Cran de deplacement (modifiable mais égaux au départ pour ligne droite)
-                let uppScaleX = 0.1;
-                let uppScaleY = 0.1;
+                let uppScaleX = 0.02;
+                let uppScaleY = 0.02;
 
                 //Application de Ax + b pour une ligne droite (if pour décider qui est A et qui est B)
                 if (absolueX >= absolueY && absolueX > 0) {
-                    uppScaleY = 0.1 * absolueY / absolueX;
+                    uppScaleY = uppScaleY * absolueY / absolueX;
 
                 } else if (absolueY > 0) {
-                    uppScaleX = 0.1 * absolueX / absolueY;
+                    uppScaleX = uppScaleX * absolueX / absolueY;
                 }//On evite les division par 0
 
 
@@ -1547,7 +1737,7 @@ export function Field(props: ZoomableSVGProps) {
                  }
                 }
                
-                showPlayer();
+                showPlayer(false);
 
 
             }
@@ -1578,7 +1768,7 @@ export function Field(props: ZoomableSVGProps) {
 
     const checkEndingAnimation = () => {
        
-        if(checkForEnd.some((item) => item === false)){
+        if(checkForEnd.some((item) => item === false) || checkForEnd.length < 1){
             //Pas fini
         }else{
             //Fini
@@ -1586,10 +1776,13 @@ export function Field(props: ZoomableSVGProps) {
             if(positionList.length - 1 > indexPosition){
                 setIndexPosition(indexPosition +1);
 
-                //Si on anime tout jusqu'à la fin
-                // if(superAnimation){
-                //     animate();
-                // }
+                // * Boucle infini sur animate... *
+                // simulateMouveRefresh(); //Ne marche pas
+                // showPlayer(false); //Ne refresh pas non plus
+                // //Si on anime tout jusqu'à la fin
+                // animate();
+                
+
             }
             
         }
@@ -1608,7 +1801,7 @@ export function Field(props: ZoomableSVGProps) {
                 svg_Mode = diffSVG(svg_Mode, getCenterBallon(svg_Mode), xBallon_Array, getPourcentageCenter(j[index][0], 1 - j[index][1]));
                 positionList[indexPosition][2][0].svgValue(svg_Mode);
 
-                showPlayer();
+                showPlayer(false);
 
             }
             if (j.length == index + 1 && j[index][0] != -100) {
@@ -1640,6 +1833,17 @@ export function Field(props: ZoomableSVGProps) {
                 if(currentValue < closestValue){
                     closestValue = currentValue;
                     closestID = [joueur.id,joueur.position];
+
+                    //If autoLink actif + depending on closestValue (arbitrary 0.05) + no link
+                    if(closestValue < 0.05 
+                        && autoLink
+                        && positionList[indexPosition][2][0].idJoueur == ""){
+                        console.log("Auto Link done !");
+                        setClosestPlayer(closestID);
+                        linkToPlayer(false);
+
+                        //simulateMouveRefresh();
+                    }
                 }
             });
 
@@ -1647,21 +1851,116 @@ export function Field(props: ZoomableSVGProps) {
         }
     };
 
-    const linkToPlayer = () => {
+    const simulateMouveRefresh = () => {
+
+        setTranslationInc([translationIncrement[0],
+                        translationIncrement[1]]);
+        setLock(true);
+
+        proportionAll(proportion);
+
+        diffMovingAll([translationIncrement[0], 
+            translationIncrement[1]]);
+
+        
+        setAll();
+
+        //On fait suivre les joueurs, le center est reset pour le getPourcentageCenter (pour le mettre au bon endroit)
+        center = [((superSvg_Field[0][0] + superSvg_Field[0][2] + superSvg_Field[0][4] + superSvg_Field[0][5]) / 4), ((superSvg_Field[0][1] + superSvg_Field[0][3] + superSvg_Field[0][3] + superSvg_Field[0][6]) / 4)]
+        let svg_Mode = proportionSVG(player, ((superSvg_Field[0][5] - superSvg_Field[0][0]) / (svg_fieldUNCHANGED[5] - svg_fieldUNCHANGED[0])))
+        positionList[indexPosition][1].map((joueur) => {
+            svg_Mode = diffSVG(svg_Mode, getCenter(svg_Mode), xArrayPlayer, getPourcentageCenter(joueur.position[0], joueur.position[1]))
+            joueur.svgValue(svg_Mode);
+        });
+
+        svg_Mode = proportionSVG(ballon_svg, ((superSvg_Field[0][5] - superSvg_Field[0][0]) / (svg_fieldUNCHANGED[5] - svg_fieldUNCHANGED[0])))
+        positionList[indexPosition][2].map((ball) => {
+            svg_Mode = diffSVG(svg_Mode, getCenterBallon(svg_Mode), xBallon_Array, getPourcentageCenter(ball.position[0], ball.position[1]))
+            ball.svgValue(svg_Mode);
+        });
+
+        showPlayer(false);
+
+    };
+
+    
+
+    const linkToPlayer = (refresh: boolean) => {
         if(positionList[indexPosition][1].length > 0 && positionList[indexPosition][2].length > 0){
             //Si le joueur n'est pas link, on le link
             if(positionList[indexPosition][2][0].idJoueur == ""){
                 positionList[indexPosition][2][0].idChange(closestPlayer[0]);
                 positionList[indexPosition][2][0].positionChange(closestPlayer[1]);
 
+                
             }else{
                 //Sinon on UNLICK
                 positionList[indexPosition][2][0].idChange("");
             }
+            
+            if(refresh){
+                simulateMouveRefresh();
+            }
+           
         }
-        showPlayer();
-        
     } 
+
+    const autoLinkOnOff = () => {
+       setAutoLink(!autoLink);
+    };
+
+    const replacePlayerID = (text : string) => {
+        
+        //Si un joueur à cette id
+        if(positionList[indexPosition][1].some((joueur) => joueur.id === text && joueur.id !== currentID) && isValidString(text)){
+            alert(`A player has the ID:${text}`);
+        }else if(isValidString(text)){
+            let indexID = positionList[indexPosition][1].findIndex((joueur) => joueur.id === currentID);
+            if(indexID != -1){
+                //Si il y'a un ballon on verifie qu'il ne soit pas attaché
+                if(positionList[indexPosition][2].length > 0 ){
+                    if(positionList[indexPosition][2][0].idJoueur === positionList[indexPosition][1][indexID].id){
+                        //Si il est attaché à ce joueur, on l'attache à sa modif
+                        positionList[indexPosition][2][0].idChange(text);
+                    }
+                }
+                
+                //On regarde si un dessins est fait pour ce joueur
+                let indexPath = playerPaths.findIndex((p) => p.id === positionList[indexPosition][1][indexID].id+'P');
+                if(indexPath != -1){
+                    playerPaths.splice(indexPath,1);
+                }
+                positionList[indexPosition][1][indexID].idChange(text);
+                setCurrentID(text);
+                simulateMouveRefresh();
+            }
+        }
+    };
+
+    const deletePlayer = () => {
+        let indexID = positionList[indexPosition][1].findIndex((joueur) => joueur.id === currentID);
+            if(indexID != -1){
+                const newPositionList = [...positionList]; 
+                newPositionList[indexPosition][1].splice(indexID, 1);
+                setPositionList(newPositionList);
+                setCurrentID('');
+                let indexPathID = playerPaths.findIndex((p) => p.id === currentID+'P');
+                if(indexPathID != -1){
+                    const newPlayerPath = [...playerPaths];
+                    newPlayerPath.splice(indexPathID,1);
+                    setPlayerPaths(newPlayerPath);
+                }
+                
+                simulateMouveRefresh();
+            }
+    };
+
+    const deleteBallon = () => {
+                const newPositionList = [...positionList]; 
+                newPositionList[indexPosition][2].splice(0, 1);
+                setPositionList(newPositionList);
+                simulateMouveRefresh();
+    };
 
     const checkForIntersection = () => {
 
@@ -2125,6 +2424,17 @@ export function Field(props: ZoomableSVGProps) {
                                 {svgBallon}
                             </Svg>
 
+                            {listMaillot.map(({ id, position, textContent, textSize }) => (
+                            
+                            <Text key={id} style={{ position: 'absolute', 
+                            fontSize: textSize, 
+                            left: position[0], 
+                            top: position[1], 
+                            color: 'white' }}>
+                                {textContent}
+                            </Text>
+
+                            ))}
 
                         </View>
 
@@ -2136,6 +2446,8 @@ export function Field(props: ZoomableSVGProps) {
                 </PanGestureHandler>
             </PinchGestureHandler>
             {/* </LongPressGestureHandler> */}
+
+            
 
             <View
                 style={{
@@ -2166,7 +2478,8 @@ export function Field(props: ZoomableSVGProps) {
                     </Text>
                 </Pressable>
 
-                { addMode && (<TextInput
+                { addMode && ((currentID=='') || (currentID[currentID.length - 1]=='P'))
+                 && (<TextInput
                     placeholder="Enter Player ID [B/R][Number] ex: B6"
                     value={playerId}
                     onChangeText={text => setPlayerId(text)}
@@ -2179,12 +2492,88 @@ export function Field(props: ZoomableSVGProps) {
                     }}
                 />)}
                 
+                { addMode && (currentID!='') && (currentID[currentID.length - 1]!='P') 
+                && (<TextInput
+                    placeholder={currentID.slice(1)}
+                    onChangeText={text => setchangeID(text)}
+                    onSubmitEditing={() => replacePlayerID(`${currentID[0]}${changeID}`)}
+                    style={{
+                        height: 40,
+                        borderColor: 'gray',
+                        borderWidth: 1,
+                        marginBottom: 10,
+                        paddingLeft: 10,
+                    }}
+                />)
+                }
+
+                { addMode && (currentID!='') && (currentID[currentID.length - 1]!='P') 
+                && (<Pressable
+                    onPress={() => deletePlayer()}
+                    style={({pressed}: { pressed: any }) => [
+                        {
+                            backgroundColor: pressed ? 'rgb(210, 230, 255)' : 'rgb(65, 105, 225)',
+                            padding: 10,
+                            borderRadius: 5,
+                            marginBottom: 10
+                        },
+                    ]}
+                >
+                    <Text>
+                        POUBELLE
+                    </Text>
+                </Pressable>)
+                }    
+
+                { addMode && (currentID!='') && (currentID[currentID.length - 1]!='P') 
+                && (<Pressable
+                    onPress={() => replacePlayerID(`B${currentID.substring(1)}`)}
+                    style={({pressed}: { pressed: any }) => [
+                        {
+                            backgroundColor: pressed ? 'rgb(210, 230, 255)' : 'rgb(65, 105, 225)',
+                            padding: 10,
+                            borderRadius: 5,
+                            marginBottom: 10
+                        },
+                    ]}
+                >
+                    <Text>
+                        BLUE
+                    </Text>
+                </Pressable>)
+                }   
+
+                { addMode && (currentID!='') && (currentID[currentID.length - 1]!='P') 
+                && (<Pressable
+                    onPress={() => replacePlayerID(`R${currentID.substring(1)}`)}
+                    style={({pressed}: { pressed: any }) => [
+                        {
+                            backgroundColor: pressed ? 'rgb(210, 230, 255)' : 'rgb(65, 105, 225)',
+                            padding: 10,
+                            borderRadius: 5,
+                            marginBottom: 10
+                        },
+                    ]}
+                >
+                    <Text>
+                        RED
+                    </Text>
+                </Pressable>)
+                }          
+                
 
               
 
+                { ballMode && (positionList[indexPosition][2].length == 0) && (
+                    <Text>
+                        Posez le ballon sur le terrain
+                    </Text>
+                )}
 
-                { ballMode && (<Pressable
-                    onPress={() => linkToPlayer()}
+                { ballMode && (positionList[indexPosition][2].length > 0) && (
+                
+                <Pressable
+                    onPress={() => linkToPlayer(true)}
                     style={({pressed}: { pressed: any }) => [
                         {
                             backgroundColor: pressed ? 'rgb(210, 230, 255)' : 'rgb(65, 105, 225)',
@@ -2198,9 +2587,46 @@ export function Field(props: ZoomableSVGProps) {
                         Link
                     </Text>
                 </Pressable>)}
-                { ballMode && (<Text>
+                { ballMode && (positionList[indexPosition][2].length > 0) && (<Text>
                     {closestPlayer[0]}
                 </Text>)}
+
+                { ballMode && (positionList[indexPosition][2].length > 0) && 
+                (
+                    <Pressable
+                    onPress={() => autoLinkOnOff()}
+                    style={({pressed}: { pressed: any }) => [
+                        {
+                            backgroundColor: pressed ? 'rgb(210, 230, 255)' : 'rgb(65, 105, 225)',
+                            padding: 10,
+                            borderRadius: 5,
+                            marginBottom: 10
+                        },
+                    ]}
+                >
+                    <Text>
+                        AutoLink Mode
+                    </Text>
+                </Pressable>
+                )
+                }
+                { ballMode && (positionList[indexPosition][2].length > 0) 
+                && (<Pressable
+                    onPress={() => deleteBallon()}
+                    style={({pressed}: { pressed: any }) => [
+                        {
+                            backgroundColor: pressed ? 'rgb(210, 230, 255)' : 'rgb(65, 105, 225)',
+                            padding: 10,
+                            borderRadius: 5,
+                            marginBottom: 10
+                        },
+                    ]}
+                >
+                    <Text>
+                        POUBELLE
+                    </Text>
+                </Pressable>)
+                }    
             </View>
 
 
