@@ -1,19 +1,8 @@
-import {StatusBar} from 'expo-status-bar';
-import React, {useRef, useState} from 'react';
-import {
-    StyleSheet, Text, View, Dimensions, PanResponder, Pressable, TouchableOpacity,
-    TextStyle, StyleProp, TouchableWithoutFeedback, Image
-} from 'react-native';
-
-import {Video} from 'expo-av';
-
-import ViewShot from 'react-native-view-shot';
-import ImageSequence from 'react-native-image-sequence';
+import React, {useState} from 'react';
+import {StyleSheet, View, Dimensions} from 'react-native';
 import {Field} from './Field';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import Position from '../ToolBar/Position';
-import Player from '../../classes/Player';
-import Ballon from '../../classes/Ballon';
 
 const dimWidth = Dimensions.get('window').width;
 const dimHeight = Dimensions.get('window').height;
@@ -40,7 +29,6 @@ export default function FieldHandler() {
         setButtonZoom(false);
         setButtonValueAdd(false);
         setballMode(true);
-        
     };
 
     return (
@@ -78,7 +66,7 @@ const styles = StyleSheet.create({
     },
     button2: {
         position: 'absolute',
-        top: dimHeight * 0,
+        top: 0,
         left: dimWidth * 0.1,
         marginTop: 20,
     }

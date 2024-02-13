@@ -1,4 +1,4 @@
-class Player {
+export default class Player {
   static Player(arg0: number[], arg1: string, arg2: never[], arg3: never[], arg4: number): Player[] {
       throw new Error("Method not implemented.");
   }
@@ -8,7 +8,6 @@ class Player {
   myArray: number[][];
   svg_player : number[];
   speed : number;
-
 
   constructor(position : number[], id: string, myArray: number[][], svg_player: number[],speed : number) {
     this.position = position;
@@ -39,12 +38,10 @@ class Player {
   }
 
   speedUp(): void{
-    this.speed = this.speed +1;
+    this.speed = this.speed + 1;
     if(this.speed>3){
       this.speed = 1;
     }
   }
-
 }
 
-export default Player;

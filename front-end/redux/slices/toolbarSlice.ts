@@ -1,24 +1,18 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit"
-import Player from "../../classes/Player";
-import Ballon from "../../classes/Ballon";
 
-export interface ToolBarState {
-    positionList: [number, Player[], Ballon[]][]
+interface ToolBarState {
+    positionList: string
 }
 
 const initialState: ToolBarState = {
-    positionList: [[
-        0,
-        [Player.createPlayer([0, 0], "0B", [], [], 1)],
-        [Ballon.createBallon([0,0],[],"")]
-    ]]
+    positionList: ""
 }
 
 export const toolbarSlice = createSlice({
     name: "toolbar",
     initialState,
     reducers: {
-        setToolbarPositionList : (state, action: PayloadAction<[number, Player[], Ballon[ ]][]>) : void => {
+        setToolbarPositionList : (state, action: PayloadAction<string>) : void => {
             state.positionList = action.payload
         }
     }

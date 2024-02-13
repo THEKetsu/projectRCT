@@ -1,9 +1,9 @@
 import React, {useEffect, useState} from 'react';
 import {View, Text, TouchableOpacity, StyleSheet, Dimensions} from 'react-native';
-import Player from '../../classes/Player';
-import Ballon from '../../classes/Ballon';
 import {useAppSelector} from "../../hooks/reduxHooks";
 import {RootState} from "../../redux/store";
+import {Player} from "../../classes/Player";
+import {Ballon} from "../../classes/Ballon";
 
 const dimWidth = Dimensions.get('window').width;
 const dimHeight = Dimensions.get('window').height;
@@ -28,20 +28,20 @@ export default function Position({
 
         let different = true;
         numberOfPosition.map((i) => {
-            if (toolbar.positionList.some((item : [number, Player[], Ballon[]]) => item[0] === i)) {
+            if (JSON.parse(toolbar.positionList).some((item : [number, Player[], Ballon[]]) => item[0] === i)) {
                 different = false;
             }
         })
-        if (toolbar.positionList[0][0] != 0 && different) {
-            setNumberOfPosition(toolbar.positionList.map((item : [number, Player[], Ballon[]]) => item[0]));
+        if (JSON.parse(toolbar.positionList)[0][0] != 0 && different) {
+            setNumberOfPosition(JSON.parse(toolbar.positionList).map((item : [number, Player[], Ballon[]]) => item[0]));
         }
-    }, [toolbar.positionList[0][0]]);
+    }, [JSON.parse(toolbar.positionList)[0][0]]);
 
     const handlePress = (item: number) => {
         sendDataToB(item);
 
-        if (toolbar.positionList[0][0] != 0) {
-            console.log("Position reçu", toolbar.positionList)
+        if (JSON.parse(toolbar.positionList)[0][0] != 0) {
+            console.log("Position reçu", JSON.parse(toolbar.positionList))
         }
     };
 
