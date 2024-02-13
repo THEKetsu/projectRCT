@@ -1,5 +1,7 @@
+import React from 'react';
 import {View, Button} from 'react-native';
 
+// @ts-ignore
 export default function Home ({navigation}) {
 
     return (

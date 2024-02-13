@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
     },
     button2: {
         position: 'absolute',
-        top: dimHeight * 0,
+        top: 0,
         left: dimWidth * 0.1,
         marginTop: 20,
     }
