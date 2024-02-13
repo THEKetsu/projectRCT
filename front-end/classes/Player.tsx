@@ -1,4 +1,4 @@
-class Player {
+export default class Player {
 
   id: string;
   position: number[];
@@ -36,6 +36,10 @@ class Player {
     this.position = pos;
   }
 
+  idChange(id: string): void{
+    this.id = id;
+  }
+
   speedUp(): void{
     this.speed = this.speed +1;
     if(this.speed>3){
@@ -45,4 +49,3 @@ class Player {
 
 }
 
-export default Player;
