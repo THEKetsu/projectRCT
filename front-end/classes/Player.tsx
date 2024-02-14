@@ -16,8 +16,11 @@ export default class Player {
   }
 
   static createPlayer(position : number[], id: string, myArray: number[][], svg_player : number[], speed : number): Player {
-    const player = new Player(position, id, myArray,svg_player,speed);
-    return player;
+    return new Player(position, id, myArray, svg_player, speed);
+  }
+
+  static from(json: any) {
+    return Object.assign(new Player(json.position, json.id, json.myArray, json.svg_player, json.speed), json)
   }
 
   svgValue(svg: number[]): void{
@@ -46,6 +49,8 @@ export default class Player {
       this.speed = 1;
     }
   }
+
+
 
 }
 

@@ -5,6 +5,7 @@ import Ballon from '../../classes/Ballon';
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+
 const dimWidth = Dimensions.get('window').width;
 const dimHeight = Dimensions.get('window').height;
 
@@ -17,42 +18,42 @@ interface PositionProps {
     handleClickAdd: () => void;
     handleCLickBallMode: () => void;
     handleClickDrawMode: () => void;
-  }
+}
 
-  
+
 export default function Position({
-    sendDataToB,
-    receivedData,
-    receivedPosition,
-    sendSavedData,
-    handleClickZoom,
-    handleClickAdd,
-    handleCLickBallMode,
-    handleClickDrawMode
-  }: PositionProps) {
+                                     sendDataToB,
+                                     receivedData,
+                                     receivedPosition,
+                                     sendSavedData,
+                                     handleClickZoom,
+                                     handleClickAdd,
+                                     handleCLickBallMode,
+                                     handleClickDrawMode
+                                 }: PositionProps) {
     const [numberOfPosition, setNumberOfPosition] = useState<number[]>([1, 2]);
     const [collapsed, setCollapsed] = useState(false); // État pour suivre l'état de la barre (repliée ou non)
-  const [animation] = useState(new Animated.Value(0)); // Utilisation d'Animated pour gérer l'animation
-  const toggleBar = () => {
-    // Détermination de la valeur cible pour l'animation en fonction de l'état actuel
-    const toValue = collapsed ? 0 : 1; // 1 représente la valeur déployée (non rétrécie)
-    
-    // Configuration de l'animation utilisant Animated.timing
-    Animated.timing(animation, {
-      toValue, // La valeur cible déterminée ci-dessus
-      duration: 300, // Durée de l'animation en millisecondes
-      useNativeDriver: false, // Utilisation du moteur natif pour l'animation
-    }).start(); // Lancement de l'animation
+    const [animation] = useState(new Animated.Value(0)); // Utilisation d'Animated pour gérer l'animation
+    const toggleBar = () => {
+        // Détermination de la valeur cible pour l'animation en fonction de l'état actuel
+        const toValue = collapsed ? 0 : 1; // 1 représente la valeur déployée (non rétrécie)
 
-    // Inversion de l'état 'collapsed' pour refléter le nouvel état de la barre
-    setCollapsed(!collapsed);
-  };
+        // Configuration de l'animation utilisant Animated.timing
+        Animated.timing(animation, {
+            toValue, // La valeur cible déterminée ci-dessus
+            duration: 300, // Durée de l'animation en millisecondes
+            useNativeDriver: false, // Utilisation du moteur natif pour l'animation
+        }).start(); // Lancement de l'animation
 
-  // Création d'une interpolation pour ajuster la hauteur de la barre
-  const barHeight = animation.interpolate({
-    inputRange: [0, 1], // Plage des valeurs à interpréter
-    outputRange: ['2.5%', '25%'], // Hauteur initiale et finale de la barre
-  });
+        // Inversion de l'état 'collapsed' pour refléter le nouvel état de la barre
+        setCollapsed(!collapsed);
+    };
+
+    // Création d'une interpolation pour ajuster la hauteur de la barre
+    const barHeight = animation.interpolate({
+        inputRange: [0, 1], // Plage des valeurs à interpréter
+        outputRange: ['2.5%', '25%'], // Hauteur initiale et finale de la barre
+    });
     useEffect(() => {
         console.log(receivedData);
 
@@ -77,22 +78,27 @@ export default function Position({
     };
 
     return (
-        <Animated.View style={[styles.container, { height: barHeight }]}>
+        <Animated.View style={[styles.container, {height: barHeight}]}>
             <TouchableOpacity onPress={toggleBar} style={styles.retractable}>
-    
-            { collapsed && (<MaterialIcons style={styles.chevronIcon}
-                name={"keyboard-arrow-down"}
-                size={'200%'}
-                color={"black"}
-            /> )}
-            { !collapsed && (<MaterialIcons style={styles.chevronIcon}
-                name={"keyboard-arrow-up"}
-                size={'200%'}
-                color={"black"}
-            /> )}
+
+                {collapsed && (
+                    <MaterialIcons style={styles.chevronIcon}
+                                   name={"keyboard-arrow-down"}
+                                   size={'200%'}
+                                   color={"black"}
+                    />
+                )}
+                {!collapsed && (
+                    <MaterialIcons style={styles.chevronIcon}
+                                   name={"keyboard-arrow-up"}
+                                   size={'200%'}
+                                   color={"black"}
+                    />
+                )}
 
             </TouchableOpacity>
-            <Animated.View style={{flexDirection: "row", position: "absolute", alignSelf: "flex-start", top: 0, left: 0}}>
+            <Animated.View
+                style={{flexDirection: "row", position: "absolute", alignSelf: "flex-start", top: 0, left: 0}}>
                 {numberOfPosition.map((item, index) => (
                     <TouchableOpacity
                         activeOpacity={0.7}
@@ -106,45 +112,47 @@ export default function Position({
             </Animated.View>
             <Animated.View style={styles.buttonContainer}>
 
-            <TouchableOpacity onPress={handleClickAdd} style={[styles.buttonBase, !collapsed && {display: 'none'}]}>
-                {/* Mode ZOOM */}
-                <Ionicons
-                                    name={"shirt-sharp"}
-                                    size={'200%'}
-                                    color={"black"}
-                                />
-            </TouchableOpacity>
+                <TouchableOpacity onPress={handleClickAdd} style={[styles.buttonBase, !collapsed && {display: 'none'}]}>
+                    {/* Mode ZOOM */}
+                    <Ionicons
+                        name={"shirt-sharp"}
+                        size={'200%'}
+                        color={"black"}
+                    />
+                </TouchableOpacity>
 
-            <TouchableOpacity onPress={handleClickZoom} style={[styles.buttonBase, !collapsed && {display: 'none'}]}>
-                {/* Add Player */}
-                <FontAwesome
-                                    name={"arrows"}
-                                    size={'200%'}
-                                    color={"black"}
-                                />
-            </TouchableOpacity>
-            
-            <TouchableOpacity onPress={handleCLickBallMode} style={[styles.buttonBase, !collapsed && {display: 'none'}]}>
-                {/* Mode Ballon */}
-                <MaterialIcons
-                                    name={"sports-rugby"}
-                                    size={'200%'}
-                                    color={"black"}
-                                />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={handleClickDrawMode} style={[styles.buttonBase, !collapsed && {display: 'none'}]}>
-                {/* Mode crayon */}
-                <FontAwesome
-                                    name={"pencil"}
-                                    size={'200%'}
-                                    color={"black"}
-                                />
-            </TouchableOpacity>
+                <TouchableOpacity onPress={handleClickZoom}
+                                  style={[styles.buttonBase, !collapsed && {display: 'none'}]}>
+                    {/* Add Player */}
+                    <FontAwesome
+                        name={"arrows"}
+                        size={'200%'}
+                        color={"black"}
+                    />
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={handleCLickBallMode}
+                                  style={[styles.buttonBase, !collapsed && {display: 'none'}]}>
+                    {/* Mode Ballon */}
+                    <MaterialIcons
+                        name={"sports-rugby"}
+                        size={'200%'}
+                        color={"black"}
+                    />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={handleClickDrawMode}
+                                  style={[styles.buttonBase, !collapsed && {display: 'none'}]}>
+                    {/* Mode crayon */}
+                    <FontAwesome
+                        name={"pencil"}
+                        size={"200%"}
+                        color={"black"}
+                    />
+                </TouchableOpacity>
             </Animated.View>
         </Animated.View>
     );
 };
-
 
 const styles = StyleSheet.create({
     container: {
@@ -154,7 +162,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         flexDirection: "row",
-        overflow:"hidden"
+        overflow: "hidden"
     },
     buttonPos: {
         height: 20,
@@ -174,24 +182,22 @@ const styles = StyleSheet.create({
         marginLeft: 10,
     },
     buttonContainer: {
-        flexDirection:"row",
+        flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
         width: "90%"
     },
     retractable: {
         position: "absolute",
-        top:"-5%",
+        top: "-5%",
         backgroundColor: "#D9D9D9",
         borderRadius: "25%",
         width: "10%",
-        justifyContent:"center",
-        alignItems:"center",
+        justifyContent: "center",
+        alignItems: "center",
         zIndex: 1
 
     },
-    chevronIcon: {
-    
-    }
+    chevronIcon: {}
 
 })

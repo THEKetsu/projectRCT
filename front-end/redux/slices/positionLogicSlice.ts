@@ -5,7 +5,7 @@ export interface PositionLogic {
 }
 
 const initialState : PositionLogic = {
-    positionList: "hello"
+    positionList: "[]"
 }
 
 export const positionLogicSlice: Slice<PositionLogic>  = createSlice({
