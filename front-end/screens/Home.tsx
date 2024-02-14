@@ -9,8 +9,6 @@ export default function Home () {
         roboto: require('../assets/font/Roboto-Medium.ttf'),
     });
     const navigation = useNavigation();
-    const [text, onChangeText] = React.useState('');
-    const [number, onChangeNumber] = React.useState('');
     if (!loaded) {
       return null;
     }
@@ -64,8 +62,8 @@ const styles = StyleSheet.create({
   },
   button: {
     // Remove left and top properties
-    width: 300,
-    height: 60,
+    width: "15%",
+    height: "5.5%",
     marginTop: 20,
     backgroundColor: '#D9D9D9',
     paddingHorizontal: 20,
