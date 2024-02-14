@@ -64,8 +64,8 @@ const styles = StyleSheet.create({
   },
   button: {
     // Remove left and top properties
-    width: 300,
-    height: 60,
+    width: "15%",
+    height: "5.5%",
     marginTop: 20,
     backgroundColor: '#D9D9D9',
     paddingHorizontal: 20,

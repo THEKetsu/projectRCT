@@ -1,14 +1,30 @@
 import React from 'react';
 import { useFonts } from 'expo-font';
 import {ImageBackground, Image, TouchableOpacity, View, StyleSheet, TextInput, Text} from 'react-native';
-
+import { useNavigation } from '@react-navigation/native';
+import { auth } from '../firebase/firebase'
+import { createUserWithEmailAndPassword } from "firebase/auth";
 export default function Register () {
+  const navigation = useNavigation();
       const [loaded] = useFonts({
         oswald: require('../assets/font/Oswald-Medium.ttf'),
         roboto: require('../assets/font/Roboto-Medium.ttf'),
     });
-    const [text, onChangeText] = React.useState('');
-    const [number, onChangeNumber] = React.useState('');
+    const [email, setEmail] = React.useState('');
+    const [password, setPassword] = React.useState('');
+    const [passwordRepeated, checkPassword] = React.useState('');
+
+    const register = () => {
+      createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          console.log(userCredential);
+        })
+        .catch((error) => {
+          console.log(error);
+        })
+    };
+
+
     if (!loaded) {
       return null;
     }
@@ -19,6 +35,9 @@ export default function Register () {
               <View style={styles.title}>
                 <Text style={styles.titleText}>Inscri<Text style={styles.redText}>ption</Text></Text>
               </View>
+              <TouchableOpacity style={styles.leftButton} onPress={() => navigation.goBack()}>
+                    <Image source={require('../assets/left_arrow.png')} style={styles.leftButtonImage} />
+              </TouchableOpacity>
               <View style={styles.starContainer}>
                 <Image source={require('../assets/star.png')} style={styles.starImage} />
                 <Image source={require('../assets/star.png')} style={styles.starImage} />
@@ -30,6 +49,8 @@ export default function Register () {
                       placeholder="E-mail"
                       placeholderTextColor="rgba(255, 255, 255, 0.5)" // Couleur du placeholder avec opacité
                       underlineColorAndroid="transparent"
+                      value={email}
+                      onChangeText={(text) => setEmail(text)}
                   />
                 </View>
                 <View style={[styles.overlay, styles.overlay2]}>
@@ -39,6 +60,8 @@ export default function Register () {
                       placeholderTextColor="rgba(255, 255, 255, 0.5)" // Couleur du placeholder avec opacité
                       underlineColorAndroid="transparent"
                       secureTextEntry={true}
+                      value={password}
+                      onChangeText={(text) => setPassword(text)}
                   />
               </View>
               <View style={[styles.overlay, styles.overlay3]}>
@@ -48,9 +71,11 @@ export default function Register () {
                       placeholderTextColor="rgba(255, 255, 255, 0.5)" // Couleur du placeholder avec opacité
                       underlineColorAndroid="transparent"
                       secureTextEntry={true}
+                      value={passwordRepeated}
+                      onChangeText={(text) => checkPassword(text)}
                   />
               </View>
-              <TouchableOpacity style={styles.button} activeOpacity={0.7}>
+              <TouchableOpacity style={styles.button} activeOpacity={0.7} onPress={register}>
                   <Text style={[styles.buttonText, { fontWeight: 'bold' }]}>S'inscrire</Text>
               </TouchableOpacity>
             </ImageBackground>
@@ -102,8 +127,8 @@ const styles = StyleSheet.create({
     right: 0, // Center horizontally
   },
   input: {
-    width: 250, // Largeur du TextInput
-    height: 60, // Hauteur du TextInput
+    width: "15%",
+    height: "5.5%",
     paddingHorizontal: 10,
     fontSize: 26, // Taille de la police du texte
     fontFamily: "roboto",
@@ -113,8 +138,8 @@ const styles = StyleSheet.create({
   },
   button: {
     // Remove left and top properties
-    width: 250,
-    height: 60,
+    width: "15%",
+    height: "5.5%",
     marginTop: 20,
     backgroundColor: '#959595',
     paddingHorizontal: 20,
@@ -146,5 +171,15 @@ const styles = StyleSheet.create({
     width: 30, // Largeur de l'image d'étoile
     height: 30, // Hauteur de l'image d'étoile
     marginHorizontal: 5, // Marge horizontale entre les étoiles
+  },
+  leftButton: {
+    position: 'absolute',
+    top: 40, // Décaler vers le bas
+    left: 30, // Décaler vers la droite
+    zIndex: 999, // Assure que le bouton est au-dessus de tout autre contenu
+  },
+  leftButtonImage: {
+      width: 40,
+      height: 40,
   },
 });

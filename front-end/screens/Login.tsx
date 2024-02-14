@@ -93,8 +93,8 @@ const styles = StyleSheet.create({
     right: 0, // Center horizontally
   },
   input: {
-    width: 250, // Largeur du TextInput
-    height: 60, // Hauteur du TextInput
+    width: "15%",
+    height: "5.5%",
     paddingHorizontal: 10,
     fontSize: 26, // Taille de la police du texte
     fontFamily: "roboto",
@@ -103,9 +103,8 @@ const styles = StyleSheet.create({
     borderBottomColor: '#fff', // Couleur de la barre horizontale
   },
   button: {
-    // Remove left and top properties
-    width: 250,
-    height: 60,
+    width: "15%",
+    height: "5.5%",
     marginTop: 20,
     backgroundColor: '#959595',
     paddingHorizontal: 20,
