@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {View, Text, TouchableOpacity, StyleSheet, Dimensions} from 'react-native';
+import {View, Text, TouchableOpacity, StyleSheet, Dimensions, ScrollView} from 'react-native';
 import Player from '../../classes/Player';
 import Ballon from '../../classes/Ballon';
 
@@ -14,7 +14,7 @@ interface PositionProps {
     handleClickZoom: () => void;
     handleClickAdd: () => void;
     handleCLickBallMode: () => void;
-  }
+}
 
 export default function Position({
     sendDataToB,
@@ -24,7 +24,7 @@ export default function Position({
     handleClickZoom,
     handleClickAdd,
     handleCLickBallMode
-  }: PositionProps) {
+}: PositionProps) {
     const [numberOfPosition, setNumberOfPosition] = useState<number[]>([1, 2]);
 
     useEffect(() => {
@@ -50,62 +50,102 @@ export default function Position({
         }
     };
 
+    // New function to handle the creation of a new position
+    const handleCreateNewPosition = () => {
+        const newPosition = numberOfPosition.length + 1;
+        setNumberOfPosition(prevPositions => [...prevPositions, newPosition]);
+    };
+
     return (
         <View style={styles.container}>
-            <View style={{flexDirection: "row", position: "absolute", alignSelf: "flex-start", top: 0, left: 0}}>
-                {numberOfPosition.map((item, index) => (
-                    <TouchableOpacity
-                        activeOpacity={0.7}
-                        key={index}
-                        onPress={() => handlePress(item)}
-                        style={styles.buttonPos}
-                    >
-                        <Text>{item}</Text>
-                    </TouchableOpacity>
-                ))}
+            <View style={styles.positionContainer}>
+                <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
+                    <View style={{flexDirection: "row"}}>
+                        {numberOfPosition.map((item, index) => (
+                            <TouchableOpacity
+                                activeOpacity={0.7}
+                                key={index}
+                                onPress={() => handlePress(item)}
+                                style={styles.buttonPos}
+                            >
+                                <Text>{item}</Text>
+                            </TouchableOpacity>
+                        ))}
+                        {/* New "Plus" button */}
+                        <TouchableOpacity
+                            activeOpacity={0.7}
+                            onPress={handleCreateNewPosition}
+                            style={styles.buttonPos}
+                        >
+                            <Text>+</Text>
+                        </TouchableOpacity>
+                    </View>
+                </ScrollView>
             </View>
 
-            <TouchableOpacity onPress={handleClickZoom} style={styles.buttonBase}>
-                <Text>Mode ZOOM</Text>
-            </TouchableOpacity>
+            <View style={styles.buttonBaseContainer}>
+                <TouchableOpacity onPress={handleClickZoom} style={styles.buttonBase}>
+                    <Text>Mode ZOOM</Text>
+                </TouchableOpacity>
 
-            <TouchableOpacity onPress={handleClickAdd} style={styles.buttonBase}>
-                <Text>Add Player</Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity onPress={handleCLickBallMode} style={styles.buttonBase}>
-                <Text>Mode Ballon</Text>
-            </TouchableOpacity>
+                <TouchableOpacity onPress={handleClickAdd} style={styles.buttonBase}>
+                    <Text>Add Player</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity onPress={handleCLickBallMode} style={styles.buttonBase}>
+                    <Text>Mode Ballon</Text>
+                </TouchableOpacity>
+            </View>
         </View>
     );
 };
 
+const activeColor = '#959595'; // la couleur du bouton actif
+const inactiveColor = '#D9D9D9'; // la couleur du bouton inactif
+const windowWidth = Dimensions.get('window').width;
+const windowHeight = Dimensions.get('window').height;
 
 const styles = StyleSheet.create({
     container: {
-        height: dimHeight / 4,
-        width: dimWidth,
-        backgroundColor: "#D9D9D9",
-        justifyContent: "center",
-        alignItems: "center",
-        flexDirection: "row"
+        flex: 1,
+        flexDirection: 'column',
+    },
+    positionContainer: {
+        height: windowHeight / 4, // Utilisez windowHeight pour définir la hauteur
+        width: windowWidth, // Utilisez windowWidth pour définir la largeur
+        backgroundColor: 'transparent',
+        justifyContent: 'center',
+        alignItems: 'center',
+        flexDirection: 'row',
+        borderRadius: 15,
+        position: 'relative',
+        top: '-45%',
     },
     buttonPos: {
-        height: 20,
-        width: 100,
-        backgroundColor: "green",
-        borderRadius: 20,
-        justifyContent: "center",
-        alignItems: "center"
-    },
-    buttonBase: {
         height: 30,
         width: 100,
-        backgroundColor: "#959595",
-        borderRadius: 10,
-        justifyContent: "center",
-        alignItems: "center",
-        marginLeft: 10
+        justifyContent: 'center',
+        alignItems: 'center',
+        elevation: 4,
+        borderTopRightRadius: 10,
+        borderRightWidth: 2,
+        borderColor: 'lightgrey',
+        backgroundColor: 'grey',
+    },
+    plusSign: {
+        fontSize: 24,
+        marginLeft: 10,
+    },
+    buttonBaseContainer: {
+        backgroundColor: 'white',
+        height: 30,
+        width: 100,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+
+    buttonBase: {
+
     }
 
-})
+});
