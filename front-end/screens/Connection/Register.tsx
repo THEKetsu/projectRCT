@@ -28,14 +28,20 @@ export default function Register () {
       console.error("The password must have a minimum length of 6 characters")
       return
     }
-    createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        console.log(userCredential);
-        navigation.navigate("Login")
-      })
-      .catch((error) => {
-        console.log(error);
-      })
+    if (password == passwordRepeated){
+      createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          console.log(userCredential);
+          navigation.navigate("Login")
+        })
+        .catch((error) => {
+          console.log(error);
+        })
+    }
+    else{
+      console.error("Not the same password")
+      return
+    }
   };
 
 
