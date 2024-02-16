@@ -82,17 +82,17 @@ export default function Position({
     
             { collapsed && (<MaterialIcons style={styles.chevronIcon}
                 name={"keyboard-arrow-down"}
-                size={'200%'}
+                size={200}
                 color={"black"}
             /> )}
             { !collapsed && (<MaterialIcons style={styles.chevronIcon}
                 name={"keyboard-arrow-up"}
-                size={'200%'}
+                size={200}
                 color={"black"}
             /> )}
 
             </TouchableOpacity>
-            <Animated.View style={{flexDirection: "row", position: "absolute", alignSelf: "flex-start", top: 0, left: 0}}>
+            <View style={{flexDirection: "row", position: "absolute", alignSelf: "flex-start", top: 0, left: 0}}>
                 {numberOfPosition.map((item, index) => (
                     <TouchableOpacity
                         activeOpacity={0.7}
@@ -103,14 +103,14 @@ export default function Position({
                         <Text>{item}</Text>
                     </TouchableOpacity>
                 ))}
-            </Animated.View>
-            <Animated.View style={styles.buttonContainer}>
+            </View>
+            <View style={styles.buttonContainer}>
 
             <TouchableOpacity onPress={handleClickAdd} style={[styles.buttonBase, !collapsed && {display: 'none'}]}>
                 {/* Mode ZOOM */}
                 <Ionicons
                                     name={"shirt-sharp"}
-                                    size={'200%'}
+                                    size={200}
                                     color={"black"}
                                 />
             </TouchableOpacity>
@@ -119,7 +119,7 @@ export default function Position({
                 {/* Add Player */}
                 <FontAwesome
                                     name={"arrows"}
-                                    size={'200%'}
+                                    size={200}
                                     color={"black"}
                                 />
             </TouchableOpacity>
@@ -128,7 +128,7 @@ export default function Position({
                 {/* Mode Ballon */}
                 <MaterialIcons
                                     name={"sports-rugby"}
-                                    size={'200%'}
+                                    size={200}
                                     color={"black"}
                                 />
             </TouchableOpacity>
@@ -136,11 +136,11 @@ export default function Position({
                 {/* Mode crayon */}
                 <FontAwesome
                                     name={"pencil"}
-                                    size={'200%'}
+                                    size={200}
                                     color={"black"}
                                 />
             </TouchableOpacity>
-            </Animated.View>
+            </View>
         </Animated.View>
     );
 };
@@ -181,13 +181,13 @@ const styles = StyleSheet.create({
     },
     retractable: {
         position: "absolute",
-        top:"-5%",
-        backgroundColor: "#D9D9D9",
-        borderRadius: "25%",
+        top:"-10%",
+        backgroundColor: "red",
+        borderRadius: 25,
         width: "10%",
         justifyContent:"center",
         alignItems:"center",
-        zIndex: 1
+        zIndex: 5
 
     },
     chevronIcon: {
