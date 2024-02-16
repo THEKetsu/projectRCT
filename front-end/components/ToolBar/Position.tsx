@@ -20,7 +20,6 @@ interface PositionProps {
     handleClickDrawMode: () => void;
 }
 
-
 export default function Position({
                                      sendDataToB,
                                      receivedData,

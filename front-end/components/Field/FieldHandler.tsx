@@ -1,14 +1,8 @@
 import {StatusBar} from 'expo-status-bar';
 import React, {useRef, useState} from 'react';
 import {
-    StyleSheet, Text, View, Dimensions, PanResponder, Pressable, TouchableOpacity,
-    TextStyle, StyleProp, TouchableWithoutFeedback, Image
+    StyleSheet, View, Dimensions
 } from 'react-native';
-
-import {Video} from 'expo-av';
-
-import ViewShot from 'react-native-view-shot';
-import ImageSequence from 'react-native-image-sequence';
 import {Field} from './Field';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import Position from '../ToolBar/Position';
@@ -33,57 +27,52 @@ export default function FieldHandler() {
     const [dataForReturn, setDataForReturn] = useState<[number, Player[], Ballon[]][]>([[0, [stupidPlayer],[stupidBallon]]]);
 
     const handleClickZoom = () => {
-        if(buttonZoom){
+        if (buttonZoom) {
             setButtonValueAdd(false);
             setButtonZoom(false);
             setballMode(false);
-        }else{
+        } else {
             setButtonValueAdd(false);
             setButtonZoom(true);
             setballMode(false);
         }
-        
     };
     const handleClickDraw = () => {
-        if(buttonDrawMode){
+        if (buttonDrawMode) {
             setButtonValueAdd(false);
             setButtonZoom(false);
             setballMode(false);
             setdrawMode(false);
-        }else{
+        } else {
             setButtonValueAdd(false);
             setButtonZoom(false);
             setballMode(false);
             setdrawMode(true);
         }
-        
     };
 
     const handleClickAdd = () => {
-        if(buttonADDPlayer){
+        if (buttonADDPlayer) {
             setButtonZoom(false);
             setButtonValueAdd(false);
             setballMode(false);
-        }else{
+        } else {
             setButtonZoom(false);
             setButtonValueAdd(true);
             setballMode(false);
         }
-        
     };
 
     const handleClickBallMode = () => {
-        if(buttonBallMode){
+        if (buttonBallMode) {
             setButtonZoom(false);
             setButtonValueAdd(false);
             setballMode(false);
-        }else{
+        } else {
             setButtonZoom(false);
             setButtonValueAdd(false);
             setballMode(true);
         }
-        
-        
     };
 
     return (

@@ -49,8 +49,5 @@ export default class Player {
       this.speed = 1;
     }
   }
-
-
-
 }
 

@@ -2,22 +2,29 @@ import React, {useEffect} from 'react';
 import {View, Button} from 'react-native';
 import Player from "../classes/Player";
 import Ballon from "../classes/Ballon";
+import {useDispatch} from "react-redux";
+import {useAppDispatch, useAppSelector} from "../hooks/reduxHooks";
+import {setPositionList} from "../redux/actions/positionLogicActions";
 
 // @ts-ignore
 export default function Home ({navigation}) {
 
-    function testClass() {
-        const player1: Player = Player.createPlayer([0, 0], "0B", [], [], 1)
-        const ballon1: Ballon = Ballon.createBallon([0,0],[],"")
+    const dispatch = useAppDispatch()
+    const positionLogic = useAppSelector((state) => state.positionLogic)
 
-        let strPlayer: string = JSON.stringify(player1)
-        let jsonPlayer  = Player.from(JSON.parse(strPlayer))
+    function testClass () {
+        const player1: Player = Player.createPlayer([0, 0], "0B", [], [], 1);
+        const ballon1: Ballon = Ballon.createBallon([0,0],[],"");
 
-        console.log(jsonPlayer)
+        const positionList: [number, Player[], Ballon[]][] = [[
+            0,
+            [player1],
+            [ballon1]
+        ]]
 
-        jsonPlayer.idChange("5R")
+        const strPL: string = JSON.stringify(positionList)
 
-        console.log(jsonPlayer)
+        console.log(strPL)
     }
 
     useEffect(() => {

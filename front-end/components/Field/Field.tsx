@@ -127,9 +127,6 @@ export function Field(props: ZoomableSVGProps) {
         retrievePlayer();
     }, []);
 
-    useEffect(() => {
-        console.log("IT CHANGED", JSON.parse(positionLogic.positionList))
-    }, [positionLogic.positionList])
 
     useEffect(() => {
         if (props.buttonADDPlayer) {
@@ -364,13 +361,13 @@ export function Field(props: ZoomableSVGProps) {
             center = [((superSvg_Field[0][0] + superSvg_Field[0][2] + superSvg_Field[0][4] + superSvg_Field[0][5]) / 4), ((superSvg_Field[0][1] + superSvg_Field[0][3] + superSvg_Field[0][3] + superSvg_Field[0][6]) / 4)]
             let svg_Mode = proportionSVG(player, ((superSvg_Field[0][5] - superSvg_Field[0][0]) / (svg_fieldUNCHANGED[5] - svg_fieldUNCHANGED[0])))
 
-            JSON.parse(positionLogic.positionList)[indexPosition][1].map((joueur: Player) => {
+            JSON.parse(positionLogic.positionList)[indexPosition][1].map(Player.from).map((joueur: Player) => {
                 svg_Mode = diffSVG(svg_Mode, getCenter(svg_Mode), xArrayPlayer, getPourcentageCenter(joueur.position[0], joueur.position[1]))
                 joueur.svgValue(svg_Mode)
             });
 
             svg_Mode = proportionSVG(ballon_svg, ((superSvg_Field[0][5] - superSvg_Field[0][0]) / (svg_fieldUNCHANGED[5] - svg_fieldUNCHANGED[0])))
-            JSON.parse(positionLogic.positionList)[indexPosition][2].map((ball: any) => {
+            JSON.parse(positionLogic.positionList)[indexPosition][2].map(Ballon.from).map((ball: any) => {
                 svg_Mode = diffSVG(svg_Mode, getCenterBallon(svg_Mode), xBallon_Array, getPourcentageCenter(ball.position[0], ball.position[1]))
                 ball.svgValue(svg_Mode);
             });
@@ -388,9 +385,6 @@ export function Field(props: ZoomableSVGProps) {
     };
 
     const onGestureEvent = (event: PanGestureHandlerGestureEvent) => {
-
-        console.log("GESTURE EVENT", positionLogic.positionList)
-
         //Un compteur pour réduire la vitesse de prise de valeur (translation) qui créer des bugs d'affichage
         if (pathDrawing) {
             const {translationX, translationY, velocityX, velocityY} = event.nativeEvent;
@@ -429,13 +423,13 @@ export function Field(props: ZoomableSVGProps) {
 
                             const isInside: boolean = pointInPolygon([getXY[0] + translationX, getXY[1] + translationY], polygonPoints);
                             if (!isInside) {
-                                JSON.parse(positionLogic.positionList)[indexPosition][1][index].pathArraySetup([]);
+                                Player.from(JSON.parse(positionLogic.positionList)[indexPosition][1][index]).pathArraySetup([]);
                                 setPlayerPaths(prevPaths => {
                                     // Create a new array with updated path for the specific player
                                     return prevPaths.filter((p) => p.id !== currentID);
                                 });
                             } else {
-                                JSON.parse(positionLogic.positionList)[indexPosition][1][index].arrayPush([pourcentX, pourcentY]);
+                                Player.from(JSON.parse(positionLogic.positionList)[indexPosition][1][index]).arrayPush([pourcentX, pourcentY]);
                                 //La valeur a comparé pour ignorer les valeurs trop proche
 
                                 // Update myPlayersPaths using the state updater function
@@ -491,7 +485,6 @@ export function Field(props: ZoomableSVGProps) {
                             });
 
                         } else {
-
                             setCurrentDraw(prevPaths => {
                                 // Create a new array with updated path for the specific player
                                 return prevPaths.map(prevChemin => {
@@ -541,13 +534,14 @@ export function Field(props: ZoomableSVGProps) {
                     //On fait suivre les joueurs, le center est reset pour le getPourcentageCenter (pour le mettre au bon endroit)
                     center = [((superSvg_Field[0][0] + superSvg_Field[0][2] + superSvg_Field[0][4] + superSvg_Field[0][5]) / 4), ((superSvg_Field[0][1] + superSvg_Field[0][3] + superSvg_Field[0][3] + superSvg_Field[0][6]) / 4)]
                     let svg_Mode = proportionSVG(player, ((superSvg_Field[0][5] - superSvg_Field[0][0]) / (svg_fieldUNCHANGED[5] - svg_fieldUNCHANGED[0])))
-                    JSON.parse(positionLogic.positionList)[indexPosition][1].map((joueur: any) => {
+
+                    JSON.parse(positionLogic.positionList)[indexPosition][1].map(Player.from).map((joueur: Player) => {
                         svg_Mode = diffSVG(svg_Mode, getCenter(svg_Mode), xArrayPlayer, getPourcentageCenter(joueur.position[0], joueur.position[1]))
                         joueur.svgValue(svg_Mode);
                     });
 
                     svg_Mode = proportionSVG(ballon_svg, ((superSvg_Field[0][5] - superSvg_Field[0][0]) / (svg_fieldUNCHANGED[5] - svg_fieldUNCHANGED[0])))
-                    JSON.parse(positionLogic.positionList)[indexPosition][2].map((ball: any) => {
+                    JSON.parse(positionLogic.positionList)[indexPosition][2].map(Ballon.from).map((ball: Ballon) => {
                         svg_Mode = diffSVG(svg_Mode, getCenterBallon(svg_Mode), xBallon_Array, getPourcentageCenter(ball.position[0], ball.position[1]))
                         ball.svgValue(svg_Mode);
                     });
@@ -568,7 +562,7 @@ export function Field(props: ZoomableSVGProps) {
                     let grabB = false;
                     setTranslationPrevPlayer([translationX, translationY]);
 
-                    JSON.parse(positionLogic.positionList)[indexPosition][1].map((j: any) => {
+                    JSON.parse(positionLogic.positionList)[indexPosition][1].map(Player.from).map((j: Player) => {
                         if (j.id == currentID) {
 
                             let centerPlayer = [(j.svg_player[74] + j.svg_player[139] + (translationX - translationPrevPlayer[0]) * 2) / 2,
@@ -601,8 +595,7 @@ export function Field(props: ZoomableSVGProps) {
                             j.pathArraySetup([]);
                             setPlayerPaths([]);
 
-
-                            JSON.parse(positionLogic.positionList)[indexPosition][1].map((joueur: any, index: number) => {
+                            JSON.parse(positionLogic.positionList)[indexPosition][1].map(Player.from).map((joueur: Player) => {
                                 if (currentID == joueur.id) {
                                     let centerXY = getCenter(joueur.svg_player);
                                     let pourcentX = (centerXY[0] - superField[0][0]) / (superField[0][5] - superField[0][0]);
@@ -616,12 +609,12 @@ export function Field(props: ZoomableSVGProps) {
                                         let svg_Mode = JSON.parse(positionLogic.positionList)[indexPosition][2][0].svg_ballon;
 
                                         svg_Mode = diffSVG(svg_Mode, getCenterBallon(svg_Mode), xBallon_Array, getPourcentageCenter2(j.position[0], j.position[1]));
-                                        JSON.parse(positionLogic.positionList)[indexPosition][2][0].svgValue(svg_Mode);
+                                        JSON.parse(positionLogic.positionList)[indexPosition][2].map(Ballon.from)[0].svgValue(svg_Mode);
 
                                         let centerXY = getCenterBallon(svg_Mode);
                                         let pourcentX = (centerXY[0] - superField[0][0]) / (superField[0][5] - superField[0][0]);
                                         let pourcentY = (centerXY[1] - superField[0][3]) / (superField[0][1] - superField[0][3]);
-                                        JSON.parse(positionLogic.positionList)[indexPosition][2][0].positionChange([pourcentX, 1 - pourcentY]);
+                                        JSON.parse(positionLogic.positionList)[indexPosition][2].map(Ballon.from)[0].positionChange([pourcentX, 1 - pourcentY]);
                                     }
                                 }
                             })
@@ -645,7 +638,9 @@ export function Field(props: ZoomableSVGProps) {
             setTranslationPrevPlayer([1.0, 1.0]);
 
             //When we drop the player, we set its position
-            JSON.parse(positionLogic.positionList)[indexPosition][1].map((joueur: any) => {
+
+            JSON.parse(positionLogic.positionList)[indexPosition][1].map(Player.from).map((joueur: Player) => {
+                console.log(joueur)
                 if (currentID == joueur.id) {
                     let centerXY = getCenter(joueur.svg_player);
                     let pourcentX = (centerXY[0] - superField[0][0]) / (superField[0][5] - superField[0][0]);
@@ -703,9 +698,7 @@ export function Field(props: ZoomableSVGProps) {
     };
 
     center = [((superSvg_Field[0][0] + superSvg_Field[0][2] + superSvg_Field[0][4] + superSvg_Field[0][5]) / 4), ((superSvg_Field[0][1] + superSvg_Field[0][3] + superSvg_Field[0][3] + superSvg_Field[0][6]) / 4)]
-    let svg_diff = diffSVG(player, getCenter(player), xArrayPlayer, center);
 
-    //A effacer
     const retrievePlayer = () => {
         data.map(myPosition => {
             let myPlayersData: Player[] = [];
@@ -716,7 +709,6 @@ export function Field(props: ZoomableSVGProps) {
 
                 let newPlayer = Player.createPlayer([xCoordinate, yCoordinate], item.id, item.array, player, 1);
                 myPlayersData.push(newPlayer);
-
             });
 
             if (myPosition.ballon.length > 0) {
@@ -734,6 +726,8 @@ export function Field(props: ZoomableSVGProps) {
                 [...myBallonData]
             ];
 
+            console.log("DEBUG 3: ", [...JSON.parse(positionLogic.positionList), positionCurrent])
+
             dispatch(setPositionList(JSON.stringify([...JSON.parse(positionLogic.positionList), positionCurrent])))
 
             myPlayersData = [];
@@ -747,7 +741,7 @@ export function Field(props: ZoomableSVGProps) {
     const handlePlayerPress = (id: string) => {
         setPathDrawing(true);
 
-        JSON.parse(positionLogic.positionList)[indexPosition][1].map((joueur: any) => {
+        JSON.parse(positionLogic.positionList)[indexPosition][1].map(Player.from).map((joueur: Player) => {
             if (joueur.id === id) {
                 setCurrentID(joueur.id + 'P');
                 //On a cliqué sur le joueur on boost sa speed
@@ -794,13 +788,13 @@ export function Field(props: ZoomableSVGProps) {
                 setAll();
 
                 let svg_Mode = proportionSVG(player, ((superSvg_Field[0][5] - superSvg_Field[0][0]) / (svg_fieldUNCHANGED[5] - svg_fieldUNCHANGED[0])))
-                JSON.parse(positionLogic.positionList)[indexPosition][1].map((joueur: any) => {
+                JSON.parse(positionLogic.positionList)[indexPosition][1].map(Player.from).map((joueur: Player) => {
                     svg_Mode = diffSVG(svg_Mode, getCenter(svg_Mode), xArrayPlayer, getPourcentageCenter(joueur.position[0], joueur.position[1]))
                     joueur.svgValue(svg_Mode);
                 });
 
                 svg_Mode = proportionSVG(ballon_svg, ((superSvg_Field[0][5] - superSvg_Field[0][0]) / (svg_fieldUNCHANGED[5] - svg_fieldUNCHANGED[0])))
-                JSON.parse(positionLogic.positionList)[indexPosition][2].map((ball: any) => {
+                JSON.parse(positionLogic.positionList)[indexPosition][2].map(Ballon.from).map((ball: Ballon) => {
                     svg_Mode = diffSVG(svg_Mode, getCenterBallon(svg_Mode), xBallon_Array, getPourcentageCenter(ball.position[0], ball.position[1]))
                     ball.svgValue(svg_Mode);
                 });
@@ -990,7 +984,7 @@ export function Field(props: ZoomableSVGProps) {
             let continueAdding = true;
             let existingPlayerIndex = -1;
 
-            JSON.parse(positionLogic.positionList)[indexPosition][1].map((player: any, index: number) => {
+            JSON.parse(positionLogic.positionList)[indexPosition][1].map(Player.from).map((player: Player, index: number) => {
                 if (newPlayer.id == player.id) {
                     continueAdding = false;
                     existingPlayerIndex = index;
@@ -1017,7 +1011,6 @@ export function Field(props: ZoomableSVGProps) {
                 ))
 
             } else {
-
                 center = [((superField[0][0] + superField[0][2] + superField[0][4] + superField[0][5]) / 4), ((superField[0][1] + superField[0][3] + superField[0][3] + superField[0][6]) / 4)]
                 let svg_Mode = proportionSVG(player, ((superField[0][5] - superField[0][0]) / (svg_fieldUNCHANGED[5] - svg_fieldUNCHANGED[0])))
                 svg_Mode = diffSVG(svg_Mode, getCenter(svg_Mode), xArrayPlayer, getPourcentageCenter2(newPlayer.position[0], newPlayer.position[1]))
@@ -1048,7 +1041,6 @@ export function Field(props: ZoomableSVGProps) {
         superSvg_Field = superField;
         let newBall = Ballon.createBallon(positionAdd, ballon_svg, "");
 
-
         center = [((superField[0][0] + superField[0][2] + superField[0][4] + superField[0][5]) / 4), ((superField[0][1] + superField[0][3] + superField[0][3] + superField[0][6]) / 4)]
         let svg_Mode = proportionSVG(ballon_svg, ((superField[0][5] - superField[0][0]) / (svg_fieldUNCHANGED[5] - svg_fieldUNCHANGED[0])))
         svg_Mode = diffSVG(svg_Mode, getCenterBallon(svg_Mode), xBallon_Array, getPourcentageCenter2(newBall.position[0], newBall.position[1]))
@@ -1075,14 +1067,13 @@ export function Field(props: ZoomableSVGProps) {
         const x = event.nativeEvent.x;
         const y = event.nativeEvent.y;
 
-
         const state = event.nativeEvent.state;
 
         if (state == 2) {
             setCurrentID(''); //New action => reset the current ID
             if (addMode && svgRef.current) {
                 let onPlayer = false;
-                JSON.parse(positionLogic.positionList)[indexPosition][1].map((joueur: any) => {
+                JSON.parse(positionLogic.positionList)[indexPosition][1].map(Player.from).map((joueur: Player) => {
 
                     const polygonPoints: number[][] = [
                         [joueur.svg_player[74], joueur.svg_player[9]],
@@ -1103,13 +1094,11 @@ export function Field(props: ZoomableSVGProps) {
                 });
 
                 if (!onPlayer) {
-
                     //on veut px et py qui sont les 5 et 6e valeur de measure (les autres sont inutile mais on doit les demandé pour atteindre px et py)
-                    svgRef.current.measure((fx: number, fy: number, width: number, height: number, px: number, py: number) => {
+                    svgRef.current.measure(() => {
                         // Adjust x and y based on the position of the SVG
-                        const adjustedX = x;
-                        const adjustedY = y;
-
+                        const adjustedX: number = x;
+                        const adjustedY: number = y;
 
                         const polygonPoints: number[][] = [
                             [superField[0][0], superField[0][1]],
@@ -1131,11 +1120,10 @@ export function Field(props: ZoomableSVGProps) {
             } else if (ballMode && svgRef.current) {
 
                 //on veut px et py qui sont les 5 et 6e valeur de measure (les autres sont inutile mais on doit les demandé pour atteindre px et py)
-                svgRef.current.measure((fx: number, fy: number, width: number, height: number, px: number, py: number) => {
+                svgRef.current.measure(() => {
                     // Adjust x and y based on the position of the SVG
                     const adjustedX = x;
                     const adjustedY = y;
-
 
                     const polygonPoints: number[][] = [
                         [superField[0][0], superField[0][1]],
@@ -1155,8 +1143,8 @@ export function Field(props: ZoomableSVGProps) {
 
             } else if (drawMode && svgRef.current) {
                 //Selection check (modif speed)
-                let onPlayer = false;
-                JSON.parse(positionLogic.positionList)[indexPosition][1].map((joueur: any) => {
+                let onPlayer: boolean = false;
+                JSON.parse(positionLogic.positionList)[indexPosition][1].map(Player.from).map((joueur: Player) => {
 
                     const polygonPoints: number[][] = [
                         [joueur.svg_player[74], joueur.svg_player[9]],
@@ -1164,7 +1152,6 @@ export function Field(props: ZoomableSVGProps) {
                         [joueur.svg_player[139], joueur.svg_player[105]],
                         [joueur.svg_player[139], joueur.svg_player[9]],
                     ];
-
 
                     svgRef.current.measure(() => {
                         // Adjust x and y based on the position of the SVG
@@ -1174,20 +1161,19 @@ export function Field(props: ZoomableSVGProps) {
                             onPlayer = true;
                             handlePlayerPress(joueur.id);
                         }
-
                     })
                 });
 
                 if (!onPlayer && drawMode) {
-                    svgRef.current.measure((fx: number, fy: number, width: number, height: number, px: number, py: number) => {
+                    svgRef.current.measure((px: number, py: number) => {
 
                         px1 = px;
                         py1 = py;
 
-                        const adjustedX = x;
-                        const adjustedY = y;
-                        let pourcentX = (adjustedX - superField[0][0]) / (superField[0][5] - superField[0][0]);
-                        let pourcentY = (adjustedY - superField[0][3]) / (superField[0][1] - superField[0][3]);
+                        const adjustedX: number = x;
+                        const adjustedY: number = y;
+                        let pourcentX: number = (adjustedX - superField[0][0]) / (superField[0][5] - superField[0][0]);
+                        let pourcentY: number = (adjustedY - superField[0][3]) / (superField[0][1] - superField[0][3]);
 
 
                         const newFreePath: freeDraw = {
@@ -1204,13 +1190,8 @@ export function Field(props: ZoomableSVGProps) {
                     });
                 }
             }
-
-
         }
-
-
     };
-
 
     function comparePositions(positionA: number[], positionB: number[]): boolean {
         // Replace this logic with your actual comparison logic
@@ -1226,17 +1207,12 @@ export function Field(props: ZoomableSVGProps) {
         setballMode(false);
         setZoomMode(false);
         setDrawMode(false);
-
         setPathDrawing(false);
 
-
         animationEnCours = true;
-
         //Un boolean pour ajouter une Position si il y'a eu un changement au moins
         let atLeastOneChange = false;
-
         let listJoueurModify: [string, number[]][] = [];
-
         let ballonMove = false;
 
         //Il exist un index après le current (?) si oui...
@@ -1352,28 +1328,25 @@ export function Field(props: ZoomableSVGProps) {
             let getXYListEnd = getPourcentageCenter(newAnimationPathBallon[newAnimationPathBallon.length - 1][0], 1 - newAnimationPathBallon[newAnimationPathBallon.length - 1][1]);
             setAnimationPathBallon([getXYListStart, getXYListEnd]);
 
-
             //On lance une animation du ballon
             prioAnimation(listNumb, 0, atLeastOneChange, listJoueurModify);
         } else {
 
             animateSuite(atLeastOneChange, listJoueurModify);
         }
-
     };
 
     const animateSuite = (atLeastOneChange: boolean, listJoueurModify: [string, number[]][]) => {
         let indexCheck = -1;
 
-        JSON.parse(positionLogic.positionList)[indexPosition][1].map((joueur: any, index: number) => {
+        JSON.parse(positionLogic.positionList)[indexPosition][1].map(Player.from).map((joueur: Player) => {
             //Check if ID === an ID of listJoueurModify, recup its index on listJoueurModify
             const modifyIndex = listJoueurModify.findIndex(([id]) => id === joueur.id);
-
 
             if (joueur.myArray.length > 0) {
                 //On start l'animation
                 atLeastOneChange = true;
-                setcheckForEnd((...prevCheck) => [false]);
+                setcheckForEnd(() => [false]);
                 goAnimation(joueur, 0, indexCheck);
 
                 //On reset le chemin dessiné pour l'effacer [NOPE echec]
@@ -1396,32 +1369,18 @@ export function Field(props: ZoomableSVGProps) {
                     addCy = -1;
                 }
 
-                //Add +0.1*addCx and +0.1*addCy until the numbers are close enough to listJoueurModify[modifyIndex][1]
-                //If they are closer than 0.1, the last value should be equal to listJoueurModify[modifyIndex][1]
-                //Exemple : 0,0 towards 0.28,0.28 , list numb = [[0,0],[0.1,0.1],[0.2,0.2],[0.28,0.28]]
-
-
                 let [currentX, currentY] = joueur.position;
-
-
-                let antiCrashIndex = 0;//Dans le cas où qqun met de mauvaise valeur JSON
-                //On continue tant que x et y ne sont pas assez proche du final
-
+                let antiCrashIndex = 0;
                 let absolueX = Math.abs(currentX - listJoueurModify[modifyIndex][1][0]);
                 let absolueY = Math.abs(currentY - listJoueurModify[modifyIndex][1][1]);
-
-                //Cran de deplacement (modifiable mais égaux au départ pour ligne droite)
                 let uppScaleX = 0.02;
                 let uppScaleY = 0.02;
 
-                //Application de Ax + b pour une ligne droite (if pour décider qui est A et qui est B)
                 if (absolueX >= absolueY && absolueX > 0) {
                     uppScaleY = uppScaleY * absolueY / absolueX;
-
                 } else if (absolueY > 0) {
                     uppScaleX = uppScaleX * absolueX / absolueY;
-                }//On evite les division par 0
-
+                }
 
                 while ((Math.abs(currentX - listJoueurModify[modifyIndex][1][0]) > uppScaleX ||
                     Math.abs(currentY - listJoueurModify[modifyIndex][1][1]) > uppScaleY) && antiCrashIndex < 1000) {
@@ -1432,7 +1391,6 @@ export function Field(props: ZoomableSVGProps) {
                     } else {
                         currentX = currentX + uppScaleX * addCx; // on l'approche d'un cran
                     }
-
 
                     if (Math.abs(currentY - listJoueurModify[modifyIndex][1][1]) < uppScaleY) {
                         currentY = listJoueurModify[modifyIndex][1][1];
@@ -1447,13 +1405,10 @@ export function Field(props: ZoomableSVGProps) {
                 listNumb.push([listJoueurModify[modifyIndex][1][0], 1 - listJoueurModify[modifyIndex][1][1]])
                 joueur.pathArraySetup(listNumb);
 
-                setcheckForEnd((...prevCheck) => [false]);
+                setcheckForEnd(() => [false]);
                 indexCheck = indexCheck + 1;
                 goAnimation(joueur, 0, indexCheck);
-
-
             }
-
         });
 
         //La Position CURRENT est la dernière et il y'a eu un changement, on créer la nouvelle position
@@ -1500,7 +1455,6 @@ export function Field(props: ZoomableSVGProps) {
                 center = [((superSvg_Field[0][0] + superSvg_Field[0][2] + superSvg_Field[0][4] + superSvg_Field[0][5]) / 4), ((superSvg_Field[0][1] + superSvg_Field[0][3] + superSvg_Field[0][3] + superSvg_Field[0][6]) / 4)]
                 let svg_Mode = proportionSVG(player, ((superSvg_Field[0][5] - superSvg_Field[0][0]) / (svg_fieldUNCHANGED[5] - svg_fieldUNCHANGED[0])))
 
-
                 svg_Mode = diffSVG(svg_Mode, getCenter(svg_Mode), xArrayPlayer, getPourcentageCenter(j.myArray[index][0], 1 - j.myArray[index][1]));
                 j.svgValue(svg_Mode);
 
@@ -1508,15 +1462,11 @@ export function Field(props: ZoomableSVGProps) {
                     if (j.id == JSON.parse(positionLogic.positionList)[indexPosition][2][0].idJoueur) {
                         let svg_Mode = proportionSVG(ballon_svg, ((superSvg_Field[0][5] - superSvg_Field[0][0]) / (svg_fieldUNCHANGED[5] - svg_fieldUNCHANGED[0])))
 
-
                         svg_Mode = diffSVG(svg_Mode, getCenterBallon(svg_Mode), xBallon_Array, getPourcentageCenter(j.myArray[index][0], 1 - j.myArray[index][1]));
                         JSON.parse(positionLogic.positionList)[indexPosition][2][0].svgValue(svg_Mode);
                     }
                 }
-
                 showPlayer(false);
-
-
             }
             if (j.myArray.length == index + 1 && j.myArray[index][0] != -100) {
                 j.positionChange([j.myArray[index][0], 1 - j.myArray[index][1]])
@@ -1525,12 +1475,9 @@ export function Field(props: ZoomableSVGProps) {
         } else {
             if (j.myArray[0][0] != -100) {
                 j.positionChange([j.myArray[0][0], 1 - j.myArray[0][1]]);
-
-
             } else {
                 j.positionChange([j.myArray[1][0], 1 - j.myArray[1][1]]);
                 j.pathArraySetup([]);
-
             }
             //Prevenir de la fin
             setcheckForEnd((prevCheck) => {
@@ -1538,7 +1485,6 @@ export function Field(props: ZoomableSVGProps) {
                 changeCheck[indexCheck] = true;
                 return (changeCheck);
             });
-
             checkEndingAnimation();
         }
     };
@@ -1559,9 +1505,7 @@ export function Field(props: ZoomableSVGProps) {
                 // //Si on anime tout jusqu'à la fin
                 // animate();
 
-
             }
-
         }
     };
 
@@ -1574,12 +1518,10 @@ export function Field(props: ZoomableSVGProps) {
                 center = [((superSvg_Field[0][0] + superSvg_Field[0][2] + superSvg_Field[0][4] + superSvg_Field[0][5]) / 4), ((superSvg_Field[0][1] + superSvg_Field[0][3] + superSvg_Field[0][3] + superSvg_Field[0][6]) / 4)]
                 let svg_Mode = proportionSVG(ballon_svg, ((superSvg_Field[0][5] - superSvg_Field[0][0]) / (svg_fieldUNCHANGED[5] - svg_fieldUNCHANGED[0])))
 
-
                 svg_Mode = diffSVG(svg_Mode, getCenterBallon(svg_Mode), xBallon_Array, getPourcentageCenter(j[index][0], 1 - j[index][1]));
                 JSON.parse(positionLogic.positionList)[indexPosition][2][0].svgValue(svg_Mode);
 
                 showPlayer(false);
-
             }
             if (j.length == index + 1 && j[index][0] != -100) {
                 JSON.parse(positionLogic.positionList)[indexPosition][2][0].positionChange([j[index][0], 1 - j[index][1]])
@@ -1594,7 +1536,6 @@ export function Field(props: ZoomableSVGProps) {
             }
             animateSuite(atLeastOneChange, listJoueurModify);
         }
-
     };
 
     const closestPlayerToBallon = () => {
@@ -1644,13 +1585,13 @@ export function Field(props: ZoomableSVGProps) {
         //On fait suivre les joueurs, le center est reset pour le getPourcentageCenter (pour le mettre au bon endroit)
         center = [((superSvg_Field[0][0] + superSvg_Field[0][2] + superSvg_Field[0][4] + superSvg_Field[0][5]) / 4), ((superSvg_Field[0][1] + superSvg_Field[0][3] + superSvg_Field[0][3] + superSvg_Field[0][6]) / 4)]
         let svg_Mode = proportionSVG(player, ((superSvg_Field[0][5] - superSvg_Field[0][0]) / (svg_fieldUNCHANGED[5] - svg_fieldUNCHANGED[0])))
-        JSON.parse(positionLogic.positionList)[indexPosition][1].map((joueur: any) => {
+        JSON.parse(positionLogic.positionList)[indexPosition][1].map(Player.from).map((joueur: any) => {
             svg_Mode = diffSVG(svg_Mode, getCenter(svg_Mode), xArrayPlayer, getPourcentageCenter(joueur.position[0], joueur.position[1]))
             joueur.svgValue(svg_Mode);
         });
 
         svg_Mode = proportionSVG(ballon_svg, ((superSvg_Field[0][5] - superSvg_Field[0][0]) / (svg_fieldUNCHANGED[5] - svg_fieldUNCHANGED[0])))
-        JSON.parse(positionLogic.positionList)[indexPosition][2].map((ball: any) => {
+        JSON.parse(positionLogic.positionList)[indexPosition][2].map(Ballon.from).map((ball: any) => {
             svg_Mode = diffSVG(svg_Mode, getCenterBallon(svg_Mode), xBallon_Array, getPourcentageCenter(ball.position[0], ball.position[1]))
             ball.svgValue(svg_Mode);
         });
@@ -1663,19 +1604,16 @@ export function Field(props: ZoomableSVGProps) {
         if (JSON.parse(positionLogic.positionList)[indexPosition][1].length > 0 && JSON.parse(positionLogic.positionList)[indexPosition][2].length > 0) {
             //Si le joueur n'est pas link, on le link
             if (JSON.parse(positionLogic.positionList)[indexPosition][2][0].idJoueur == "") {
-                JSON.parse(positionLogic.positionList)[indexPosition][2][0].idChange(closestPlayer[0]);
-                JSON.parse(positionLogic.positionList)[indexPosition][2][0].positionChange(closestPlayer[1]);
-
-
+                Player.from(JSON.parse(positionLogic.positionList)[indexPosition][2][0]).idChange(closestPlayer[0]);
+                Player.from(JSON.parse(positionLogic.positionList)[indexPosition][2][0]).positionChange(closestPlayer[1]);
             } else {
                 //Sinon on UNLICK
-                JSON.parse(positionLogic.positionList)[indexPosition][2][0].idChange("");
+                Player.from(JSON.parse(positionLogic.positionList)[indexPosition][2][0]).idChange("");
             }
 
             if (refresh) {
                 simulateMouveRefresh();
             }
-
         }
     }
 
@@ -1695,7 +1633,7 @@ export function Field(props: ZoomableSVGProps) {
                 if (JSON.parse(positionLogic.positionList)[indexPosition][2].length > 0) {
                     if (JSON.parse(positionLogic.positionList)[indexPosition][2][0].idJoueur === JSON.parse(positionLogic.positionList)[indexPosition][1][indexID].id) {
                         //Si il est attaché à ce joueur, on l'attache à sa modif
-                        JSON.parse(positionLogic.positionList)[indexPosition][2][0].idChange(text);
+                        Player.from(JSON.parse(positionLogic.positionList)[indexPosition][2][0]).idChange(text);
                     }
                 }
 
@@ -1704,7 +1642,7 @@ export function Field(props: ZoomableSVGProps) {
                 if (indexPath != -1) {
                     playerPaths.splice(indexPath, 1);
                 }
-                JSON.parse(positionLogic.positionList)[indexPosition][1][indexID].idChange(text);
+                Player.from(JSON.parse(positionLogic.positionList)[indexPosition][1][indexID]).idChange(text);
                 setCurrentID(text);
                 simulateMouveRefresh();
             }
