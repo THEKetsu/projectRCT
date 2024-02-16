@@ -14,20 +14,20 @@ export default function Login () {
   });
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
-  const [shakeAnimation] = React.useState(new Animated.Value(0)); // Create an animated value for the shake animation
+  const [isEmailValid, setIsEmailValid] = React.useState(false); // New state to track email validity
+  const [isPasswordValid, setIsPasswordValid] = React.useState(false); // New state to track password validity
+
 
   const login = () => {
     console.log("Test register")
 
-    if ((regex.test(email) === false)) {
+    if (!isEmailValid) {
       console.error("Invalid email address")
-      startShakeAnimation();
       return
     }
 
-    if (password.length < 6) {
+    if (!isPasswordValid) {
       console.error("The password must have a minimum length of 6 characters")
-      startShakeAnimation();
       return
     }
     signInWithEmailAndPassword(auth, email, password)
@@ -37,18 +37,11 @@ export default function Login () {
       })
       .catch((error) => {
         console.log(error);
-        startShakeAnimation(); // Trigger the shake animation
       })
   };
 
-  // Function to start the shake animation
-  const startShakeAnimation = () => {
-    Animated.sequence([
-      Animated.timing(shakeAnimation, { toValue: 10, duration: 50, useNativeDriver: true }),
-      Animated.timing(shakeAnimation, { toValue: -10, duration: 50, useNativeDriver: true }),
-      Animated.timing(shakeAnimation, { toValue: 10, duration: 50, useNativeDriver: true }),
-      Animated.timing(shakeAnimation, { toValue: 0, duration: 50, useNativeDriver: true })
-    ]).start();
+  const handleForgotPassword = () => {
+    navigation.navigate("ForgotPassword");
   };
 
   if (!loaded) {
@@ -75,21 +68,31 @@ export default function Login () {
                   placeholder="E-mail"
                   placeholderTextColor="rgba(255, 255, 255, 0.5)" // Couleur du placeholder avec opacité
                   underlineColorAndroid="transparent"
-                  onChangeText={(text) => setEmail(text)}
+                  onChangeText={(text) => {
+                    setEmail(text);
+                    setIsEmailValid(regex.test(text)); // Update email validity
+                  }}
               />
-              </View>
-              <View style={[styles.overlay, styles.overlay2]}>
+            </View>
+            <View style={[styles.overlay, styles.overlay2]}>
               <TextInput
                   style={styles.input}
                   placeholder="Mot de passe"
                   placeholderTextColor="rgba(255, 255, 255, 0.5)" // Couleur du placeholder avec opacité
                   underlineColorAndroid="transparent"
                   secureTextEntry={true}
-                  onChangeText={(text) => setPassword(text)}
+                  onChangeText={(text) => {
+                    setPassword(text);
+                    setIsPasswordValid(text.length >= 6); // Update password validity
+                  }}
               />
           </View>
-          <TouchableOpacity style={styles.button} activeOpacity={0.7} onPress={() => login()}>
+          <TouchableOpacity style={[styles.button, (isEmailValid && isPasswordValid) ? styles.buttonActive : null]} activeOpacity={0.7} onPress={() => login()} disabled={!isEmailValid || !isPasswordValid}>
               <Text style={[styles.buttonText, { fontWeight: 'bold' }]}>Se Connecter</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.forgotPasswordButton} onPress={handleForgotPassword}>
+            <Text style={styles.forgotPasswordText}>Mot de passe oublié ?</Text>
           </TouchableOpacity>
         </ImageBackground>
     </View>
@@ -167,6 +170,17 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontFamily: "roboto",
   },
+  forgotPasswordButton: {
+    position: 'absolute',
+    alignSelf: 'center',
+    top: '70%',
+  },
+  forgotPasswordText: {
+    color: '#fff',
+    textDecorationLine: 'underline',
+    fontSize: 18,
+    fontFamily: "roboto",
+  },
   starContainer: {
     flexDirection: 'row', // Alignement horizontal des images d'étoiles
     marginTop: 10, // Marge en haut des étoiles
@@ -187,5 +201,8 @@ const styles = StyleSheet.create({
   leftButtonImage: {
       width: 40,
       height: 40,
+  },
+  buttonActive: {
+    backgroundColor: '#fff', // Change button color to white when both fields are valid
   },
 });

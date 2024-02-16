@@ -15,19 +15,22 @@ export default function Register () {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [passwordRepeated, checkPassword] = React.useState('');
+  const [isEmailValid, setIsEmailValid] = React.useState(false);
+  const [isPasswordValid, setIsPasswordValid] = React.useState(false);
 
   const register = () => {
     console.log("Test register")
 
-    if ((regex.test(email) === false)) {
+    if (!isEmailValid) {
       console.error("Invalid email address")
       return
     }
 
-    if (password.length < 6) {
-      console.error("The password must have a minimum length of 6 characters")
+    if (!isPasswordValid || password !== passwordRepeated) {
+      console.error("Passwords do not match or are not valid")
       return
     }
+
     createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         console.log(userCredential);
@@ -37,7 +40,6 @@ export default function Register () {
         console.log(error);
       })
   };
-
 
   if (!loaded) {
     return null;
@@ -61,37 +63,47 @@ export default function Register () {
               <TextInput
                   style={styles.input}
                   placeholder="E-mail"
-                  placeholderTextColor="rgba(255, 255, 255, 0.5)" // Couleur du placeholder avec opacité
+                  placeholderTextColor="rgba(255, 255, 255, 0.5)"
                   underlineColorAndroid="transparent"
                   value={email}
-                  onChangeText={(text) => setEmail(text)}
+                  onChangeText={(text) => {
+                    setEmail(text);
+                    setIsEmailValid(regex.test(text));
+                  }}
               />
             </View>
             <View style={[styles.overlay, styles.overlay2]}>
               <TextInput
                   style={styles.input}
                   placeholder="Mot de passe"
-                  placeholderTextColor="rgba(255, 255, 255, 0.5)" // Couleur du placeholder avec opacité
+                  placeholderTextColor="rgba(255, 255, 255, 0.5)"
                   underlineColorAndroid="transparent"
                   secureTextEntry={true}
                   value={password}
-                  onChangeText={(text) => setPassword(text)}
+                  onChangeText={(text) => {
+                    setPassword(text);
+                    setIsPasswordValid(text.length >= 6);
+                  }}
               />
           </View>
           <View style={[styles.overlay, styles.overlay3]}>
               <TextInput
                   style={styles.input}
                   placeholder="Répéter le mot de passe"
-                  placeholderTextColor="rgba(255, 255, 255, 0.5)" // Couleur du placeholder avec opacité
+                  placeholderTextColor="rgba(255, 255, 255, 0.5)"
                   underlineColorAndroid="transparent"
                   secureTextEntry={true}
                   value={passwordRepeated}
                   onChangeText={(text) => checkPassword(text)}
               />
           </View>
-          <TouchableOpacity style={styles.button} activeOpacity={0.7} onPress={() => register()}>
+          <TouchableOpacity style={[styles.button, (isEmailValid && isPasswordValid && password === passwordRepeated) ? styles.buttonActive : null]}
+                  activeOpacity={0.7}
+                  onPress={() => register()}
+                  disabled={!isEmailValid || !isPasswordValid || password !== passwordRepeated}>
               <Text style={[styles.buttonText, { fontWeight: 'bold' }]}>S'inscrire</Text>
           </TouchableOpacity>
+
         </ImageBackground>
     </View>
   )
@@ -194,5 +206,8 @@ const styles = StyleSheet.create({
   leftButtonImage: {
       width: 40,
       height: 40,
+  },
+  buttonActive: {
+    backgroundColor: '#fff', // Change button color to white when both fields are valid
   },
 });
