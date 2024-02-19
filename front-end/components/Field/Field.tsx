@@ -12,7 +12,7 @@ import {
 } from 'react-native-gesture-handler';
 import pointInPolygon from 'point-in-polygon';
 import Player from '../../classes/Player';
-import data from '../../assets/data2.json';
+import data from '../../assets/data2.json'
 import Ballon from '../../classes/Ballon';
 import {useAppDispatch, useAppSelector} from "../../hooks/reduxHooks";
 import {PositionLogic} from "../../redux/slices/positionLogicSlice";
@@ -105,6 +105,7 @@ export function Field() {
     const [svgBallon, setSvgBallon] = useState<React.ReactNode>();
     const [playerPaths, setPlayerPaths] = useState<PlayerPath[]>([]);
     const [pathDrawing, setPathDrawing] = useState(false);
+    const [myPlayerID, setMyPlayerID] = useState("");
 
     const panRef = useRef<PanGestureHandler>(null);
     const pinchRef = useRef<PinchGestureHandler>(null);
@@ -695,6 +696,7 @@ export function Field() {
                 if (joueur.id == dynamicPositionList[positionLogic.positionIndex][2][0].idJoueur && !grab) {
                     ballonShown = true;
                     moveBallon = getCenter(joueur.svg_player);
+                    dynamicPositionList[positionLogic.positionIndex][2][0].positionChange(joueur.position);
                 }
             }
 
@@ -1075,6 +1077,7 @@ export function Field() {
         }
         if (ballonMove) {
             //On construit un array de déplacement
+            setMyPlayerID(dynamicPositionList[positionLogic.positionIndex][2][0].idJoueur);
             dynamicPositionList[positionLogic.positionIndex][2][0].idChange("");
             let listNumb = [[-100, -100], [dynamicPositionList[positionLogic.positionIndex][2][0].position[0], 1 - dynamicPositionList[positionLogic.positionIndex][2][0].position[1]]];
             let addCx = 1;
@@ -1336,10 +1339,13 @@ export function Field() {
     const checkEndingAnimation = () => {
 
         if (checkForEnd.some((item) => item === false) || checkForEnd.length < 1) {
-            //Pas fini
+            //L'animation n'est pas terminé (on peut bloquer des options par exemple...)
         } else {
+            //L'animation est terminé
             if (dynamicPositionList.length - 1 > positionLogic.positionIndex) {
-                dispatch(setPositionIndex(positionLogic.positionIndex + 1))
+                //On redonne le ballon aux joueurs
+                dynamicPositionList[positionLogic.positionIndex][2][0].idChange(myPlayerID);
+                dispatch(setPositionIndex(positionLogic.positionIndex + 1));
             }
         }
     };
