@@ -12,7 +12,7 @@ import {
 } from 'react-native-gesture-handler';
 import pointInPolygon from 'point-in-polygon';
 import Player from '../../classes/Player';
-import data from '../../assets/data2.json';
+import data from "../../assets/data2.json"
 import Ballon from '../../classes/Ballon';
 import {useAppDispatch, useAppSelector} from "../../hooks/reduxHooks";
 import {PositionLogic} from "../../redux/slices/positionLogicSlice";
@@ -186,13 +186,12 @@ export function Field(props: ZoomableSVGProps) {
         setSuperField(superSvg_Field);
 
         if (currentDraw) {
-
             letDraw.map((free) => {
                 let redrawPath = '';
 
                 for (let i = 0; i < free.numbers.length; i++) {
-
                     let myNumberXY = getPourcentageCenter(free.numbers[i][0], 1 - free.numbers[i][1]);
+
                     if (i == 0) {
                         redrawPath = `M${myNumberXY[0]} ${myNumberXY[1]}`;
                     } else {
@@ -535,16 +534,24 @@ export function Field(props: ZoomableSVGProps) {
                     center = [((superSvg_Field[0][0] + superSvg_Field[0][2] + superSvg_Field[0][4] + superSvg_Field[0][5]) / 4), ((superSvg_Field[0][1] + superSvg_Field[0][3] + superSvg_Field[0][3] + superSvg_Field[0][6]) / 4)]
                     let svg_Mode = proportionSVG(player, ((superSvg_Field[0][5] - superSvg_Field[0][0]) / (svg_fieldUNCHANGED[5] - svg_fieldUNCHANGED[0])))
 
-                    JSON.parse(positionLogic.positionList)[indexPosition][1].map(Player.from).map((joueur: Player) => {
-                        svg_Mode = diffSVG(svg_Mode, getCenter(svg_Mode), xArrayPlayer, getPourcentageCenter(joueur.position[0], joueur.position[1]))
-                        joueur.svgValue(svg_Mode);
+                    const buffPositionList: any = JSON.parse(positionLogic.positionList)
+
+                    console.log("buffPositionList[indexPosition][1][0]", buffPositionList[indexPosition][1][0])
+
+                    buffPositionList[indexPosition][1].map((joueur: Player) => {
+                        svg_Mode = diffSVG(svg_Mode, getCenter(svg_Mode), xArrayPlayer, getPourcentageCenter2(joueur.position[0], joueur.position[1]))
+                        joueur.svg_player = svg_Mode
                     });
 
                     svg_Mode = proportionSVG(ballon_svg, ((superSvg_Field[0][5] - superSvg_Field[0][0]) / (svg_fieldUNCHANGED[5] - svg_fieldUNCHANGED[0])))
-                    JSON.parse(positionLogic.positionList)[indexPosition][2].map(Ballon.from).map((ball: Ballon) => {
+                    buffPositionList[indexPosition][2].map(Ballon.from).map((ball: Ballon) => {
                         svg_Mode = diffSVG(svg_Mode, getCenterBallon(svg_Mode), xBallon_Array, getPourcentageCenter(ball.position[0], ball.position[1]))
                         ball.svgValue(svg_Mode);
                     });
+
+                    console.log("buffPositionList[indexPosition][1][0]", buffPositionList[indexPosition][1][0])
+
+                    dispatch(setPositionList(JSON.stringify(buffPositionList)))
 
                     showPlayer(false);
                     receivedTranslationsCounter = 0;
@@ -640,7 +647,7 @@ export function Field(props: ZoomableSVGProps) {
             //When we drop the player, we set its position
 
             JSON.parse(positionLogic.positionList)[indexPosition][1].map(Player.from).map((joueur: Player) => {
-                console.log(joueur)
+                console.log("onHandlerStateChange", Player.from(joueur))
                 if (currentID == joueur.id) {
                     let centerXY = getCenter(joueur.svg_player);
                     let pourcentX = (centerXY[0] - superField[0][0]) / (superField[0][5] - superField[0][0]);
@@ -700,6 +707,8 @@ export function Field(props: ZoomableSVGProps) {
     center = [((superSvg_Field[0][0] + superSvg_Field[0][2] + superSvg_Field[0][4] + superSvg_Field[0][5]) / 4), ((superSvg_Field[0][1] + superSvg_Field[0][3] + superSvg_Field[0][3] + superSvg_Field[0][6]) / 4)]
 
     const retrievePlayer = () => {
+        console.log("DATA", data)
+        let buffPositionList: [number, Player[], Ballon[]][] = []
         data.map(myPosition => {
             let myPlayersData: Player[] = [];
             let myBallonData: Ballon[] = [];
@@ -726,13 +735,12 @@ export function Field(props: ZoomableSVGProps) {
                 [...myBallonData]
             ];
 
-            console.log("DEBUG 3: ", [...JSON.parse(positionLogic.positionList), positionCurrent])
-
-            dispatch(setPositionList(JSON.stringify([...JSON.parse(positionLogic.positionList), positionCurrent])))
+            buffPositionList = [...buffPositionList, positionCurrent]
 
             myPlayersData = [];
             myBallonData = [];
         });
+        dispatch(setPositionList(JSON.stringify(buffPositionList)))
     }
 
     const [playerPaths, setPlayerPaths] = useState<PlayerPath[]>([]);
@@ -805,6 +813,8 @@ export function Field(props: ZoomableSVGProps) {
 
     let ballonShown = false;
     const showPlayer = (grab: boolean) => {
+
+
         console.log("Grab", grab)
         ballonShown = false
         setSvgPlayers([]);
@@ -813,7 +823,11 @@ export function Field(props: ZoomableSVGProps) {
 
         let moveBallon = [-100, -100];
 
-        JSON.parse(positionLogic.positionList)[indexPosition][1].map((joueur: any) => {
+        const buffPositionList: any = JSON.parse(positionLogic.positionList)[indexPosition][1]
+
+        console.log(buffPositionList[0], "buffPositionList[0]")
+
+        buffPositionList.map(Player.from).map((joueur: any) => {
             let color = "";
             let colorSpeed = "";
             if (joueur.id[0] == 'B') {
@@ -1063,10 +1077,8 @@ export function Field(props: ZoomableSVGProps) {
     }
 
     const setupPlayerAdding = (event: HandlerStateChangeEvent<TapGestureHandlerEventPayload>) => {
-
         const x = event.nativeEvent.x;
         const y = event.nativeEvent.y;
-
         const state = event.nativeEvent.state;
 
         if (state == 2) {
