@@ -1,5 +1,14 @@
 import { StyleSheet } from 'react-native';
-let styles = StyleSheet.create({
+let styles =  StyleSheet.create({
+  selectedButton: {
+    borderRadius: 10,
+    padding: 10,
+    backgroundColor: '#D9D9D9',
+    margin: 5,
+    width: '90%',
+    borderColor: 'red',
+    borderWidth: 4,
+  },
     container: {
         width: '100%',
         height: '100%',
@@ -90,13 +99,12 @@ let styles = StyleSheet.create({
       textTopContent:{
         fontSize: 10,
         color: '#373737',
+        fontWeight: 'bold',
       },
 
       imagesTop: {
         marginRight: '10%'
       },
-      
-
       listDrawerLeft: {
         height: '80%',
         backgroundColor: '#959595',
@@ -153,11 +161,23 @@ let styles = StyleSheet.create({
         width: '100%',
         marginLeft: 10
       },
-
       Field:{
         borderRadius: 10,
-        width:'100%'
-      }
+        width:'100%',
+      },
+      plusButton:{
+        padding: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+        margin: 5,
+        width: '90%',
+      },
+      plusButtonImage:{
+        width: 20,
+        height: 20,
+      },  
 })
+
+
 
 export default styles;
