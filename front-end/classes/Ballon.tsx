@@ -11,8 +11,11 @@ class Ballon {
     }
   
     static createBallon(position : number[], svg_ballon : number[], idJoueur: string): Ballon {
-      const player = new Ballon(position,svg_ballon,idJoueur);
-      return player;
+        return new Ballon(position, svg_ballon, idJoueur);
+    }
+
+    static from(json: any) {
+        return Object.assign(new Ballon(json.position, json.svg_ballon, json.idJoueur), json)
     }
   
     svgValue(svg: number[]): void{

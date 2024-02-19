@@ -1,98 +1,90 @@
 import React, {useEffect, useState} from 'react';
-import {View, Text, TouchableOpacity, StyleSheet, Dimensions, Animated, Image} from 'react-native';
-import Player from '../../classes/Player';
-import Ballon from '../../classes/Ballon';
+import {Text, TouchableOpacity, StyleSheet, Dimensions, Animated} from 'react-native';
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import {useAppDispatch, useAppSelector} from "../../hooks/reduxHooks";
+import {setPositionIndex, setPositionList} from "../../redux/actions/positionLogicActions";
+import {
+    selectBallMode,
+    selectDrawMode,
+    selectPlayerMode,
+    selectZoomMode
+} from "../../redux/actions/toolbarLogicActions";
+
 const dimWidth = Dimensions.get('window').width;
 const dimHeight = Dimensions.get('window').height;
 
-interface PositionProps {
-    sendDataToB: React.Dispatch<React.SetStateAction<number>>;
-    receivedData: number;
-    receivedPosition: [number, Player[], Ballon[]][];
-    sendSavedData: React.Dispatch<React.SetStateAction<[number, Player[], Ballon[]][]>>;
-    handleClickZoom: () => void;
-    handleClickAdd: () => void;
-    handleCLickBallMode: () => void;
-    handleClickDrawMode: () => void;
-  }
-
-  
-export default function Position({
-    sendDataToB,
-    receivedData,
-    receivedPosition,
-    sendSavedData,
-    handleClickZoom,
-    handleClickAdd,
-    handleCLickBallMode,
-    handleClickDrawMode
-  }: PositionProps) {
-    const [numberOfPosition, setNumberOfPosition] = useState<number[]>([1, 2]);
+export default function Position() {
+    const [numberOfPosition, setNumberOfPosition] = useState<number[]>([0, 1]);
     const [collapsed, setCollapsed] = useState(false); // État pour suivre l'état de la barre (repliée ou non)
-  const [animation] = useState(new Animated.Value(0)); // Utilisation d'Animated pour gérer l'animation
-  const toggleBar = () => {
-    // Détermination de la valeur cible pour l'animation en fonction de l'état actuel
-    const toValue = collapsed ? 0 : 1; // 1 représente la valeur déployée (non rétrécie)
+    const [animation] = useState(new Animated.Value(0)); // Utilisation d'Animated pour gérer l'animation
+
+    const dispatch = useAppDispatch()
+    const positionLogic = useAppSelector((state) => state.positionLogic)
     
-    // Configuration de l'animation utilisant Animated.timing
-    Animated.timing(animation, {
-      toValue, // La valeur cible déterminée ci-dessus
-      duration: 300, // Durée de l'animation en millisecondes
-      useNativeDriver: false, // Utilisation du moteur natif pour l'animation
-    }).start(); // Lancement de l'animation
+    const toggleBar = () => {
+        const toValue = collapsed ? 0 : 1;
 
-    // Inversion de l'état 'collapsed' pour refléter le nouvel état de la barre
-    setCollapsed(!collapsed);
-  };
+        Animated.timing(animation, {
+            toValue,
+            duration: 300,
+            useNativeDriver: false,
+        }).start();
 
-  // Création d'une interpolation pour ajuster la hauteur de la barre
-  const barHeight = animation.interpolate({
-    inputRange: [0, 1], // Plage des valeurs à interpréter
-    outputRange: ['2.5%', '25%'], // Hauteur initiale et finale de la barre
-  });
+        setCollapsed(!collapsed);
+    };
+
+    const barHeight = animation.interpolate({
+        inputRange: [0, 1],
+        outputRange: ['2.5%', '25%'],
+    });
+
     useEffect(() => {
-        console.log(receivedData);
-
         let different = true;
+
         numberOfPosition.map((i) => {
-            if (i == receivedData) {
+            if (i == positionLogic.positionIndex) {
                 different = false;
             }
         })
-        if (receivedData != 0 && different) {
-            setNumberOfPosition(prevPositions => [...prevPositions, receivedData]);
+
+        if (positionLogic.positionIndex != 0 && different) {
+            setNumberOfPosition(prevPositions => [...prevPositions, positionLogic.positionIndex]);
         }
-    }, [receivedData]);
+    }, [positionLogic.positionIndex]);
 
     const handlePress = (item: number) => {
-        sendDataToB(item);
+        dispatch(setPositionIndex(item))
 
-        if (receivedPosition[0][0] != 0) {
-            console.log("Position reçu", receivedPosition)
-            sendSavedData(receivedPosition);
+        if (positionLogic.positionList != "[]" && JSON.parse(positionLogic.positionList)[0][0] != 0) {
+            dispatch(setPositionList(positionLogic.positionList))
         }
     };
 
     return (
-        <Animated.View style={[styles.container, { height: barHeight }]}>
+        <Animated.View style={[styles.container, {height: barHeight}]}>
             <TouchableOpacity onPress={toggleBar} style={styles.retractable}>
-    
-            { collapsed && (<MaterialIcons style={styles.chevronIcon}
-                name={"keyboard-arrow-down"}
-                size={'200%'}
-                color={"black"}
-            /> )}
-            { !collapsed && (<MaterialIcons style={styles.chevronIcon}
-                name={"keyboard-arrow-up"}
-                size={'200%'}
-                color={"black"}
-            /> )}
-
+                {collapsed && (
+                    <MaterialIcons
+                        style={styles.chevronIcon}
+                        name={"keyboard-arrow-down"}
+                        size={'200%'}
+                        color={"black"}
+                    />
+                )}
+                {!collapsed && (
+                    <MaterialIcons
+                        style={styles.chevronIcon}
+                        name={"keyboard-arrow-up"}
+                        size={'200%'}
+                        color={"black"}
+                    />
+                )}
             </TouchableOpacity>
-            <Animated.View style={{flexDirection: "row", position: "absolute", alignSelf: "flex-start", top: 0, left: 0}}>
+
+            <Animated.View
+                style={{flexDirection: "row", position: "absolute", alignSelf: "flex-start", top: 0, left: 0}}>
                 {numberOfPosition.map((item, index) => (
                     <TouchableOpacity
                         activeOpacity={0.7}
@@ -100,46 +92,56 @@ export default function Position({
                         onPress={() => handlePress(item)}
                         style={styles.buttonPos}
                     >
-                        <Text>{item}</Text>
+                        <Text>{item + 1}</Text>
                     </TouchableOpacity>
                 ))}
             </Animated.View>
+
             <Animated.View style={styles.buttonContainer}>
+                <TouchableOpacity
+                    onPress={() => dispatch(selectPlayerMode())}
+                    style={[styles.buttonBase, !collapsed && {display: 'none'}]}
+                >
+                    <Ionicons
+                        name={"shirt-sharp"}
+                        size={'200%'}
+                        color={"black"}
+                    />
+                </TouchableOpacity>
 
-            <TouchableOpacity onPress={handleClickAdd} style={[styles.buttonBase, !collapsed && {display: 'none'}]}>
-                {/* Mode ZOOM */}
-                <Ionicons
-                                    name={"shirt-sharp"}
-                                    size={'200%'}
-                                    color={"black"}
-                                />
-            </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={() => dispatch(selectZoomMode())}
+                    style={[styles.buttonBase, !collapsed && {display: 'none'}]}
+                >
+                    <FontAwesome
+                        name={"arrows"}
+                        size={'200%'}
+                        color={"black"}
+                    />
+                </TouchableOpacity>
 
-            <TouchableOpacity onPress={handleClickZoom} style={[styles.buttonBase, !collapsed && {display: 'none'}]}>
-                {/* Add Player */}
-                <FontAwesome
-                                    name={"arrows"}
-                                    size={'200%'}
-                                    color={"black"}
-                                />
-            </TouchableOpacity>
-            
-            <TouchableOpacity onPress={handleCLickBallMode} style={[styles.buttonBase, !collapsed && {display: 'none'}]}>
-                {/* Mode Ballon */}
-                <MaterialIcons
-                                    name={"sports-rugby"}
-                                    size={'200%'}
-                                    color={"black"}
-                                />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={handleClickDrawMode} style={[styles.buttonBase, !collapsed && {display: 'none'}]}>
-                {/* Mode crayon */}
-                <FontAwesome
-                                    name={"pencil"}
-                                    size={'200%'}
-                                    color={"black"}
-                                />
-            </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={() => dispatch(selectBallMode())}
+                    style={[styles.buttonBase, !collapsed && {display: 'none'}]}
+                >
+                    {/* Mode Ballon */}
+                    <MaterialIcons
+                        name={"sports-rugby"}
+                        size={'200%'}
+                        color={"black"}
+                    />
+                </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={() => dispatch(selectDrawMode())}
+                    style={[styles.buttonBase, !collapsed && {display: 'none'}]}
+                >
+                    {/* Mode crayon */}
+                    <FontAwesome
+                        name={"pencil"}
+                        size={'200%'}
+                        color={"black"}
+                    />
+                </TouchableOpacity>
             </Animated.View>
         </Animated.View>
     );
@@ -154,7 +156,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         flexDirection: "row",
-        overflow:"hidden"
+        overflow: "hidden"
     },
     buttonPos: {
         height: 20,
@@ -174,24 +176,22 @@ const styles = StyleSheet.create({
         marginLeft: 10,
     },
     buttonContainer: {
-        flexDirection:"row",
+        flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
         width: "90%"
     },
     retractable: {
         position: "absolute",
-        top:"-5%",
+        top: "-5%",
         backgroundColor: "#D9D9D9",
-        borderRadius: "25%",
+        borderRadius: 25,
         width: "10%",
-        justifyContent:"center",
-        alignItems:"center",
+        justifyContent: "center",
+        alignItems: "center",
         zIndex: 1
 
     },
-    chevronIcon: {
-    
-    }
+    chevronIcon: {}
 
 })
