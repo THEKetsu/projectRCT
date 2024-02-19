@@ -2,14 +2,14 @@ import {StyleSheet, View} from 'react-native';
 import React from 'react';
 import {GestureHandlerRootView} from "react-native-gesture-handler";
 import {Field} from "../components/Field/Field";
-import Position from "../components/ToolBar/Position";
+import ToolBar from "../components/ToolBar/ToolBar";
 
 export default function Strategy() {
     return (
         <View style={styles.container}>
             <GestureHandlerRootView style={{flex: 1}}>
                 <Field/>
-                <Position/>
+                <ToolBar/>
             </GestureHandlerRootView>
         </View>
     )

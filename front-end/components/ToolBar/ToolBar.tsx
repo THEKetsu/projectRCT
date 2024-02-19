@@ -4,27 +4,28 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import {useAppDispatch, useAppSelector} from "../../hooks/reduxHooks";
-import {setPositionIndex, setPositionList} from "../../redux/actions/positionLogicActions";
+import {setPositionIndex, setPositionList} from "../../redux/actions/positionActions";
 import {
     selectBallMode,
     selectDrawMode,
     selectPlayerMode,
     selectZoomMode
-} from "../../redux/actions/toolbarLogicActions";
+} from "../../redux/actions/toolbarActions";
+import {Position} from "../../redux/slices/positionSlice";
 
 const dimWidth = Dimensions.get('window').width;
 const dimHeight = Dimensions.get('window').height;
 
-export default function Position() {
+export default function ToolBar() {
     const [numberOfPosition, setNumberOfPosition] = useState<number[]>([0, 1]);
     const [collapsed, setCollapsed] = useState(false); // État pour suivre l'état de la barre (repliée ou non)
     const [animation] = useState(new Animated.Value(0)); // Utilisation d'Animated pour gérer l'animation
 
     const dispatch = useAppDispatch()
-    const positionLogic = useAppSelector((state) => state.positionLogic)
-    
-    const toggleBar = () => {
-        const toValue = collapsed ? 0 : 1;
+    const position: Position = useAppSelector((state) => state.position)
+
+    const toggleBar = (): void => {
+        const toValue: 0 | 1 = collapsed ? 0 : 1;
 
         Animated.timing(animation, {
             toValue,
@@ -35,30 +36,30 @@ export default function Position() {
         setCollapsed(!collapsed);
     };
 
-    const barHeight = animation.interpolate({
+    const barHeight: Animated.AnimatedInterpolation<string> = animation.interpolate({
         inputRange: [0, 1],
         outputRange: ['2.5%', '25%'],
     });
 
-    useEffect(() => {
+    useEffect((): void => {
         let different = true;
 
-        numberOfPosition.map((i) => {
-            if (i == positionLogic.positionIndex) {
+        numberOfPosition.map((i): void => {
+            if (i == position.positionIndex) {
                 different = false;
             }
         })
 
-        if (positionLogic.positionIndex != 0 && different) {
-            setNumberOfPosition(prevPositions => [...prevPositions, positionLogic.positionIndex]);
+        if (position.positionIndex != 0 && different) {
+            setNumberOfPosition((prevPositions: number[]) => [...prevPositions, position.positionIndex]);
         }
-    }, [positionLogic.positionIndex]);
+    }, [position.positionIndex]);
 
     const handlePress = (item: number) => {
         dispatch(setPositionIndex(item))
 
-        if (positionLogic.positionList != "[]" && JSON.parse(positionLogic.positionList)[0][0] != 0) {
-            dispatch(setPositionList(positionLogic.positionList))
+        if (position.positionList != "[]" && JSON.parse(position.positionList)[0][0] != 0) {
+            dispatch(setPositionList(position.positionList))
         }
     };
 
@@ -67,7 +68,6 @@ export default function Position() {
             <TouchableOpacity onPress={toggleBar} style={styles.retractable}>
                 {collapsed && (
                     <MaterialIcons
-                        style={styles.chevronIcon}
                         name={"keyboard-arrow-down"}
                         size={'200%'}
                         color={"black"}
@@ -75,7 +75,6 @@ export default function Position() {
                 )}
                 {!collapsed && (
                     <MaterialIcons
-                        style={styles.chevronIcon}
                         name={"keyboard-arrow-up"}
                         size={'200%'}
                         color={"black"}
@@ -124,7 +123,6 @@ export default function Position() {
                     onPress={() => dispatch(selectBallMode())}
                     style={[styles.buttonBase, !collapsed && {display: 'none'}]}
                 >
-                    {/* Mode Ballon */}
                     <MaterialIcons
                         name={"sports-rugby"}
                         size={'200%'}
@@ -135,7 +133,6 @@ export default function Position() {
                     onPress={() => dispatch(selectDrawMode())}
                     style={[styles.buttonBase, !collapsed && {display: 'none'}]}
                 >
-                    {/* Mode crayon */}
                     <FontAwesome
                         name={"pencil"}
                         size={'200%'}
@@ -146,7 +143,6 @@ export default function Position() {
         </Animated.View>
     );
 };
-
 
 const styles = StyleSheet.create({
     container: {
@@ -191,7 +187,5 @@ const styles = StyleSheet.create({
         alignItems: "center",
         zIndex: 1
 
-    },
-    chevronIcon: {}
-
+    }
 })

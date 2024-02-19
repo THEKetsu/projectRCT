@@ -1,11 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit'
-import {positionLogicSlice} from "./slices/positionLogicSlice";
-import {toolbarLogicSlice} from "./slices/toolbarLogicSlice";
+import {positionSlice} from "./slices/positionSlice";
+import {toolbarSlice} from "./slices/toolbarSlice";
+import {optionSlice} from "./slices/optionSlice";
 
 export const store = configureStore({
     reducer: {
-        positionLogic: positionLogicSlice.reducer,
-        toolbarLogic: toolbarLogicSlice.reducer
+        position: positionSlice.reducer,
+        toolbar: toolbarSlice.reducer,
+        option: optionSlice.reducer
     },
 })
 

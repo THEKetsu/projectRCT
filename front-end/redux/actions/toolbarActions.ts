@@ -1,4 +1,4 @@
-import {toolbarLogicSlice} from "../slices/toolbarLogicSlice";
+import {toolbarSlice} from "../slices/toolbarSlice";
 import {ActionCreatorWithoutPayload, ActionCreatorWithPayload} from "@reduxjs/toolkit";
 
 interface TLActionsType {
@@ -16,4 +16,4 @@ export const {
     selectPlayerMode,
     selectDrawMode,
     unselectAll
-}: TLActionsType = toolbarLogicSlice.actions
+}: TLActionsType = toolbarSlice.actions
