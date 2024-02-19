@@ -59,7 +59,7 @@ export default function Position({
     return (
         <View style={styles.container}>
             <View style={styles.positionContainer}>
-                <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
+                <ScrollView horizontal={true} showsHorizontalScrollIndicator={true}>
                     <View style={{flexDirection: "row"}}>
                         {numberOfPosition.map((item, index) => (
                             <TouchableOpacity
@@ -75,7 +75,7 @@ export default function Position({
                         <TouchableOpacity
                             activeOpacity={0.7}
                             onPress={handleCreateNewPosition}
-                            style={styles.buttonPos}
+                            style={styles.plusSign}
                         >
                             <Text>+</Text>
                         </TouchableOpacity>
@@ -100,8 +100,7 @@ export default function Position({
     );
 };
 
-const activeColor = '#959595'; // la couleur du bouton actif
-const inactiveColor = '#D9D9D9'; // la couleur du bouton inactif
+
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
@@ -111,8 +110,8 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
     },
     positionContainer: {
-        height: windowHeight / 4, // Utilisez windowHeight pour définir la hauteur
-        width: windowWidth, // Utilisez windowWidth pour définir la largeur
+        height: windowHeight / 4,
+        width: windowWidth,
         backgroundColor: 'transparent',
         justifyContent: 'center',
         alignItems: 'center',
@@ -130,22 +129,28 @@ const styles = StyleSheet.create({
         borderTopRightRadius: 10,
         borderRightWidth: 2,
         borderColor: 'lightgrey',
-        backgroundColor: 'grey',
+        backgroundColor: 'white', // Bouton de position en blanc
     },
     plusSign: {
-        fontSize: 24,
-        marginLeft: 10,
+        height: 30,
+        width: 100,
+        justifyContent: 'center',
+        alignItems: 'center',
+        elevation: 4,
+        borderTopRightRadius: 10,
+        borderRightWidth: 2,
+        borderColor: 'lightgrey',
+        color: 'lightgrey', // Couleur grise pour le bouton "plus"
+        backgroundColor: 'lightgrey',
     },
     buttonBaseContainer: {
-        backgroundColor: 'white',
+        backgroundColor: 'lightgrey', // Fond gris pour le bouton de base
         height: 30,
         width: 100,
         justifyContent: 'center',
         alignItems: 'center',
     },
-
     buttonBase: {
-
+        color: 'white', // Texte blanc pour le bouton de base
     }
-
 });
