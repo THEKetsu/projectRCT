@@ -5,9 +5,9 @@ import Home from "./screens/Home";
 import Strategy from "./screens/Strategy";
 import {Provider} from "react-redux";
 import {store} from "./redux/store";
-import React from "react";
 
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator()
+
 export default function App() {
     return (
         <NavigationContainer>
