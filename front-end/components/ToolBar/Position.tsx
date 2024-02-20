@@ -69,7 +69,7 @@ export default function Position() {
                     <MaterialIcons
                         style={styles.chevronIcon}
                         name={"keyboard-arrow-down"}
-                        size={'200%'}
+                        size={200} // Changed from '200%' to 200
                         color={"black"}
                     />
                 )}
@@ -77,7 +77,8 @@ export default function Position() {
                     <MaterialIcons
                         style={styles.chevronIcon}
                         name={"keyboard-arrow-up"}
-                        size={'200%'}
+                        size={200} // Changed from '200%' to 200
+                    
                         color={"black"}
                     />
                 )}
@@ -104,7 +105,7 @@ export default function Position() {
                 >
                     <Ionicons
                         name={"shirt-sharp"}
-                        size={'200%'}
+                        size={200} // Changed from '200%' to 200
                         color={"black"}
                     />
                 </TouchableOpacity>
@@ -115,7 +116,8 @@ export default function Position() {
                 >
                     <FontAwesome
                         name={"arrows"}
-                        size={'200%'}
+                        size={200} // Changed from '200%' to 200
+                        
                         color={"black"}
                     />
                 </TouchableOpacity>
@@ -127,7 +129,8 @@ export default function Position() {
                     {/* Mode Ballon */}
                     <MaterialIcons
                         name={"sports-rugby"}
-                        size={'200%'}
+                        size={200} // Changed from '200%' to 200
+                        
                         color={"black"}
                     />
                 </TouchableOpacity>
@@ -138,7 +141,8 @@ export default function Position() {
                     {/* Mode crayon */}
                     <FontAwesome
                         name={"pencil"}
-                        size={'200%'}
+                        size={200} // Changed from '200%' to 200
+                        
                         color={"black"}
                     />
                 </TouchableOpacity>

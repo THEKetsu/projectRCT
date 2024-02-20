@@ -4,9 +4,49 @@ import React, { useRef, useState } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import ViewShot from 'react-native-view-shot';
 import { Field } from '../components/Field/Field';
+import TopWidget from '../components/drawer/TopWidget';
 import Position from '../components/ToolBar/Position';
+import DrawerLeft from '../components/drawer/DrawerLeft';
 
 export default function Strategy() {
+
+
+
+  console.log('******************************TEST*********************************');
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<string | null>(null);
+  /**
+   * Handle the press event on the play button.
+   *
+   * @param {any} info - the information related to the press event
+   * @return {void} 
+   */
+  const handlePressPlayButton = (info: any) => {
+    setIsDrawerOpen(true);
+  };
+
+  /**
+   * Closes the drawer by setting the isDrawerOpen state to false.
+   *
+   * @param {} 
+   * @return {}
+   */
+  const handleCloseDrawer = () => {
+    setIsDrawerOpen(false);
+  };
+  /**
+   * A function that handles the selected item.
+   *
+   * @param {any | null} selectedItem - the selected item to be handled
+   * @return {void} 
+   */
+  const handleItemSelected = (selectedItem: any | null) => { 
+    setSelectedItem(selectedItem.name);
+  };
+
+  
+  console.log('Information about the selected item: ', selectedItem);
+ 
   const viewShotRef = useRef<ViewShot>(null);
   let capturedCount = 0;
   const [base64Icon, setBase] = useState('');
@@ -34,6 +74,9 @@ export default function Strategy() {
 
   return (
     <View style={styles.container}>
+      {isDrawerOpen && <DrawerLeft onClose={handleCloseDrawer} isOpen={isDrawerOpen} onItemSelected={handleItemSelected} />}
+      {!isDrawerOpen && <TopWidget onPlayButtonPress={handlePressPlayButton}  selectedItem={selectedItem}/>}
+
       <GestureHandlerRootView style={{ flex: 1 }}>
         {/* <ViewShot ref={viewShotRef} options={{ format: 'png', quality: 0.9 }}> */}
           <Field />
@@ -42,7 +85,6 @@ export default function Strategy() {
         <Position />
         {/* <Image style={{ width: 50, height: 50 }} source={{ uri: base64Icon }} /> */}
       </GestureHandlerRootView>
-
       {/* <Pressable
         onPress={captureScreen}
         style={({ pressed }) => [
@@ -55,7 +97,6 @@ export default function Strategy() {
           },
         ]}
       >
-
       </Pressable> */}
 
     </View>
@@ -64,9 +105,9 @@ export default function Strategy() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     backgroundColor: '#5FB07B',
-    alignItems: 'center',
-    justifyContent: 'center',
+    width: '100%',
+    height: '100%',
+    zIndex:1
   },
 });
