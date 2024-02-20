@@ -1,6 +1,6 @@
 import React from 'react';
 import { useFonts } from 'expo-font';
-import {ImageBackground, Image, TouchableOpacity, View, StyleSheet, TextInput, Text} from 'react-native';
+import {ImageBackground, Image, TouchableOpacity, View, StyleSheet, TextInput, Text, Dimensions} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { auth } from '../../firebase/firebase'
 import { createUserWithEmailAndPassword } from "firebase/auth";
@@ -49,6 +49,9 @@ export default function Register () {
   if (!loaded) {
     return null;
   }
+  
+  const screenWidth = Dimensions.get('window').width;
+  const starSize = screenWidth * 0.02; // Adjust this factor according to your preference
   return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
         <ImageBackground  source={require('../../assets/login.png')} 
@@ -60,9 +63,9 @@ export default function Register () {
                 <Image source={require('../../assets/left_arrow.png')} style={styles.leftButtonImage} />
           </TouchableOpacity>
           <View style={styles.starContainer}>
-            <Image source={require('../../assets/star.png')} style={styles.starImage} />
-            <Image source={require('../../assets/star.png')} style={styles.starImage} />
-            <Image source={require('../../assets/star.png')} style={styles.starImage} />
+            <Image source={require('../assets/star.png')} style={[styles.starImage, { width: starSize, height: starSize }]} />
+            <Image source={require('../assets/star.png')} style={[styles.starImage, { width: starSize, height: starSize }]} />
+            <Image source={require('../assets/star.png')} style={[styles.starImage, { width: starSize, height: starSize }]} />
           </View>
           <View style={styles.overlay}>
               <TextInput
@@ -192,15 +195,13 @@ const styles = StyleSheet.create({
     fontFamily: "roboto",
   },
   starContainer: {
-    flexDirection: 'row', // Alignement horizontal des images d'étoiles
-    marginTop: 10, // Marge en haut des étoiles
+    flexDirection: 'row',
+    marginTop: 10,
     justifyContent: 'center',
     alignItems: 'center',
   },
   starImage: {
-    width: 30, // Largeur de l'image d'étoile
-    height: 30, // Hauteur de l'image d'étoile
-    marginHorizontal: 5, // Marge horizontale entre les étoiles
+    marginHorizontal: 5,
   },
   leftButton: {
     position: 'absolute',

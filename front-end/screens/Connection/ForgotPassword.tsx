@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useFonts } from 'expo-font';
-import {ImageBackground, Image, TouchableOpacity, View, StyleSheet, TextInput, Text, Animated} from 'react-native';
+import {ImageBackground, Image, TouchableOpacity, View, StyleSheet, TextInput, Text, Dimensions} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { sendPasswordResetEmail } from "firebase/auth";
 import { auth } from '../../firebase/firebase'
@@ -142,15 +142,13 @@ const styles = StyleSheet.create({
     fontFamily: "roboto",
   },
   starContainer: {
-    flexDirection: 'row', // Alignement horizontal des images d'étoiles
-    marginTop: 10, // Marge en haut des étoiles
+    flexDirection: 'row',
+    marginTop: 10,
     justifyContent: 'center',
     alignItems: 'center',
   },
   starImage: {
-    width: 30, // Largeur de l'image d'étoile
-    height: 30, // Hauteur de l'image d'étoile
-    marginHorizontal: 5, // Marge horizontale entre les étoiles
+    marginHorizontal: 5,
   },
   leftButton: {
     position: 'absolute',

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useFonts } from 'expo-font';
 import { useNavigation } from '@react-navigation/native';
-import {ImageBackground, Image, TouchableOpacity, View, StyleSheet, Text} from 'react-native';
+import {ImageBackground, Image, TouchableOpacity, View, StyleSheet, Text, Dimensions} from 'react-native';
 
 export default function Home () {
       const [loaded] = useFonts({
@@ -12,6 +12,8 @@ export default function Home () {
     if (!loaded) {
       return null;
     }
+    const screenWidth = Dimensions.get('window').width;
+    const starSize = screenWidth * 0.02; // Adjust this factor according to your preference
     return (
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
             <ImageBackground  source={require('../assets/login.png')} 
@@ -20,9 +22,9 @@ export default function Home () {
                 <Text style={styles.titleText}>Stratégie<Text style={styles.redText}>RCT</Text></Text>
               </View>
               <View style={styles.starContainer}>
-                <Image source={require('../assets/star.png')} style={styles.starImage} />
-                <Image source={require('../assets/star.png')} style={styles.starImage} />
-                <Image source={require('../assets/star.png')} style={styles.starImage} />
+                <Image source={require('../assets/star.png')} style={[styles.starImage, { width: starSize, height: starSize }]} />
+                <Image source={require('../assets/star.png')} style={[styles.starImage, { width: starSize, height: starSize }]} />
+                <Image source={require('../assets/star.png')} style={[styles.starImage, { width: starSize, height: starSize }]} />
               </View>
               <TouchableOpacity onPress={() => navigation.navigate('Register')} style={styles.button} activeOpacity={0.7}>
                   <Text style={[styles.buttonText, { fontWeight: 'bold' }]}>Inscription</Text>
@@ -97,14 +99,12 @@ const styles = StyleSheet.create({
     fontFamily: "roboto",
   },
   starContainer: {
-    flexDirection: 'row', // Alignement horizontal des images d'étoiles
-    marginTop: 10, // Marge en haut des étoiles
+    flexDirection: 'row',
+    marginTop: 10,
     justifyContent: 'center',
     alignItems: 'center',
   },
   starImage: {
-    width: 30, // Largeur de l'image d'étoile
-    height: 30, // Hauteur de l'image d'étoile
-    marginHorizontal: 5, // Marge horizontale entre les étoiles
+    marginHorizontal: 5,
   },
 });
