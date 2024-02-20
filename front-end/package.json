@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "@expo/webpack-config": "^19.0.0",
-    "@react-native-firebase/app": "^18.8.0",
     "@react-navigation/native": "^6.1.9",
     "@react-navigation/native-stack": "^6.9.17",
     "@reduxjs/toolkit": "^1.9.7",
