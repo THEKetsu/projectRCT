@@ -47,6 +47,29 @@ export default function Position({
     // Inversion de l'état 'collapsed' pour refléter le nouvel état de la barre
     setCollapsed(!collapsed);
   };
+  const [inline_maillot, setinline] = useState(false);
+  const maillot_inline = () => {
+    setinline(!inline_maillot)
+
+  }
+
+  const [inline_zoom, setinline2] = useState(false);
+  const zoom_inline = () => {
+    setinline2(!inline_maillot)
+
+  }
+
+  const [inline_ball, setinline3] = useState(false);
+  const ball_inline = () => {
+    setinline3(!inline_maillot)
+
+  }
+
+  const [inline_pen, setinline4] = useState(false);
+  const pen_inline = () => {
+    setinline4(!inline_maillot)
+
+  }
 
   // Création d'une interpolation pour ajuster la hauteur de la barre
   const barHeight = animation.interpolate({
@@ -133,8 +156,8 @@ export default function Position({
 
             <View style={styles.buttonContainer}>
 
-            <TouchableOpacity onPress={handleClickAdd} style={[styles.buttonBase, !collapsed && {display: 'none'}]}>
-                {/* Mode ZOOM */}
+            <TouchableOpacity onPress={() => { handleClickAdd(); maillot_inline(); }}style={[styles.buttonBase, !collapsed && {display: 'none'},inline_maillot ? styles.activebutton : null]}>
+                {/* Add player */}
                 <Ionicons
                                     name={"shirt-sharp"}
                                     size={(dimWidth *4) / 100}
@@ -143,7 +166,7 @@ export default function Position({
             </TouchableOpacity>
 
             <TouchableOpacity onPress={handleClickZoom} style={[styles.buttonBase, !collapsed && {display: 'none'}]}>
-                {/* Add Player */}
+                {/* Mode Zoom */}
                 <FontAwesome
                                     name={"arrows"}
                                     size={(dimWidth *4) / 100}
@@ -296,5 +319,12 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    
+    activebutton:{
+        width: (dimHeight *5) / 100, // Largeur du bouton
+        height: (dimWidth *5) / 100, // Hauteur du bouton
+        borderRadius: 50, // Moitié de la largeur/hauteur pour obtenir une forme de cercle
+        backgroundColor: 'blue', // Couleur de fond du bouton
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
 });
