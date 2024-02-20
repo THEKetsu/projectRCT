@@ -1,9 +1,5 @@
 import {createSlice, PayloadAction, Slice} from "@reduxjs/toolkit"
-
-export interface Position {
-    positionList: string,
-    positionIndex: number
-}
+import {Position} from "../../utils/interfaces";
 
 const initialState : Position = {
     positionList: "[]",

@@ -1,18 +1,96 @@
-import React from "react";
+import React, {useState} from "react";
 import {Pressable, Text, TextInput, useWindowDimensions, View} from "react-native";
 import {useAppDispatch, useAppSelector} from "../../hooks/reduxHooks";
-import {Toolbar} from "../../redux/slices/toolbarSlice";
-import {Option} from "../../redux/slices/optionSlice";
-import {Position} from "../../redux/slices/positionSlice";
+import {
+    selectPlayer,
+    setInputPlayerId,
+    setPlayerPaths,
+    toggleAutoLink,
+    triggerRefresh
+} from "../../redux/actions/optionActions";
+import Player from "../../classes/Player";
+import Ballon from "../../classes/Ballon";
+import {isValidString} from "../../utils/functions";
+import {setPositionList} from "../../redux/actions/positionActions";
+import {Option, PlayerPath, Position, Toolbar} from "../../utils/interfaces";
 
 
-export default function Options() {
+// @ts-ignore
+export default function Options({animate, linkToPlayer}) {
+
+    const [changeId, setChangeId] = useState<string>("")
 
     const dispatch = useAppDispatch()
-    
+
     const toolbar: Toolbar = useAppSelector((state) => state.toolbar)
     const position: Position = useAppSelector((state) => state.position)
     const option: Option = useAppSelector((state) => state.option)
+
+    const replacePlayerID = (text: string): void => {
+        if (isValidString(text)) {
+            const buffPositionList = JSON.parse(position.positionList)
+            let indexID: number = buffPositionList[position.positionIndex][1].findIndex((joueur: Player): boolean => joueur.id === option.selectedPlayer);
+
+            if (indexID != -1) {
+                if (buffPositionList[position.positionIndex][2].length > 0) {
+                    if (buffPositionList[position.positionIndex][2][0].idJoueur === buffPositionList[position.positionIndex][1][indexID].id) {
+                        buffPositionList[position.positionIndex][2][0].idJoueur = text
+                        dispatch(setPositionList(JSON.stringify(buffPositionList)))
+                    }
+                }
+                let indexPath = JSON.parse(option.playerPaths).findIndex((p: PlayerPath): boolean => p.id === buffPositionList[position.positionIndex][1][indexID].id + 'P');
+
+                if (indexPath != -1) {
+                    dispatch(setPlayerPaths(
+                        JSON.stringify(
+                            JSON.parse(option.playerPaths).splice(indexPath, 1)
+                        )
+                    ))
+                }
+                buffPositionList[position.positionIndex][1][indexID].idJoueur = text
+
+                dispatch(setPositionList(
+                    JSON.stringify(
+                        buffPositionList
+                    )
+                ))
+                dispatch(selectPlayer(text))
+                dispatch(triggerRefresh());
+            }
+        }
+    }
+
+    const deletePlayer = () => {
+        let indexID: number = JSON.parse(position.positionList)[position.positionIndex][1].findIndex((joueur: Player): boolean => joueur.id === option.selectedPlayer);
+
+        if (indexID != -1) {
+            let newPositionList: [number, Player[], Ballon[]][] = [...JSON.parse(position.positionList)];
+            let indexPathID: number = JSON.parse(option.playerPaths).findIndex((p: PlayerPath): boolean => p.id === option.selectedPlayer + 'P');
+
+            newPositionList[position.positionIndex][1].splice(indexID, 1);
+
+            dispatch(setPositionList(JSON.stringify(newPositionList)))
+
+            dispatch(selectPlayer(""))
+
+            if (indexPathID != -1) {
+                const newPlayerPath: PlayerPath[] = [...JSON.parse(option.playerPaths)];
+
+                newPlayerPath.splice(indexPathID, 1);
+                
+                dispatch(setPlayerPaths(JSON.stringify(newPlayerPath)))
+            }
+            dispatch(triggerRefresh());
+        }
+    }
+
+    const deleteBallon = () => {
+        const newPositionList = [...JSON.parse(position.positionList)];
+        newPositionList[position.positionIndex][2].splice(0, 1);
+
+        dispatch(setPositionList(JSON.stringify(newPositionList)))
+        dispatch(triggerRefresh());
+    }
 
     return (
         <View
@@ -44,13 +122,29 @@ export default function Options() {
                 </Text>
             </Pressable>
 
+            {toolbar.playerMode && ((option.selectedPlayer == '') || (option.selectedPlayer[option.selectedPlayer.length - 1] == 'P'))
+                && (
+                    <TextInput
+                        placeholder="Enter Player ID [B/R][Number] ex: B6"
+                        value={option.inputPlayerId}
+                        onChangeText={(text) => dispatch(setInputPlayerId(text))}
+                        style={{
+                            height: 40,
+                            borderColor: 'gray',
+                            borderWidth: 1,
+                            marginBottom: 10,
+                            paddingLeft: 10,
+                        }}
+                    />
+                )}
+
             {toolbar.playerMode && (option.selectedPlayer != '') && (option.selectedPlayer[option.selectedPlayer.length - 1] != 'P')
                 && (
                     <>
                         <TextInput
                             placeholder="Enter Player ID [B/R][Number] ex: B6"
-                            value={playerId}
-                            onChangeText={text => setPlayerId(text)}
+                            value={option.inputPlayerId}
+                            onChangeText={(text) => dispatch(setInputPlayerId(text))}
                             style={{
                                 height: 40,
                                 borderColor: 'gray',
@@ -62,8 +156,8 @@ export default function Options() {
 
                         <TextInput
                             placeholder={option.selectedPlayer.slice(1)}
-                            onChangeText={text => setchangeID(text)}
-                            onSubmitEditing={() => replacePlayerID(`${option.selectedPlayer[0]}${changeID}`)}
+                            onChangeText={text => setChangeId(text)}
+                            onSubmitEditing={() => replacePlayerID(`${option.selectedPlayer[0]}${changeId}`)}
                             style={{
                                 height: 40,
                                 borderColor: 'gray',
@@ -148,11 +242,11 @@ export default function Options() {
                         </Pressable>
 
                         <Text>
-                            {closestPlayer[0]}
+                            {JSON.parse(option.closestPlayer)[0]}
                         </Text>
 
                         <Pressable
-                            onPress={() => autoLinkOnOff()}
+                            onPress={() => dispatch(toggleAutoLink())}
                             style={({pressed}: { pressed: any }) => [
                                 {
                                     backgroundColor: pressed ? 'rgb(210, 230, 255)' : 'rgb(65, 105, 225)',

@@ -1,11 +1,5 @@
 import {ActionCreatorWithoutPayload, createSlice, Slice, SliceCaseReducers} from "@reduxjs/toolkit"
-
-export interface Toolbar {
-    zoomMode: boolean,
-    ballMode: boolean,
-    playerMode: boolean,
-    drawMode: boolean
-}
+import {Toolbar} from "../../utils/interfaces";
 
 const initialState: Toolbar = {
     zoomMode: true,

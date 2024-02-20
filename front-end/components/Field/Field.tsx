@@ -15,31 +15,12 @@ import Player from '../../classes/Player';
 import data from '../../assets/data2.json';
 import Ballon from '../../classes/Ballon';
 import {useAppDispatch, useAppSelector} from "../../hooks/reduxHooks";
-import {Position} from "../../redux/slices/positionSlice";
 import {setPositionIndex, setPositionList} from "../../redux/actions/positionActions";
-import {Toolbar} from "../../redux/slices/toolbarSlice";
 import {unselectAll} from "../../redux/actions/toolbarActions";
-import {Option} from "../../redux/slices/optionSlice"
-import {selectPlayer} from "../../redux/actions/optionActions";
-
-type PlayerPath = {
-    id: string;
-    path: string;
-};
-
-type freeDraw = {
-    position: number[];
-    path: string;
-    id: number;
-    numbers: number[][];
-}
-
-type numberMaillot = {
-    id: string;
-    position: number[];
-    textContent: string;
-    textSize: number;
-}
+import {selectPlayer, setClosestPlayer, setInputPlayerId, setPlayerPaths} from "../../redux/actions/optionActions";
+import {comparePositions, isValidString} from '../../utils/functions';
+import {FreeDraw, Option, PlayerPath, Position, ShirtDigit, Toolbar} from '../../utils/interfaces';
+import Options from "../Options/Options";
 
 export function Field() {
     let [px1, py1] = [0, 0];
@@ -80,34 +61,28 @@ export function Field() {
     let animationEnCours = false;
 
     const [prevPourcent, setPrevPourcent] = useState([0, 0]);
-    const [autoLink, setAutoLink] = useState(true);
     const [boolLock, setLock] = useState(false);
     const [grabEnCours, setgrabEnCours] = useState(false);
     const [delta, setDelta] = useState(1);
-    const [centerForP, setCenterForP] = useState([0, 0]);
     const [proportion, setProportion] = useState(1.0);
     const [translationPrev, setTranslationPrev] = useState([1.0, 1.0]);
     const [translationIncrement, setTranslationInc] = useState([0, 0]);
     const [translationPrevPlayer, setTranslationPrevPlayer] = useState([1.0, 1.0]);
-    const [closestPlayer, setClosestPlayer] = useState<[string, number[]]>(["", []])
-    const [listMaillot, setlistMaillot] = useState<numberMaillot[]>([]);
+    const [listMaillot, setlistMaillot] = useState<ShirtDigit[]>([]);
     const [checkForEnd, setcheckForEnd] = useState<Boolean[]>([]);
     const [svgSize, setSvgSize] = useState({
         width: useWindowDimensions().width,
         height: useWindowDimensions().height
     });
     const [animationPathBallon, setAnimationPathBallon] = useState<number[][]>([]);
-    const [currentDraw, setCurrentDraw] = useState<freeDraw[]>([]);
+    const [currentDraw, setCurrentDraw] = useState<FreeDraw[]>([]);
     const [superField, setSuperField] = useState(superSvg_Field);
-    const [changeID, setchangeID] = useState('');
     const [freeID, setFreeID] = useState(-1);
-    const [playerId, setPlayerId] = useState('');
     const [dynamicPositionList, setDynamicPositionList] = useState<[number, Player[], Ballon[]][]>([]);
     const [svgPlayers, setSvgPlayers] = useState<React.ReactNode[]>([]);
     const [svgBallon, setSvgBallon] = useState<React.ReactNode>();
-    const [playerPaths, setPlayerPaths] = useState<PlayerPath[]>([]);
     const [pathDrawing, setPathDrawing] = useState(false);
-    const [count, setCount] = useState<number>(0)
+    const [isFirstLoad, setIsFirstLoad] = useState<boolean>(true)
 
     const panRef = useRef<PanGestureHandler>(null);
     const pinchRef = useRef<PinchGestureHandler>(null);
@@ -143,15 +118,23 @@ export function Field() {
     }, [position.positionList]);
 
     useEffect(() => {
-        setPlayerPaths([]);
+        dispatch(setPlayerPaths("[]"))
         setCurrentDraw([]);
     }, [position.positionIndex]);
+
+    useEffect(() => {
+        if (!isFirstLoad) {
+            simulateRefresh()
+        } else {
+            setIsFirstLoad(false)
+        }
+    }, [option.refresh]);
 
     const setAll = () => {
         setSuperField(superSvg_Field);
 
         if (currentDraw) {
-            const buffDraw: freeDraw[] = currentDraw
+            const buffDraw: FreeDraw[] = currentDraw
 
             buffDraw.map((free) => {
                 let redrawPath = '';
@@ -284,8 +267,8 @@ export function Field() {
 
     const onGestureEvent = (event: PanGestureHandlerGestureEvent) => {
         if (pathDrawing) {
-            const {translationX, translationY, velocityX, velocityY} = event.nativeEvent;
-            playerPaths.map((chemin) => {
+            const {translationX, translationY} = event.nativeEvent;
+            JSON.parse(option.playerPaths).map((chemin: PlayerPath) => {
                 if (chemin.id === option.selectedPlayer) {
                     const index = dynamicPositionList[position.positionIndex][1].findIndex(player => player.id + 'P' === chemin.id);
 
@@ -314,21 +297,23 @@ export function Field() {
                             if (!isInside) {
                                 dynamicPositionList[position.positionIndex][1][index].pathArraySetup([]);
 
-                                setPlayerPaths(prevPaths => {
-                                    // Create a new array with updated path for the specific player
-                                    return prevPaths.filter((p) => p.id !== option.selectedPlayer);
-                                });
+                                let buffPlayerPaths = JSON.parse(option.playerPaths)
+                                buffPlayerPaths = buffPlayerPaths.filter((p: PlayerPath) => p.id !== option.selectedPlayer)
+
+                                dispatch(setPlayerPaths(JSON.stringify(buffPlayerPaths)))
                             } else {
                                 dynamicPositionList[position.positionIndex][1][index].arrayPush([pourcentX, pourcentY]);
 
-                                setPlayerPaths(prevPaths => {
-                                    return prevPaths.map(prevChemin => {
-                                        if (prevChemin.id === option.selectedPlayer) {
-                                            return {...prevChemin, path: updatedPath};
-                                        }
-                                        return prevChemin;
-                                    });
-                                });
+                                let buffPlayerPaths = JSON.parse(option.playerPaths)
+
+                                buffPlayerPaths = buffPlayerPaths.map((prev: PlayerPath) => {
+                                    if (prev.id === option.selectedPlayer) {
+                                        return {...prev, path: updatedPath};
+                                    }
+                                    return prev;
+                                })
+
+                                dispatch(setPlayerPaths(JSON.stringify(buffPlayerPaths)))
                             }
                         }
                     }
@@ -444,7 +429,7 @@ export function Field() {
                             }
 
                             j.pathArraySetup([]);
-                            setPlayerPaths([]);
+                            dispatch(setPlayerPaths("[]"))
 
                             dynamicPositionList[position.positionIndex][1].map((joueur, index) => {
                                 if (option.selectedPlayer == joueur.id) {
@@ -571,24 +556,23 @@ export function Field() {
     const handlePlayerPress = (id: string) => {
         setPathDrawing(true);
 
-        dynamicPositionList[position.positionIndex][1].map((joueur) => {
+        dynamicPositionList[position.positionIndex][1].map((joueur: Player): void => {
             if (joueur.id === id) {
                 dispatch(selectPlayer(`${joueur.id}P`))
                 joueur.speedUp();
 
-                let getXY = getPourcentageCenter2(joueur.position[0], joueur.position[1]);
-                let beginPath = `M${getXY[0]} ${getXY[1]}`;
+                let getXY: number[] = getPourcentageCenter2(joueur.position[0], joueur.position[1]);
+                let beginPath: string = `M${getXY[0]} ${getXY[1]}`;
 
                 joueur.pathArraySetup([]);
 
-                const existingIndex = playerPaths.findIndex((p) => p.id === joueur.id + 'P');
+                const existingIndex = JSON.parse(option.playerPaths).findIndex((p: PlayerPath): boolean => p.id === joueur.id + 'P');
 
                 if (existingIndex !== -1) {
-                    setPlayerPaths((prevPaths) => {
-                        const newPaths = [...prevPaths];
-                        newPaths[existingIndex].path = beginPath;
-                        return newPaths;
-                    });
+                    const newPaths: PlayerPath[] = [...JSON.parse(option.playerPaths)]
+                    newPaths[existingIndex].path = beginPath
+
+                    dispatch(setPlayerPaths(JSON.stringify(newPaths)))
 
                     setDynamicPositionList((j0) => {
                         const save: Player[] = j0[position.positionIndex][1].filter((c) => c.id === joueur.id);
@@ -602,10 +586,12 @@ export function Field() {
                         ];
                     });
                 } else {
-                    setPlayerPaths((prevPaths) => [
-                        ...prevPaths,
-                        {id: joueur.id + 'P', path: beginPath},
-                    ]);
+                    dispatch(setPlayerPaths(
+                        JSON.stringify([
+                            ...JSON.parse(option.playerPaths),
+                            {id: joueur.id + 'P', path: beginPath}
+                        ])
+                    ))
                 }
 
                 let mcenter = [((superField[0][0] + superField[0][2] + superField[0][4] + superField[0][5]) / 4), ((superField[0][1] + superField[0][3] + superField[0][3] + superField[0][6]) / 4)]
@@ -631,7 +617,7 @@ export function Field() {
     };
 
     const showPlayer = (grab: boolean) => {
-        let maillot: numberMaillot[] = [];
+        let maillot: ShirtDigit[] = [];
         let moveBallon = [-100, -100];
         let ballonShown = false;
 
@@ -673,19 +659,21 @@ export function Field() {
                     drawnPath = `${drawnPath}L${getXY[0]} ${getXY[1]}`
                 }
 
-                const existingIndex = playerPaths.findIndex((p) => p.id === joueur.id + 'P');
+                const existingIndex = JSON.parse(option.playerPaths).findIndex((p: PlayerPath) => p.id === joueur.id + 'P');
 
                 if (existingIndex != -1) {
-                    setPlayerPaths((prevPaths) => {
-                        const newPaths = [...prevPaths];
-                        newPaths[existingIndex].path = drawnPath;
-                        return newPaths;
-                    });
+                    const newPaths: PlayerPath[] = [...JSON.parse(option.playerPaths)]
+                    newPaths[existingIndex].path = drawnPath
+
+                    dispatch(setPlayerPaths(JSON.stringify(newPaths)))
                 } else {
-                    setPlayerPaths((prevPaths) => [
-                        ...prevPaths,
-                        {id: joueur.id + 'P', path: drawnPath},
-                    ]);
+                    dispatch(setPlayerPaths(
+                        JSON.stringify([
+                            ...JSON.parse(option.playerPaths),
+                            {id: joueur.id + 'P', path: drawnPath}
+                        ])
+                    ))
+
                 }
             }
 
@@ -715,7 +703,7 @@ export function Field() {
 
             buffPosition[1] = buffPosition[1] - (buffPosition[1] * 1.7 - joueur.svg_player[75] * 1.7);
 
-            let module: numberMaillot = {
+            let module: ShirtDigit = {
                 id: joueur.id, position: buffPosition,
                 textContent: textM, textSize: textSizing
             }
@@ -767,11 +755,6 @@ export function Field() {
         }
     };
 
-    const isValidString = (input: string): boolean => {
-        const regex = /^[RrBb][1-9](?:[0-9])?$/;
-
-        return regex.test(input);
-    };
 
     const addPlayer = (positionAdd: number[], idAdd: string) => {
         superSvg_Field = superField;
@@ -823,7 +806,7 @@ export function Field() {
                     return newPositionList;
                 });
             }
-            setPlayerId("");
+            dispatch(setInputPlayerId(""))
             showPlayer(false);
         }
     };
@@ -893,7 +876,7 @@ export function Field() {
                         if (isInside && !onPlayer) {
                             let pourcentX = (adjustedX - superField[0][0]) / (superField[0][5] - superField[0][0]);
                             let pourcentY = (adjustedY - superField[0][3]) / (superField[0][1] - superField[0][3]);
-                            addPlayer([pourcentX, 1 - pourcentY], playerId);
+                            addPlayer([pourcentX, 1 - pourcentY], option.inputPlayerId);
                         }
                     });
                 }
@@ -944,7 +927,7 @@ export function Field() {
                         const adjustedX = x;
                         let pourcentX = (adjustedX - superField[0][0]) / (superField[0][5] - superField[0][0]);
                         let pourcentY = (y - superField[0][3]) / (superField[0][1] - superField[0][3]);
-                        const newFreePath: freeDraw = {
+                        const newFreePath: FreeDraw = {
                             id: currentDraw.length,
                             position: [pourcentX, pourcentY],
                             path: `M${adjustedX} ${y}`,
@@ -958,11 +941,6 @@ export function Field() {
                 }
             }
         }
-    }
-
-    function comparePositions(positionA: number[], positionB: number[]): boolean {
-        // Replace this logic with your actual comparison logic
-        return positionA[0] === positionB[0] && positionA[1] === positionB[1];
     }
 
     const animate = () => {
@@ -1082,12 +1060,13 @@ export function Field() {
                 setcheckForEnd([false]);
                 goAnimation(joueur, 0, indexCheck);
 
-                const existingIndex: number = playerPaths.findIndex((p) => p.id === joueur.id + 'P');
+                const existingIndex: number = JSON.parse(option.playerPaths).findIndex((p: PlayerPath): boolean => p.id === joueur.id + 'P');
 
                 if (existingIndex !== -1) {
-                    setPlayerPaths((prevPaths) => {
-                        return prevPaths.filter((p) => p.id !== joueur.id + 'P');
-                    });
+                    let buffPlayerPaths: PlayerPath[] = JSON.parse(option.playerPaths)
+                    buffPlayerPaths = buffPlayerPaths.filter((p: PlayerPath): boolean => p.id !== joueur.id + 'P')
+
+                    dispatch(setPlayerPaths(JSON.stringify(buffPlayerPaths)))
                 }
             } else if (modifyIndex != -1) {
                 let listNumb = [[-100, -100], [joueur.position[0], 1 - joueur.position[1]]];
@@ -1256,19 +1235,20 @@ export function Field() {
                     closestID = [joueur.id, joueur.position];
 
                     if (closestValue < 0.05
-                        && autoLink
+                        && option.autoLink
                         && dynamicPositionList[position.positionIndex][2][0].idJoueur == "") {
                         console.log("Auto Link done !");
-                        setClosestPlayer(closestID);
                         linkToPlayer(false);
+
+                        dispatch(setClosestPlayer(JSON.stringify(closestID)))
                     }
                 }
             });
-            setClosestPlayer(closestID);
+            dispatch(setClosestPlayer(JSON.stringify(closestID)))
         }
     };
 
-    const simulateMouveRefresh = () => {
+    const simulateRefresh = () => {
 
         setTranslationInc([translationIncrement[0],
             translationIncrement[1]]);
@@ -1278,15 +1258,17 @@ export function Field() {
             translationIncrement[1]]);
         setAll();
 
+        console.log("dynamicPositionList", dynamicPositionList)
+
         center = [((superSvg_Field[0][0] + superSvg_Field[0][2] + superSvg_Field[0][4] + superSvg_Field[0][5]) / 4), ((superSvg_Field[0][1] + superSvg_Field[0][3] + superSvg_Field[0][3] + superSvg_Field[0][6]) / 4)]
         let svg_Mode = proportionSVG(player, ((superSvg_Field[0][5] - superSvg_Field[0][0]) / (svg_fieldUNCHANGED[5] - svg_fieldUNCHANGED[0])))
-        dynamicPositionList[position.positionIndex][1].map((joueur) => {
+        dynamicPositionList[position.positionIndex][1].map((joueur: Player) => {
             svg_Mode = diffSVG(svg_Mode, getCenter(svg_Mode), xArrayPlayer, getPourcentageCenter(joueur.position[0], joueur.position[1]))
             joueur.svgValue(svg_Mode);
         });
 
         svg_Mode = proportionSVG(ballon_svg, ((superSvg_Field[0][5] - superSvg_Field[0][0]) / (svg_fieldUNCHANGED[5] - svg_fieldUNCHANGED[0])))
-        dynamicPositionList[position.positionIndex][2].map((ball) => {
+        dynamicPositionList[position.positionIndex][2].map((ball: Ballon) => {
             svg_Mode = diffSVG(svg_Mode, getCenterBallon(svg_Mode), xBallon_Array, getPourcentageCenter(ball.position[0], ball.position[1]))
             ball.svgValue(svg_Mode);
         });
@@ -1297,74 +1279,21 @@ export function Field() {
     const linkToPlayer = (refresh: boolean) => {
         if (dynamicPositionList[position.positionIndex][1].length > 0 && dynamicPositionList[position.positionIndex][2].length > 0) {
             if (dynamicPositionList[position.positionIndex][2][0].idJoueur == "") {
-                dynamicPositionList[position.positionIndex][2][0].idChange(closestPlayer[0]);
-                dynamicPositionList[position.positionIndex][2][0].positionChange(closestPlayer[1]);
+                dynamicPositionList[position.positionIndex][2][0].idChange(JSON.parse(option.closestPlayer)[0]);
+                dynamicPositionList[position.positionIndex][2][0].positionChange(JSON.parse(option.closestPlayer)[1]);
             } else {
                 dynamicPositionList[position.positionIndex][2][0].idChange("");
             }
 
             if (refresh) {
-                simulateMouveRefresh();
+                simulateRefresh();
             }
         }
     }
 
-    const autoLinkOnOff = () => {
-        setAutoLink(!autoLink);
-    };
-
-    const replacePlayerID = (text: string) => {
-
-        if (isValidString(text)) {
-            let indexID: number = dynamicPositionList[position.positionIndex][1].findIndex((joueur) => joueur.id === option.selectedPlayer);
-            if (indexID != -1) {
-                if (dynamicPositionList[position.positionIndex][2].length > 0) {
-                    if (dynamicPositionList[position.positionIndex][2][0].idJoueur === dynamicPositionList[position.positionIndex][1][indexID].id) {
-                        dynamicPositionList[position.positionIndex][2][0].idChange(text);
-                    }
-                }
-                let indexPath = playerPaths.findIndex((p) => p.id === dynamicPositionList[position.positionIndex][1][indexID].id + 'P');
-
-                if (indexPath != -1) {
-                    playerPaths.splice(indexPath, 1);
-                }
-                dynamicPositionList[position.positionIndex][1][indexID].idChange(text);
-                dispatch(selectPlayer(text))
-                simulateMouveRefresh();
-            }
-        }
-    };
-
-    const deletePlayer = () => {
-        let indexID: number = dynamicPositionList[position.positionIndex][1].findIndex((joueur: Player): boolean => joueur.id === option.selectedPlayer);
-        if (indexID != -1) {
-            const newPositionList: [number, Player[], Ballon[]][] = [...dynamicPositionList];
-            let indexPathID: number = playerPaths.findIndex((p: PlayerPath): boolean => p.id === option.selectedPlayer + 'P');
-
-            newPositionList[position.positionIndex][1].splice(indexID, 1);
-            setDynamicPositionList(newPositionList);
-            dispatch(selectPlayer(""))
-
-            if (indexPathID != -1) {
-                const newPlayerPath: PlayerPath[] = [...playerPaths];
-
-                newPlayerPath.splice(indexPathID, 1);
-                setPlayerPaths(newPlayerPath);
-            }
-            simulateMouveRefresh();
-        }
-    };
-
-    const deleteBallon = () => {
-        const newPositionList = [...dynamicPositionList];
-        newPositionList[position.positionIndex][2].splice(0, 1);
-        setDynamicPositionList(newPositionList);
-        simulateMouveRefresh();
-    };
-
     const checkForIntersection = () => {
         dynamicPositionList[position.positionIndex][1].forEach((joueur: Player): void => {
-            currentDraw.forEach((free: freeDraw) => {
+            currentDraw.forEach((free: FreeDraw) => {
                 if (free.numbers.length > 0) {
 
                     for (let i: number = 0; i < joueur.myArray.length - 1; i++) {
@@ -1412,7 +1341,7 @@ export function Field() {
 
     return (
         <View style={styles.container}>
-            <PinchGestureHandler onGestureEvent={onPinchGestureEvent} simultaneousHandlers={[panRef, pressableRef]}>
+            <PinchGestureHandler onGestureEvent={onPinchGestureEvent} simultaneousHandlers={[panRef, pressableRef]} >
                 <PanGestureHandler ref={panRef} onGestureEvent={onGestureEvent}
                                    onHandlerStateChange={onHandlerStateChange}
                                    simultaneousHandlers={[pinchRef, pressableRef]}>
@@ -1791,7 +1720,7 @@ export function Field() {
                                     strokeMiterlimit={lineSize[1]}
                                 />
 
-                                {playerPaths.map((P) => (
+                                {JSON.parse(option.playerPaths).map((P: PlayerPath) => (
                                     <Path key={P.id} d={P.path} fill="transparent" stroke="black"
                                           strokeWidth={lineSize[0]} strokeMiterlimit={lineSize[1]}/>
                                 ))}
@@ -1827,6 +1756,8 @@ export function Field() {
                     </TapGestureHandler>
                 </PanGestureHandler>
             </PinchGestureHandler>
+
+            <Options animate={animate} linkToPlayer={linkToPlayer}/>
         </View>
     );
 }
