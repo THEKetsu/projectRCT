@@ -13,6 +13,7 @@ import * as FileSystem from 'expo-file-system';
 
 
 
+
 /**
  * Renders the left drawer component.
  *
@@ -117,9 +118,9 @@ const DrawerLeft = ({ isOpen, onClose, onItemSelected }: { isOpen: boolean, onCl
                 {selectedButton === item.name && (
                     <View style={styles.iconContainer}>
                         <TouchableOpacity onPress={() => handleStartEditing(item.id)}>
-                            <Image source={share} style={styles.icon} />
+                            <Image source={share} style={styles.icon}/>
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={() => handleDeleteSelectedItem(item.id)}>
+                        <TouchableOpacity onPress={() => handleDeleteSelectedItem()}>
                             <Image source={bin} style={styles.icon} />
                         </TouchableOpacity>
                     </View>
