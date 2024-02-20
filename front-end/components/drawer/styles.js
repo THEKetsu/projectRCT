@@ -80,7 +80,6 @@ let styles =  StyleSheet.create({
         height: 24,
     },
     topWidgetText: {
-        fontSize: 10,
         fontWeight: 'bold',
         marginLeft: 10,
         color: '#373737'
@@ -93,10 +92,9 @@ let styles =  StyleSheet.create({
         zIndex:2,
       },
       drawerLeftContent: {
-        width: '100%',
+        height: '100%',
         flexDirection: 'column',
       },
-
 
       menuDrawerLeft: {
         height: '10%',
@@ -126,7 +124,7 @@ let styles =  StyleSheet.create({
         marginTop: 5,
       },
       listDrawerLeft: {
-        height: '80%',
+        height: '85%',
         backgroundColor: '#959595',
         flexDirection: 'list',
         alignItems: 'center',
@@ -138,7 +136,7 @@ let styles =  StyleSheet.create({
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.25,
         shadowRadius: 3.84,
-        height: '10%',
+        height: '5%',
         backgroundColor: '#D9D9D9',
         flexDirection: 'row',
         alignItems: 'center',
@@ -169,6 +167,8 @@ let styles =  StyleSheet.create({
       },
       listItem:{
         borderRadius: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
         padding: 10,
         backgroundColor: '#D9D9D9',
         margin: 5,
@@ -183,14 +183,7 @@ let styles =  StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
       },
-
-      scrollStyle: {
-        width: '100%',
-        marginLeft: 10
-      },
       Field:{
-        borderRadius: 10,
-        width:'100%',
       },
       plusButton:{
         padding: 10,
@@ -206,6 +199,10 @@ let styles =  StyleSheet.create({
       closeMenu:{
         marginLeft: 10,
         marginTop: 5,
+      },
+      scrollBar:{
+        width: '100%',
+        height: '100%',
       },
 })
 
