@@ -148,13 +148,13 @@ const DrawerLeft = ({ isOpen, onClose, onItemSelected }: { isOpen: boolean, onCl
                     {/* Menu view Top */}
                     <View style={styles.menuDrawerLeft}>
                         <TouchableOpacity onPress={onClose} style ={styles.closeMenu}>
-                            <Image source={close_menu} />
+                            <Image source={close_menu} style={styles.plusButtonImage} />
                         </TouchableOpacity>
                         <View style={styles.textTop}>
                             <Text style={styles.textTopContent}>{selectedButton || "Selectionner un scenario"}</Text>
                         </View>  
                         <TouchableOpacity style={styles.imagesTop} onPress={handleDeleteSelectedItem}>
-                            <Image source={pen} />
+                            <Image source={pen} style={styles.plusButtonImage}/>
                         </TouchableOpacity>
                     </View>
                     {/* List view */}
@@ -174,7 +174,7 @@ const DrawerLeft = ({ isOpen, onClose, onItemSelected }: { isOpen: boolean, onCl
                     {/* Bottomn view */}
                     <View style={styles.bottomDrawerLeft}>
                         <TouchableOpacity style={styles.buttonBottomDrawerLeft}>
-                            <Image source={house} />
+                            <Image source={house} style={styles.plusButtonImage} />
                         </TouchableOpacity>
                         <View style={styles.textBottom}>
                             <Text style={styles.textBottomContent}>Match du Jeudi Aprem</Text>

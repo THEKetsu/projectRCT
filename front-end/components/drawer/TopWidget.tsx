@@ -28,7 +28,7 @@ const TopWidget = ({ onPlayButtonPress,  selectedItem  }: { onPlayButtonPress: (
         <View style={styles.topWidget}>
                 <View style={styles.topWidgetElementLeft}>
                     <TouchableOpacity  style={styles.topWidgetButton} onPress={() => handlePress('Info du bouton 1')} >
-                        <Image source={burger_menu} />
+                        <Image source={burger_menu} style={styles.PlayButton} />
                     </TouchableOpacity >
                     <Text style={styles.topWidgetText}>{selectedItem || "Selectionner un scenario"}</Text>
                 </View>
@@ -37,7 +37,7 @@ const TopWidget = ({ onPlayButtonPress,  selectedItem  }: { onPlayButtonPress: (
                         <Image source={play_button} style={styles.PlayButton}/>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.topWidgetButton}>
-                        <Image source={reload}  style={styles.ReloadButton}/>
+                        <Image source={reload}  style={styles.PlayButton}/>
                     </TouchableOpacity>
                 </View>
         </View>
