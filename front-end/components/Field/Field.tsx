@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Platform, StyleSheet, Text, useWindowDimensions, View} from 'react-native';
+import {Platform, Pressable, StyleSheet, Text, useWindowDimensions, View} from 'react-native';
 import Svg, {Path} from 'react-native-svg';
 import {
     HandlerStateChangeEvent,
@@ -12,7 +12,7 @@ import {
 } from 'react-native-gesture-handler';
 import pointInPolygon from 'point-in-polygon';
 import Player from '../../classes/Player';
-import data from '../../assets/data2.json';
+import data from '../../assets/data2.json'
 import Ballon from '../../classes/Ballon';
 import {useAppDispatch, useAppSelector} from "../../hooks/reduxHooks";
 import {setPositionIndex, setPositionList} from "../../redux/actions/positionActions";
@@ -50,7 +50,7 @@ export function Field() {
         [0, 2], [0, 2], [0, 2], [0, 2], [0, 2], [0, 2], [0, 2], [0, 2], [0, 2], [0, 2], [0, 2], [0, 2], [0, 2], [0, 2], [0, 2], [0, 2]
         , [0, 2], [0, 2], [0, 2], [0, 2], [0, 2], [0, 2], [0, 2], [0, 2], [0, 2], [0, 2], [0, 2], [0, 2], [0, 2], [0, 2],
         [0, 2], [0, 2], [0, 2], [0, 2], [0, 2], [0, 2], [0, 2], [0, 2], [0, 2], [0, 2, 4, 6, 8], [0], [0, 2], [0, 2], [0, 2], [0, 2], [0, 2]];
-    let myBase = [((superSvg_Field[0][0] + superSvg_Field[0][2] + superSvg_Field[0][4] + superSvg_Field[0][5]) / 4), ((superSvg_Field[0][1] + superSvg_Field[0][3] + superSvg_Field[0][3] + superSvg_Field[0][6]) / 4)]
+    
     let receivedTranslationsCounter = 0;
     let center = [((superSvg_Field[0][0] + superSvg_Field[0][2] + superSvg_Field[0][4] + superSvg_Field[0][5]) / 4), ((superSvg_Field[0][1] + superSvg_Field[0][3] + superSvg_Field[0][3] + superSvg_Field[0][6]) / 4)]
     let proportionTotalSize = 0.5;
@@ -77,12 +77,18 @@ export function Field() {
     const [animationPathBallon, setAnimationPathBallon] = useState<number[][]>([]);
     const [currentDraw, setCurrentDraw] = useState<FreeDraw[]>([]);
     const [superField, setSuperField] = useState(superSvg_Field);
+    const [numCCC,setNumCCC] = useState(0);
+    const [numAnimation,setNumAnimation] = useState(0);
+    const [currentID, setCurrentID] = useState('');
+    const [changeID, setchangeID] = useState('');
     const [freeID, setFreeID] = useState(-1);
     const [dynamicPositionList, setDynamicPositionList] = useState<[number, Player[], Ballon[]][]>([]);
     const [svgPlayers, setSvgPlayers] = useState<React.ReactNode[]>([]);
     const [svgBallon, setSvgBallon] = useState<React.ReactNode>();
     const [pathDrawing, setPathDrawing] = useState(false);
     const [isFirstLoad, setIsFirstLoad] = useState<boolean>(true)
+    const [myPlayerID, setMyPlayerID] = useState("");
+    let myBase = [svgSize.width/2,svgSize.height/2];
 
     const panRef = useRef<PanGestureHandler>(null);
     const pinchRef = useRef<PinchGestureHandler>(null);
@@ -120,6 +126,7 @@ export function Field() {
     useEffect(() => {
         dispatch(setPlayerPaths("[]"))
         setCurrentDraw([]);
+        setNumCCC(numCCC+1)
     }, [position.positionIndex]);
 
     useEffect(() => {
@@ -129,6 +136,27 @@ export function Field() {
             setIsFirstLoad(false)
         }
     }, [option.refresh]);
+
+    useEffect(() => {
+        if(numCCC == -1){
+            setNumAnimation(numAnimation+1);
+        } else {
+            if(dynamicPositionList.length > 0 && numAnimation >= 0){
+                simulateRefresh();
+            }
+        }
+    }, [numCCC]);
+
+    useEffect(() => {
+        
+        if(dynamicPositionList.length > 0){
+            simulateRefresh();
+        }
+        if(dynamicPositionList.length > position.positionIndex +1 ){
+            showPlayer(false,position.positionIndex+1)
+        }
+    }, [numAnimation]);
+
 
     const setAll = () => {
         setSuperField(superSvg_Field);
@@ -252,7 +280,7 @@ export function Field() {
                 svg_Mode = diffSVG(svg_Mode, getCenterBallon(svg_Mode), xBallon_Array, getPourcentageCenter(ball.position[0], ball.position[1]))
                 ball.svgValue(svg_Mode);
             });
-            showPlayer(false);
+            showPlayer(false,position.positionIndex);
         }
     };
 
@@ -265,6 +293,7 @@ export function Field() {
         onPinchGestureEvent(event);
     };
 
+    
     const onGestureEvent = (event: PanGestureHandlerGestureEvent) => {
         if (pathDrawing) {
             const {translationX, translationY} = event.nativeEvent;
@@ -363,11 +392,14 @@ export function Field() {
             }
         } else if (toolbar.zoomMode) {
             const {translationX, translationY, velocityX, velocityY} = event.nativeEvent;
+            
 
-            if (event.nativeEvent.state === State.ACTIVE && (translationX > -1000 && translationX < 1000 &&
-                translationY > -1000 && translationY < 1000) && (translationPrev[0] != translationX && translationPrev[1] != translationY)) {
+            if ((event.nativeEvent.state === State.ACTIVE && (translationX > -1000 && translationX < 1000 &&
+                translationY > -1000 && translationY < 1000) && (translationPrev[0] != translationX && translationPrev[1] != translationY)) || translationX == 100) {
                 receivedTranslationsCounter++;
+                console.log("--");
 
+                
                 if (receivedTranslationsCounter === 3) {
                     setTranslationPrev([translationX, translationY]);
                     setTranslationInc([(translationIncrement[0] + (translationX - translationPrev[0])),
@@ -392,7 +424,7 @@ export function Field() {
                         ball.svgValue(svg_Mode);
                     })
 
-                    showPlayer(false);
+                    showPlayer(false,position.positionIndex);
                     receivedTranslationsCounter = 0;
                 }
             }
@@ -458,7 +490,7 @@ export function Field() {
                             return;
                         }
                     })
-                    showPlayer(grabB);
+                    showPlayer(grabB,position.positionIndex);
                     receivedTranslationsCounter = 0;
                 }
             }
@@ -547,6 +579,7 @@ export function Field() {
             ];
 
             setDynamicPositionList((prevPos) => [...prevPos, positionCurrent]);
+            setNumCCC(numCCC+1);
 
             myPlayersData = [];
             myBallonData = [];
@@ -611,12 +644,12 @@ export function Field() {
                     svg_Mode = diffSVG(svg_Mode, getCenterBallon(svg_Mode), xBallon_Array, getPourcentageCenter(ball.position[0], ball.position[1]))
                     ball.svgValue(svg_Mode);
                 });
-                showPlayer(false);
+                showPlayer(false,position.positionIndex);
             }
         });
     };
 
-    const showPlayer = (grab: boolean) => {
+    const showPlayer = (grab: boolean,indexC: number) => {
         let maillot: ShirtDigit[] = [];
         let moveBallon = [-100, -100];
         let ballonShown = false;
@@ -645,6 +678,7 @@ export function Field() {
                 if (joueur.id == dynamicPositionList[position.positionIndex][2][0].idJoueur && !grab) {
                     ballonShown = true;
                     moveBallon = getCenter(joueur.svg_player);
+                    dynamicPositionList[indexC][2][0].positionChange(joueur.position);
                 }
             }
 
@@ -807,7 +841,7 @@ export function Field() {
                 });
             }
             dispatch(setInputPlayerId(""))
-            showPlayer(false);
+            showPlayer(false,position.positionIndex);
         }
     };
 
@@ -830,7 +864,7 @@ export function Field() {
 
             return newPositionList;
         });
-        showPlayer(false);
+        showPlayer(false,position.positionIndex);
     };
 
     const setupPlayerAdding = (event: HandlerStateChangeEvent<TapGestureHandlerEventPayload>) => {
@@ -943,7 +977,8 @@ export function Field() {
         }
     }
 
-    const animate = () => {
+    const animate = (indexC:number) => {
+       
         dispatch(setPositionList(JSON.stringify(dynamicPositionList)))
         superSvg_Field = superField;
         checkForIntersection();
@@ -957,7 +992,9 @@ export function Field() {
         let listJoueurModify: [string, number[]][] = [];
         let ballonMove = false;
 
+        //Il exist un index après le current (?) si oui...
         if (dynamicPositionList.length > position.positionIndex + 1) {
+            //On va récupérez les changements entre ces index (en terme de position)
             let listJoueurA: [string, number[]][] = [];
             let listJoueurB: [string, number[]][] = [];
             dynamicPositionList[position.positionIndex][1].map((joueur) => {
@@ -968,8 +1005,10 @@ export function Field() {
                 listJoueurB.push([joueur.id, joueur.position]);
             });
 
+            //Le ballon est lançable par un joueur ? La position suivante a t-elle un ballon ? 
             if (dynamicPositionList[position.positionIndex][2].length > 0) {
                 if (dynamicPositionList[position.positionIndex][2][0].idJoueur != "" && dynamicPositionList[position.positionIndex + 1][2].length > 0) {
+                    //Si OUI, l'a sa position varie t-elle ?
                     if (dynamicPositionList[position.positionIndex][2][0].position != dynamicPositionList[position.positionIndex + 1][2][0].position) {
                         let indexIDJoueur = dynamicPositionList[position.positionIndex][1].findIndex((joueur) => joueur.id === dynamicPositionList[position.positionIndex][2][0].idJoueur);
                         if (indexIDJoueur != -1) {
@@ -990,6 +1029,7 @@ export function Field() {
             });
         }
         if (ballonMove) {
+            //On construit un array de déplacement
             dynamicPositionList[position.positionIndex][2][0].idChange("");
             let listNumb = [[-100, -100], [dynamicPositionList[position.positionIndex][2][0].position[0], 1 - dynamicPositionList[position.positionIndex][2][0].position[1]]];
             let addCx = 1;
@@ -1003,9 +1043,18 @@ export function Field() {
                 addCy = -1;
             }
 
+            //Add +0.1*addCx and +0.1*addCy until the numbers are close enough to listJoueurModify[modifyIndex][1]
+            //If they are closer than 0.1, the last value should be equal to listJoueurModify[modifyIndex][1]
+            //Exemple : 0,0 towards 0.28,0.28 , list numb = [[0,0],[0.1,0.1],[0.2,0.2],[0.28,0.28]]
+
+
             let [currentX, currentY] = dynamicPositionList[position.positionIndex][2][0].position;
+
             let [finalX, finalY] = dynamicPositionList[position.positionIndex + 1][2][0].position;
-            let antiCrashIndex = 0;
+
+            let antiCrashIndex = 0;//Dans le cas où qqun met de mauvaise valeur JSON
+            //On continue tant que x et y ne sont pas assez proche du final
+
             let absolueX = Math.abs(currentX - finalX);
             let absolueY = Math.abs(currentY - finalY);
             let uppScaleX = 0.1;
@@ -1043,22 +1092,23 @@ export function Field() {
             let getXYListStart = getPourcentageCenter(newAnimationPathBallon[0][0], 1 - newAnimationPathBallon[0][1]);
             let getXYListEnd = getPourcentageCenter(newAnimationPathBallon[newAnimationPathBallon.length - 1][0], 1 - newAnimationPathBallon[newAnimationPathBallon.length - 1][1]);
             setAnimationPathBallon([getXYListStart, getXYListEnd]);
-            prioAnimation(listNumb, 0, atLeastOneChange, listJoueurModify);
+            prioAnimation(listNumb, 0, atLeastOneChange, listJoueurModify,indexC);
         } else {
-            animateSuite(atLeastOneChange, listJoueurModify);
+            animateSuite(atLeastOneChange, listJoueurModify,indexC);
         }
     };
 
-    const animateSuite = (atLeastOneChange: boolean, listJoueurModify: [string, number[]][]) => {
+    const animateSuite = (atLeastOneChange: boolean, listJoueurModify: [string, number[]][], indexC: number) => {
         let indexCheck: number = -1;
 
         dynamicPositionList[position.positionIndex][1].map((joueur, index) => {
+            //Check if ID === an ID of listJoueurModify, recup its index on listJoueurModify
             const modifyIndex = listJoueurModify.findIndex(([id]) => id === joueur.id);
 
             if (joueur.myArray.length > 0) {
                 atLeastOneChange = true;
                 setcheckForEnd([false]);
-                goAnimation(joueur, 0, indexCheck);
+                goAnimation(joueur, 0, indexCheck,indexC);
 
                 const existingIndex: number = JSON.parse(option.playerPaths).findIndex((p: PlayerPath): boolean => p.id === joueur.id + 'P');
 
@@ -1120,10 +1170,11 @@ export function Field() {
 
                 setcheckForEnd([false]);
                 indexCheck = indexCheck + 1;
-                goAnimation(joueur, 0, indexCheck);
+                goAnimation(joueur, 0, indexCheck,indexC);
             }
         });
 
+        //La Position CURRENT est la dernière et il y'a eu un changement, on créer la nouvelle position
         if (dynamicPositionList.length == position.positionIndex + 1 && atLeastOneChange) {
             const newList: Player[] = [];
 
@@ -1148,9 +1199,10 @@ export function Field() {
         }
     };
 
-    const goAnimation = (j: Player, index: number, indexCheck: number) => {
+    const goAnimation = (j: Player, index: number, indexCheck: number, indexC :number) => {
         let timingAnimation = 100;
 
+        
         if (j.myArray.length > index) {
             if (j.myArray[index][0] != -100) {
                 center = [((superSvg_Field[0][0] + superSvg_Field[0][2] + superSvg_Field[0][4] + superSvg_Field[0][5]) / 4), ((superSvg_Field[0][1] + superSvg_Field[0][3] + superSvg_Field[0][3] + superSvg_Field[0][6]) / 4)]
@@ -1167,13 +1219,16 @@ export function Field() {
                         dynamicPositionList[position.positionIndex][2][0].svgValue(svg_Mode);
                     }
                 }
-                showPlayer(false);
+                showPlayer(false,indexC);
             }
             if (j.myArray.length == index + 1 && j.myArray[index][0] != -100) {
                 j.positionChange([j.myArray[index][0], 1 - j.myArray[index][1]])
             }
-            setTimeout(() => goAnimation(j, index + 1, indexCheck), timingAnimation / (j.speed + 1));
-        } else {
+            setTimeout(() => goAnimation(j, index + 1, indexCheck, indexC), timingAnimation / (j.speed + 1));
+        } else if(j.myArray.length == 0) {
+            //OK... il peut être vide je sais pas comment...
+        }
+        else {
             if (j.myArray[0][0] != -100) {
                 j.positionChange([j.myArray[0][0], 1 - j.myArray[0][1]]);
             } else {
@@ -1184,16 +1239,37 @@ export function Field() {
             setcheckForEnd((prevCheck) => {
                 let changeCheck = prevCheck;
                 changeCheck[indexCheck] = true;
+                
+                if (changeCheck.some((item) => item === false) || changeCheck.length < 1) {
+                    
+                } else if(changeCheck.length == 2) {
+                    
+                    checkEndingAnimation(indexC);
+                }
                 return (changeCheck);
             });
 
-            if (dynamicPositionList.length - 1 > position.positionIndex) {
-                dispatch(setPositionIndex(position.positionIndex + 1))
-            }
+            checkEndingAnimation();
         }
     };
 
-    const prioAnimation = (j: number[][], index: number, atLeastOneChange: boolean, listJoueurModify: [string, number[]][]) => {
+    const checkEndingAnimation = (indexC : number) => {
+
+
+        if (dynamicPositionList.length - 1 > position.positionIndex) {
+            //On redonne le ballon aux joueurs
+            dynamicPositionList[position.positionIndex][2][0].idChange(myPlayerID);
+            setNumCCC(numCCC*0 - 1);
+            dispatch(setPositionIndex(position.positionIndex + 1));
+
+            //Boucle d'animation EN COURS
+            // if(dynamicPositionList.length - 1 > indexC ){
+            //     setTimeout(() => animate(indexC+1),10000);
+            // }
+        }
+    };
+
+    const prioAnimation = (j: number[][], index: number, atLeastOneChange: boolean, listJoueurModify: [string, number[]][],indexC:number) => {
         let timingAnimation = 600;
 
         if (j.length > index) {
@@ -1204,12 +1280,12 @@ export function Field() {
                 svg_Mode = diffSVG(svg_Mode, getCenterBallon(svg_Mode), xBallon_Array, getPourcentageCenter(j[index][0], 1 - j[index][1]));
                 dynamicPositionList[position.positionIndex][2][0].svgValue(svg_Mode);
 
-                showPlayer(false);
+                showPlayer(false,indexC);
             }
             if (j.length == index + 1 && j[index][0] != -100) {
                 dynamicPositionList[position.positionIndex][2][0].positionChange([j[index][0], 1 - j[index][1]])
             }
-            setTimeout(() => prioAnimation(j, index + 1, atLeastOneChange, listJoueurModify), timingAnimation / 4);
+            setTimeout(() => prioAnimation(j, index + 1, atLeastOneChange, listJoueurModify,indexC), timingAnimation / 4);
         } else {
             if (j[0][0] != -100) {
                 dynamicPositionList[position.positionIndex][2][0].positionChange([j[0][0], 1 - j[0][1]]);
@@ -1217,7 +1293,7 @@ export function Field() {
                 dynamicPositionList[position.positionIndex][2][0].positionChange([j[1][0], 1 - j[1][1]]);
                 setAnimationPathBallon([]);
             }
-            animateSuite(atLeastOneChange, listJoueurModify);
+            animateSuite(atLeastOneChange, listJoueurModify,indexC);
         }
     };
 
@@ -1249,7 +1325,6 @@ export function Field() {
     };
 
     const simulateRefresh = () => {
-
         setTranslationInc([translationIncrement[0],
             translationIncrement[1]]);
         setLock(true);
@@ -1273,14 +1348,14 @@ export function Field() {
             ball.svgValue(svg_Mode);
         });
 
-        showPlayer(false);
+        showPlayer(false,position.positionIndex);
     };
 
     const linkToPlayer = (refresh: boolean) => {
         if (dynamicPositionList[position.positionIndex][1].length > 0 && dynamicPositionList[position.positionIndex][2].length > 0) {
             if (dynamicPositionList[position.positionIndex][2][0].idJoueur == "") {
                 dynamicPositionList[position.positionIndex][2][0].idChange(JSON.parse(option.closestPlayer)[0]);
-                dynamicPositionList[position.positionIndex][2][0].positionChange(JSON.parse(option.closestPlayer)[1]);
+                dynamicPositionList[position.positionIndex][2][0].positionChange(JSON.parse(option.closestPlayer)[1]);//setNumCCC(numCCC+1);
             } else {
                 dynamicPositionList[position.positionIndex][2][0].idChange("");
             }
@@ -1756,10 +1831,11 @@ export function Field() {
                     </TapGestureHandler>
                 </PanGestureHandler>
             </PinchGestureHandler>
-
+            
+            
             <Options animate={animate} linkToPlayer={linkToPlayer}/>
         </View>
-    );
+    )
 }
 
 const styles = StyleSheet.create({
