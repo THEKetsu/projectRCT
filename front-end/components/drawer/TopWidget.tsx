@@ -14,7 +14,6 @@ const TopWidget = ({ onPlayButtonPress,  selectedItem  }: { onPlayButtonPress: (
 
     return (
         <View style={styles.topWidget}>
-            <View style={styles.topWidgetElement}>
                 <View style={styles.topWidgetElementLeft}>
                     <TouchableOpacity  style={styles.topWidgetButton} onPress={() => handlePress('Info du bouton 1')} >
                         <Image source={burger_menu} />
@@ -29,7 +28,6 @@ const TopWidget = ({ onPlayButtonPress,  selectedItem  }: { onPlayButtonPress: (
                         <Image source={reload}  style={styles.topWidgetImage}/>
                     </TouchableOpacity>
                 </View>
-            </View>
         </View>
     );
 };

@@ -7,9 +7,13 @@ import pen from '../../assets/crayon.png';
 import bin from '../../assets/trash.png';
 import house from '../../assets/house.png';
 import field from '../../assets/rct_field.png';
+import share from '../../assets/share.png';
 import importAllData from './JsonFile';
+import * as FileSystem from 'expo-file-system';
 
-const DrawerLeft = ({ isOpen, onClose, onItemSelected }: { isOpen: boolean, onClose: () => void, onItemSelected: (selectedItem: string | null) => void }) => {
+
+
+const DrawerLeft = ({ isOpen, onClose, onItemSelected }: { isOpen: boolean, onClose: () => void, onItemSelected: (selectedItem: any | null) => void }) => {
     const [selectedButton, setSelectedButton] = useState<string | null>(null);
     const [editingItemId, setEditingItemId] = useState<string | null>(null); // ID de l'élément en cours de modification
     const [data, setData] = useState<any[]>([]);
@@ -18,11 +22,11 @@ const DrawerLeft = ({ isOpen, onClose, onItemSelected }: { isOpen: boolean, onCl
         setData(allData);
     }, []);
 
-    const handlePressIn = (text: string) => {
+    
+    const handlePressIn = (text: string,item : any ) => {
         setSelectedButton(text);
-        onItemSelected(text);
+        onItemSelected(item);
     };
-
     const handleDeleteSelectedItem = () => {
         if (selectedButton) {
             const newData = data.filter(item => item.text !== selectedButton);
@@ -30,7 +34,9 @@ const DrawerLeft = ({ isOpen, onClose, onItemSelected }: { isOpen: boolean, onCl
             setSelectedButton(null); // Efface également la sélection actuelle après la suppression
         }
     };
+
     const handleAddItem = () => {
+        console.log('Add item');
         const newItem = {
             id: Math.random().toString(), // Utiliser une clé aléatoire pour l'ID
             name: 'Nouvel élément',
@@ -41,14 +47,6 @@ const DrawerLeft = ({ isOpen, onClose, onItemSelected }: { isOpen: boolean, onCl
         setData(prevData => [...prevData, newItem]); 
         // create a json file with this information 
         const jsonData = JSON.stringify(newItem, null, 4);
-        // Écrire les données JSON dans un fichier
-        fs.writeFile('nouvel_element.json', jsonData, (err: any) => {
-            if (err) {
-                console.error('Une erreur s\'est produite lors de l\'écriture du fichier :', err);
-                return;
-            }
-            console.log('Le fichier nouvel_element.json a été créé avec succès.');
-        });
     };
     const handleTextInputChange = (name: string, id: string) => {
         setData(prevData => prevData.map(item => item.id === id ? { ...item, name: name } : item));
@@ -67,11 +65,24 @@ const DrawerLeft = ({ isOpen, onClose, onItemSelected }: { isOpen: boolean, onCl
     
     // Transformation de allData en tableau d'objets pour l'affichage
     const renderImageItem = ({ item }: { item: { id: string, name: string, url: string} }) => (
-        <TouchableOpacity
+            <TouchableOpacity
             key={item.id}
-            onPressIn={() => handlePressIn(item.name)}
+            onPressIn={() => handlePressIn(item.name,item)}
             style={[styles.listItem, selectedButton === item.name && styles.selectedButton]}>
-            <Image source={field} style={styles.Field}/>
+            <View style={styles.imageContainer}>
+                <Image source={field} style={[styles.Field, selectedButton === item.name && styles.selectedImage]}/>
+                {selectedButton === item.name && (
+                    <View style={styles.iconContainer}>
+                        <TouchableOpacity onPress={() => handleStartEditing(item.id)}>
+                            <Image source={share} style={styles.icon} />
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => handleDeleteSelectedItem(item.id)}>
+                            <Image source={bin} style={styles.icon} />
+                        </TouchableOpacity>
+                    </View>
+            )}
+            </View>
+
             <View style={styles.textView}>
                 {editingItemId === item.id ? (
                     <TextInput
@@ -85,6 +96,9 @@ const DrawerLeft = ({ isOpen, onClose, onItemSelected }: { isOpen: boolean, onCl
                 )}
             </View>
         </TouchableOpacity>
+
+    
+
     );
     
     return (
@@ -93,17 +107,14 @@ const DrawerLeft = ({ isOpen, onClose, onItemSelected }: { isOpen: boolean, onCl
                 <View style={styles.drawerLeftContent}>
                     {/* Menu view Top */}
                     <View style={styles.menuDrawerLeft}>
-                        <TouchableOpacity onPress={onClose} >
+                        <TouchableOpacity onPress={onClose} style ={styles.closeMenu}>
                             <Image source={close_menu} />
                         </TouchableOpacity>
                         <View style={styles.textTop}>
                             <Text style={styles.textTopContent}>{selectedButton || "Selectionner un scenario"}</Text>
                         </View>  
-                        <TouchableOpacity style={styles.imagesTop}>
-                            <Image source={pen} />
-                        </TouchableOpacity>
                         <TouchableOpacity style={styles.imagesTop} onPress={handleDeleteSelectedItem}>
-                            <Image source={bin} />
+                            <Image source={pen} />
                         </TouchableOpacity>
                     </View>
                     {/* List view */}

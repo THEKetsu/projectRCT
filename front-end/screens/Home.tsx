@@ -16,10 +16,11 @@ export default function Home() {
   const handleCloseDrawer = () => {
     setIsDrawerOpen(false);
   };
-  const handleItemSelected = (selectedItem: string | null) => {
-    setSelectedItem(selectedItem);
+  const handleItemSelected = (selectedItem: any | null) => { 
+    setSelectedItem(selectedItem.name);
   };
 
+  console.log('Information about the selected item: ', selectedItem);
   return (
     <View style={styles.container}>
       {isDrawerOpen && <DrawerLeft onClose={handleCloseDrawer} isOpen={isDrawerOpen} onItemSelected={handleItemSelected} />}
