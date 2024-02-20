@@ -13,6 +13,14 @@ import * as FileSystem from 'expo-file-system';
 
 
 
+/**
+ * Renders the left drawer component.
+ *
+ * @param {Object} isOpen - A boolean to indicate if the drawer is open
+ * @param {Function} onClose - A function to handle the closing of the drawer
+ * @param {Function} onItemSelected - A function to handle the selection of an item
+ * @return {JSX.Element} The rendered left drawer component
+ */
 const DrawerLeft = ({ isOpen, onClose, onItemSelected }: { isOpen: boolean, onClose: () => void, onItemSelected: (selectedItem: any | null) => void }) => {
     const [selectedButton, setSelectedButton] = useState<string | null>(null);
     const [editingItemId, setEditingItemId] = useState<string | null>(null); // ID de l'élément en cours de modification
@@ -23,10 +31,20 @@ const DrawerLeft = ({ isOpen, onClose, onItemSelected }: { isOpen: boolean, onCl
     }, []);
 
     
+    /**
+     * A function that handles the press in event.
+     *
+     * @param {string} text - the text to be selected
+     * @param {any} item - the item to be processed
+     * @return {void} 
+     */
     const handlePressIn = (text: string,item : any ) => {
         setSelectedButton(text);
         onItemSelected(item);
     };
+    /**
+     * Function to handle the deletion of the selected item.
+     */
     const handleDeleteSelectedItem = () => {
         if (selectedButton) {
             const newData = data.filter(item => item.text !== selectedButton);
@@ -35,6 +53,11 @@ const DrawerLeft = ({ isOpen, onClose, onItemSelected }: { isOpen: boolean, onCl
         }
     };
 
+    /**
+     * Function to handle adding an item.
+     *
+     * @return {void} 
+     */
     const handleAddItem = () => {
         console.log('Add item');
         const newItem = {
@@ -48,14 +71,33 @@ const DrawerLeft = ({ isOpen, onClose, onItemSelected }: { isOpen: boolean, onCl
         // create a json file with this information 
         const jsonData = JSON.stringify(newItem, null, 4);
     };
+    /**
+     * Updates the name property of the item with the given id in the data array.
+     *
+     * @param {string} name - the new name to be updated
+     * @param {string} id - the id of the item to be updated
+     * @return {void} 
+     */
     const handleTextInputChange = (name: string, id: string) => {
         setData(prevData => prevData.map(item => item.id === id ? { ...item, name: name } : item));
     };
 
+    /**
+     * Handles the start of editing for a specific item.
+     *
+     * @param {string} id - The identifier of the item to start editing
+     * @return {void} 
+     */
     const handleStartEditing = (id: string) => {
         setEditingItemId(id);
     };
 
+    /**
+     * This function handles the finish editing action.
+     *
+     * @param {} 
+     * @return {} 
+     */
     const handleFinishEditing = () => {
         setEditingItemId(null);
     };
@@ -63,7 +105,13 @@ const DrawerLeft = ({ isOpen, onClose, onItemSelected }: { isOpen: boolean, onCl
 
 
     
-    // Transformation de allData en tableau d'objets pour l'affichage
+
+      /**
+     * Function to render an image item.
+     *
+     * @param {Object} item - An object containing id, name, and URL of the image
+     * @return {JSX.Element} The rendered image item component
+     */
     const renderImageItem = ({ item }: { item: { id: string, name: string, url: string} }) => (
             <TouchableOpacity
             key={item.id}

@@ -23,7 +23,9 @@ export default function Home() {
   console.log('Information about the selected item: ', selectedItem);
   return (
     <View style={styles.container}>
+      /*DrawerLeft */
       {isDrawerOpen && <DrawerLeft onClose={handleCloseDrawer} isOpen={isDrawerOpen} onItemSelected={handleItemSelected} />}
+      /*TopWidget */
       {!isDrawerOpen && <TopWidget onPlayButtonPress={handlePressPlayButton}  selectedItem={selectedItem}/>}
       <View style={styles.home}>
         <Text></Text>

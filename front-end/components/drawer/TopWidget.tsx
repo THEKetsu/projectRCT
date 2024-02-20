@@ -6,6 +6,13 @@ import burger_menu from '../../assets/BurgerMenu.png';
 import play_button from '../../assets/PlayButton.png';
 import reload from '../../assets/Reload.png';
 
+/**
+ * Renders the TopWidget component.
+ *
+ * @param {Function} onPlayButtonPress - Function to handle play button press
+ * @param {string | null} selectedItem - The selected item or null
+ * @return {JSX.Element} JSX element representing the TopWidget component
+ */
 const TopWidget = ({ onPlayButtonPress,  selectedItem  }: { onPlayButtonPress: (info: string) => void, selectedItem: string | null  }) => {
     const handlePress = (info : String) => {
         // Faire quelque chose avec l'information remontée
