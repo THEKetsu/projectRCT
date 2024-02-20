@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {View, Text, TouchableOpacity, StyleSheet, Dimensions, Animated, Image} from 'react-native';
+import {View, Text, TouchableOpacity, StyleSheet, Dimensions,ScrollView, Animated, Image, Fragment} from 'react-native';
 import Player from '../../classes/Player';
 import Ballon from '../../classes/Ballon';
 import FontAwesome from "react-native-vector-icons/FontAwesome";
@@ -40,7 +40,7 @@ export default function Position({
     // Configuration de l'animation utilisant Animated.timing
     Animated.timing(animation, {
       toValue, // La valeur cible déterminée ci-dessus
-      duration: 300, // Durée de l'animation en millisecondes
+      duration: 100, // Durée de l'animation en millisecondes
       useNativeDriver: false, // Utilisation du moteur natif pour l'animation
     }).start(); // Lancement de l'animation
 
@@ -51,8 +51,9 @@ export default function Position({
   // Création d'une interpolation pour ajuster la hauteur de la barre
   const barHeight = animation.interpolate({
     inputRange: [0, 1], // Plage des valeurs à interpréter
-    outputRange: ['2.5%', '25%'], // Hauteur initiale et finale de la barre
+    outputRange: [0, (dimHeight *28) / 100], // Hauteur initiale et finale de la barre
   });
+  
     useEffect(() => {
         console.log(receivedData);
 
@@ -75,42 +76,68 @@ export default function Position({
             sendSavedData(receivedPosition);
         }
     };
+    const handleCreateNewPosition = () => {
+        const newPosition = numberOfPosition.length + 1;
+        setNumberOfPosition(prevPositions => [...prevPositions, newPosition]);
+    };
 
     return (
-        <Animated.View style={[styles.container, { height: barHeight }]}>
+        <View style={[styles.bottomBarContainer, !collapsed ? styles.bottomBarContainer_false_collapsed : styles.bottomBarContainer_true_collapsed]}>
+            <View style={[styles.retract_and_position, !collapsed ? styles.retract_and_position_false_collapsed : styles.retract_and_position_true_collapsed]}>
+            
+            {/* bouton pour retracter la bottom bar */}
             <TouchableOpacity onPress={toggleBar} style={styles.retractable}>
     
             { collapsed && (<MaterialIcons style={styles.chevronIcon}
                 name={"keyboard-arrow-down"}
-                size={200}
+                size={(dimWidth *2) / 100}
                 color={"black"}
             /> )}
             { !collapsed && (<MaterialIcons style={styles.chevronIcon}
                 name={"keyboard-arrow-up"}
-                size={200}
+                size={(dimWidth *2) / 100}
                 color={"black"}
             /> )}
 
-            </TouchableOpacity>
-            <View style={{flexDirection: "row", position: "absolute", alignSelf: "flex-start", top: 0, left: 0}}>
-                {numberOfPosition.map((item, index) => (
-                    <TouchableOpacity
-                        activeOpacity={0.7}
-                        key={index}
-                        onPress={() => handlePress(item)}
-                        style={styles.buttonPos}
-                    >
-                        <Text>{item}</Text>
-                    </TouchableOpacity>
-                ))}
+        </TouchableOpacity>
+        {/* scrollbar des positions */}
+        <View style={styles.poseContainer}>
+            {/* <View> */}
+            <View style={styles.positionContainer}>
+                <ScrollView horizontal={true} showsHorizontalScrollIndicator={true}>
+                    <View style={{flexDirection: "row"}}>
+                        {numberOfPosition.map((item, index) => (
+                            <TouchableOpacity
+                                activeOpacity={0.7}
+                                key={index}
+                                onPress={() => handlePress(item)}
+                                style={styles.buttonPos}
+                            >
+                                <Text>{item}</Text>
+                            </TouchableOpacity>
+                        ))}
+                        {/* New "Plus" button */}
+                        <TouchableOpacity
+                            activeOpacity={0.7}
+                            onPress={handleCreateNewPosition}
+                            style={styles.plusSign}
+                        >
+                            <Text>+</Text>
+                        </TouchableOpacity>
+                    </View>
+                </ScrollView>
             </View>
+            </View>
+            </View>
+        <Animated.View style={[styles.container, { height: barHeight }]}>
+
             <View style={styles.buttonContainer}>
 
             <TouchableOpacity onPress={handleClickAdd} style={[styles.buttonBase, !collapsed && {display: 'none'}]}>
                 {/* Mode ZOOM */}
                 <Ionicons
                                     name={"shirt-sharp"}
-                                    size={200}
+                                    size={(dimWidth *4) / 100}
                                     color={"black"}
                                 />
             </TouchableOpacity>
@@ -119,7 +146,7 @@ export default function Position({
                 {/* Add Player */}
                 <FontAwesome
                                     name={"arrows"}
-                                    size={200}
+                                    size={(dimWidth *4) / 100}
                                     color={"black"}
                                 />
             </TouchableOpacity>
@@ -128,7 +155,7 @@ export default function Position({
                 {/* Mode Ballon */}
                 <MaterialIcons
                                     name={"sports-rugby"}
-                                    size={200}
+                                    size={(dimWidth *4) / 100}
                                     color={"black"}
                                 />
             </TouchableOpacity>
@@ -136,17 +163,32 @@ export default function Position({
                 {/* Mode crayon */}
                 <FontAwesome
                                     name={"pencil"}
-                                    size={200}
+                                    size={(dimWidth *4) / 100}
                                     color={"black"}
                                 />
             </TouchableOpacity>
             </View>
         </Animated.View>
+        </View>
     );
 };
 
-
+const windowWidth = Dimensions.get('window').width;
+const windowHeight = Dimensions.get('window').height;
 const styles = StyleSheet.create({
+    bottomBarContainer: {
+        flex: 1,
+        flexDirection: "column"
+    },
+    bottomBarContainer_false_collapsed:{
+        flexGrow: 0, // Empêche l'expansion du conteneur
+        alignSelf: 'flex-start',
+        
+
+    },
+    bottomBarContainer_true_collapsed:{
+
+    },
     container: {
         height: dimHeight / 4,
         width: dimWidth,
@@ -154,24 +196,45 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         flexDirection: "row",
-        overflow:"hidden"
     },
-    buttonPos: {
-        height: 20,
-        width: 100,
-        backgroundColor: "green",
-        borderRadius: 20,
-        justifyContent: "center",
-        alignItems: "center"
+    retract_and_position:{
+        
+
+    },
+    retract_and_position_false_collapsed:{
+        position: 'absolute',
+        bottom: 0
+    },
+    retract_and_position_true_collapsed:{
+
+
+    },
+    poseContainer: {
+        flex: 1,
+        flexDirection: 'column',
+       
+       
+    },
+    positionContainer: {
+        height: (dimHeight *5) / 100,
+        width: windowWidth,
+        backgroundColor: '#D9D9D9',
+        // justifyContent: 'center',
+        // alignItems: 'center',
+        flexDirection: 'row',
+        // borderRadius: 15,
+        position: 'relative',
+        
+        // top: '-45%',
     },
     buttonBase: {
-        height: 60,
-        width: 60,
+        height: (dimHeight *5) / 100,
+        width: (dimWidth *5) / 100,
         backgroundColor: 'transparent',
         borderRadius: 10,
         justifyContent: "center",
         alignItems: "center",
-        marginLeft: 10,
+        
     },
     buttonContainer: {
         flexDirection:"row",
@@ -181,17 +244,57 @@ const styles = StyleSheet.create({
     },
     retractable: {
         position: "absolute",
-        top:"-10%",
-        backgroundColor: "red",
-        borderRadius: 25,
-        width: "10%",
+        // top: "-10%",
+        top: -((dimHeight *3) / 100),
+        backgroundColor: "#D9D9D9",
+        borderTopLeftRadius: 25,
+        borderTopRightRadius: 25,
+        marginLeft: "45%",
+        width: (dimWidth *10) / 100,
+        height: (dimHeight *10) / 100,
         justifyContent:"center",
         alignItems:"center",
-        zIndex: 5
+        // zIndex: 5,
+        borderTopWidth: 1, // Épaisseur de la bordure du haut
+        borderTopColor: 'black', // Couleur de la bordure du haut
 
     },
     chevronIcon: {
-    
-    }
+        flex: 1,
+        justifyContent: "center",
+        alignItems:"center"
 
-})
+    
+    },
+    buttonPos: {
+        height: (dimHeight *5) / 100,
+        width: (dimWidth *5) / 100,
+        justifyContent: 'center',
+        alignItems: 'center',
+        elevation: 4,
+        borderTopRightRadius: 10,
+        borderRightWidth: 2,
+        borderColor: 'lightgrey',
+        backgroundColor: 'white', // Bouton de position en blanc
+    },
+    plusSign: {
+        height: (dimHeight *5) / 100,
+        width: (dimWidth *5) / 100,
+        justifyContent: 'center',
+        alignItems: 'center',
+        elevation: 4,
+        borderTopRightRadius: 10,
+        borderRightWidth: 2,
+        borderColor: 'lightgrey',
+        color: 'lightgrey', // Couleur grise pour le bouton "plus"
+        backgroundColor: 'lightgrey',
+    },
+    buttonBaseContainer: {
+        backgroundColor: 'lightgrey', // Fond gris pour le bouton de base
+        height: 30,
+        width: 100,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    
+});
