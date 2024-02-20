@@ -6,6 +6,11 @@ import burger_menu from '../../assets/BurgerMenu.png';
 import play_button from '../../assets/PlayButton.png';
 import reload from '../../assets/Reload.png';
 
+
+
+
+
+
 /**
  * Renders the TopWidget component.
  *
@@ -29,10 +34,10 @@ const TopWidget = ({ onPlayButtonPress,  selectedItem  }: { onPlayButtonPress: (
                 </View>
                 <View style={styles.topWidgetElementRight}>
                     <TouchableOpacity style={styles.topWidgetButton}>
-                        <Image source={play_button} style={styles.topWidgetImage}/>
+                        <Image source={play_button} style={styles.PlayButton}/>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.topWidgetButton}>
-                        <Image source={reload}  style={styles.topWidgetImage}/>
+                        <Image source={reload}  style={styles.ReloadButton}/>
                     </TouchableOpacity>
                 </View>
         </View>

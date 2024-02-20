@@ -12,6 +12,8 @@ let styles =  StyleSheet.create({
     marginTop: 20,
     marginBottom: 20,
     marginLeft: 5,
+    width: 22.53,
+    height: 26
   },
   selectedImage: {
     borderRadius: 10,
@@ -70,9 +72,13 @@ let styles =  StyleSheet.create({
       marginLeft: 10,
     },
     topWidgetImage: {
-        width: 20,
-        height: 20,
+        width: 21,
+        height: 26,
         marginLeft: 20,
+    },
+    PlayButton: {
+        width: 26,
+        height: 24,
     },
     topWidgetText: {
         fontSize: 10,

@@ -101,11 +101,6 @@ const DrawerLeft = ({ isOpen, onClose, onItemSelected }: { isOpen: boolean, onCl
     const handleFinishEditing = () => {
         setEditingItemId(null);
     };
-
-
-
-    
-
       /**
      * Function to render an image item.
      *
@@ -144,11 +139,7 @@ const DrawerLeft = ({ isOpen, onClose, onItemSelected }: { isOpen: boolean, onCl
                 )}
             </View>
         </TouchableOpacity>
-
-    
-
     );
-    
     return (
         <View style={styles.drawerLeft}>
             { isOpen  && (

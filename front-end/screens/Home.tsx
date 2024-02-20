@@ -9,23 +9,40 @@ export default function Home() {
     console.log('******************************TEST*********************************');
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<string | null>(null);
+  /**
+   * Handle the press event on the play button.
+   *
+   * @param {any} info - the information related to the press event
+   * @return {void} 
+   */
   const handlePressPlayButton = (info: any) => {
     setIsDrawerOpen(true);
   };
 
+  /**
+   * Closes the drawer by setting the isDrawerOpen state to false.
+   *
+   * @param {} 
+   * @return {}
+   */
   const handleCloseDrawer = () => {
     setIsDrawerOpen(false);
   };
+  /**
+   * A function that handles the selected item.
+   *
+   * @param {any | null} selectedItem - the selected item to be handled
+   * @return {void} 
+   */
   const handleItemSelected = (selectedItem: any | null) => { 
     setSelectedItem(selectedItem.name);
   };
 
+  
   console.log('Information about the selected item: ', selectedItem);
   return (
     <View style={styles.container}>
-      /*DrawerLeft */
       {isDrawerOpen && <DrawerLeft onClose={handleCloseDrawer} isOpen={isDrawerOpen} onItemSelected={handleItemSelected} />}
-      /*TopWidget */
       {!isDrawerOpen && <TopWidget onPlayButtonPress={handlePressPlayButton}  selectedItem={selectedItem}/>}
       <View style={styles.home}>
         <Text></Text>
