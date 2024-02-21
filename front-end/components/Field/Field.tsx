@@ -159,6 +159,8 @@ export function Field() {
     useEffect(() => {
         
         if(numCCC == -1){
+            setPlayerPaths([]);
+            setCurrentDraw([]);
             setNumAnimation(numAnimation+1);
         }else{
             if(dynamicPositionList.length > 0 && numAnimation >= 0){
@@ -176,6 +178,8 @@ export function Field() {
         if(dynamicPositionList.length > positionLogic.positionIndex +1 ){
             showPlayer(false,positionLogic.positionIndex+1)
         }
+
+        setTimeout(() => animate(positionLogic.positionIndex+1),1000);
     }, [numAnimation]);
 
 
@@ -1403,11 +1407,13 @@ export function Field() {
     const checkEndingAnimation = (indexC : number) => {
         
  
-            if (dynamicPositionList.length - 1 > positionLogic.positionIndex) {
+            if (dynamicPositionList.length - 1 > indexC) {
                 //On redonne le ballon aux joueurs
                 dynamicPositionList[positionLogic.positionIndex][2][0].idChange(myPlayerID);
-                setNumCCC(numCCC*0 - 1);
+                //alert("Refresh");
+                setNumCCC(-1);
                 dispatch(setPositionIndex(positionLogic.positionIndex + 1));
+            
 
             //Boucle d'animation EN COURS
             // if(dynamicPositionList.length - 1 > indexC ){

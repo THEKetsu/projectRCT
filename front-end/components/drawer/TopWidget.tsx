@@ -79,7 +79,6 @@ const TopWidget = ({ onPlayButtonPress,  selectedItem  }: { onPlayButtonPress: (
 
 
       const retrieveReduxPosition = () => {
-
         let eraseAction : any[];
         if(returnPublicInstance.returnActionList.length > 0){
 
@@ -92,7 +91,9 @@ const TopWidget = ({ onPlayButtonPress,  selectedItem  }: { onPlayButtonPress: (
                 .map((item: any) => [item[0],item[1].map(Player.from),item[2].map(Ballon.from)])
                 );
 
-                handleReturnPress(eraseAction);
+                if(dynamicPositionList.length>0){
+                    handleReturnPress(eraseAction);
+                }
 
         };
         
@@ -120,11 +121,18 @@ const TopWidget = ({ onPlayButtonPress,  selectedItem  }: { onPlayButtonPress: (
                 newPositionList[positionLogic.positionIndex][1] = [...newPositionList[positionLogic.positionIndex][1], myPlayer];
             }
 
+            console.log("R",newPositionList[positionLogic.positionIndex]);
+
+
             return newPositionList;
         });
-        returnPublicInstance.returnActionList.splice((returnPublicInstance.returnActionList.length - 1),1);
+
+        if(dynamicPositionList){
+            returnPublicInstance.returnActionList.splice((returnPublicInstance.returnActionList.length - 1),1);
      
-        dispatch(setPositionList(JSON.stringify(dynamicPositionList)))
+            dispatch(setPositionList(JSON.stringify(dynamicPositionList)))
+        }
+       
     };
 
     return (
