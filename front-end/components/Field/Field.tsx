@@ -136,15 +136,17 @@ export function Field() {
                 return prevPositionList.map((item) => {
                     let buffPL = JSON
                         .parse(positionLogic.positionList)
-                        .map((item: any) => item[1]?.length > 0 && item[2].map(Player.from))
-                        .map((item: any) => item[2]?.length > 0 && item[2].map(Ballon.from))
+                        .map((item: any) => [item[0],item[1].map(Player.from),item[2].map(Ballon.from)])
 
                     const matchingItem = buffPL.find(
                         (receivedItem: [number, Player[], Ballon[]]) => receivedItem[0] === item[0]
                     );
+                    console.log(buffPL);
                     return matchingItem ? matchingItem : item;
                 });
             });
+            setNumCCC(numCCC+1);
+
         }
     }, [positionLogic.positionList]);
 
@@ -715,6 +717,7 @@ export function Field() {
         setSvgPlayers([]);
         setSvgBallon([]);
 
+
         dynamicPositionList[indexC][1].map((joueur) => {
             let color: string = "";
             let colorSpeed: string = "";
@@ -756,7 +759,9 @@ export function Field() {
                 if (existingIndex != -1) {
                     setPlayerPaths((prevPaths) => {
                         const newPaths = [...prevPaths];
-                        newPaths[existingIndex].path = drawnPath;
+                        if(newPaths.length > 0){
+                            newPaths[existingIndex].path = drawnPath;
+                        }
                         return newPaths;
                     });
                 } else {
@@ -765,6 +770,8 @@ export function Field() {
                         {id: joueur.id + 'P', path: drawnPath},
                     ]);
                 }
+            }else if(animationEnCours){
+                setPlayerPaths([]);
             }
 
             const svgPlayer = [
@@ -1069,6 +1076,7 @@ export function Field() {
 
 
         animationEnCours = true;
+        
 
         //Un boolean pour ajouter une Position si il y'a eu un changement au moins
         let atLeastOneChange = false;
@@ -1210,7 +1218,7 @@ export function Field() {
             //Check if ID === an ID of listJoueurModify, recup its index on listJoueurModify
             const modifyIndex = listJoueurModify.findIndex(([id]) => id === joueur.id);
 
-
+            
             if (joueur.myArray.length > 0) {
                 //On start l'animation
                 atLeastOneChange = true;
@@ -1293,6 +1301,7 @@ export function Field() {
                 goAnimation(joueur, 0, indexCheck,indexC);
 
 
+
             }
 
         });
@@ -1320,7 +1329,7 @@ export function Field() {
 
             setDynamicPositionList((prevPos: [number, Player[], Ballon[]][]) => [
                 ...prevPos,
-                [indexC + 1, newList, prevPos[indexC][2]],
+                [indexC + 2 , newList, prevPos[indexC][2]],
             ]);
             
             dispatch(setPositionIndex(positionLogic.positionIndex + 1))
@@ -1501,6 +1510,8 @@ export function Field() {
 
         showPlayer(false,positionLogic.positionIndex);
 
+        console.log("--->",dynamicPositionList);
+
         dispatch(setPositionList(JSON.stringify(dynamicPositionList)));
 
     };
@@ -1562,15 +1573,21 @@ export function Field() {
         let indexID = dynamicPositionList[positionLogic.positionIndex][1].findIndex((joueur) => joueur.id === currentID);
         if (indexID != -1) {
             const newPositionList = [...dynamicPositionList];
+            console.log("Player deleted");
+            returnPublicInstance.returnActionList.push(["d",newPositionList[positionLogic.positionIndex][1][indexID]]);
             newPositionList[positionLogic.positionIndex][1].splice(indexID, 1);
             setDynamicPositionList(newPositionList);
             setCurrentID('');
+            
+
             let indexPathID = playerPaths.findIndex((p) => p.id === currentID + 'P');
             if (indexPathID != -1) {
                 const newPlayerPath = [...playerPaths];
                 newPlayerPath.splice(indexPathID, 1);
                 setPlayerPaths(newPlayerPath);
             }
+
+
 
             simulateMouveRefresh();
         }
