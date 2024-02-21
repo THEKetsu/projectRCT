@@ -31,6 +31,7 @@ export default function Position({
     handleClickDrawMode
   }: PositionProps) {
     const [numberOfPosition, setNumberOfPosition] = useState<number[]>([1, 2]);
+    const [selectedPosition, setSelectedPosition] = useState<number | null>(null);
     const [collapsed, setCollapsed] = useState(false); // État pour suivre l'état de la barre (repliée ou non)
   const [animation] = useState(new Animated.Value(0)); // Utilisation d'Animated pour gérer l'animation
   const toggleBar = () => {
@@ -47,6 +48,7 @@ export default function Position({
     // Inversion de l'état 'collapsed' pour refléter le nouvel état de la barre
     setCollapsed(!collapsed);
   };
+  
   const [inline_maillot, setinline] = useState(false);
   const maillot_inline = () => {
     setinline(!inline_maillot)
@@ -86,7 +88,7 @@ export default function Position({
   // Création d'une interpolation pour ajuster la hauteur de la barre
   const barHeight = animation.interpolate({
     inputRange: [0, 1], // Plage des valeurs à interpréter
-    outputRange: [0, (dimHeight *28) / 100], // Hauteur initiale et finale de la barre
+    outputRange: [0, (dimHeight *28) / 100], // Hauteur initiale et finale de la barre 28 valeur de base
   });
   
     useEffect(() => {
@@ -102,18 +104,30 @@ export default function Position({
             setNumberOfPosition(prevPositions => [...prevPositions, receivedData]);
         }
     }, [receivedData]);
-
+    const [position_chosen, setChoosenPosition] = useState(0);
     const handlePress = (item: number) => {
+        setSelectedPosition(item);
         sendDataToB(item);
-
+        
+        
         if (receivedPosition[0][0] != 0) {
             console.log("Position reçu", receivedPosition)
             sendSavedData(receivedPosition);
         }
     };
+    const handleChoosenPosition =(index:number) => {
+        setChoosenPosition(index)
+
+    }
     const handleCreateNewPosition = () => {
-        const newPosition = numberOfPosition.length + 1;
+        const newPosition = Math.max(...numberOfPosition) + 1;
         setNumberOfPosition(prevPositions => [...prevPositions, newPosition]);
+    };
+    const handleDeletePosition = () => {
+        if (selectedPosition !== null) {
+            setNumberOfPosition(prevPositions => prevPositions.filter(position => position !== selectedPosition));
+            setSelectedPosition(null); // Reset selected position
+        }
     };
 
     return (
@@ -145,8 +159,9 @@ export default function Position({
                             <TouchableOpacity
                                 activeOpacity={0.7}
                                 key={index}
-                                onPress={() => handlePress(item)}
-                                style={styles.buttonPos}
+                                onPress={() => {handlePress(item);handleChoosenPosition(index);}}
+                                // style={styles.buttonPos}
+                                style={[styles.buttonPos, index === position_chosen ? { borderWidth: 2,borderColor:'red' } : null]}
                             >
                                 <Text>{item}</Text>
                             </TouchableOpacity>
@@ -159,6 +174,14 @@ export default function Position({
                         >
                             <Text>+</Text>
                         </TouchableOpacity>
+                        {/* Unique "Delete" button */}
+                <TouchableOpacity
+                    activeOpacity={0.7}
+                    onPress={handleDeletePosition}
+                    style={styles.deleteSign}
+                >
+                    <Text style={{color: 'white'}}>🗑️</Text>
+                </TouchableOpacity>
                     </View>
                 </ScrollView>
             </View>
@@ -312,6 +335,18 @@ const styles = StyleSheet.create({
         borderColor: 'lightgrey',
         backgroundColor: 'white', // Bouton de position en blanc
     },
+    deleteSign: {
+        height: (dimHeight *5) / 100,
+        width: (dimWidth *5) / 100,
+        justifyContent: 'center',
+        alignItems: 'center',
+        elevation: 4,
+        borderTopRightRadius: 10,
+        borderRightWidth: 2,
+        borderColor: 'lightgrey',
+        color: 'red', // Couleur grise pour le bouton "plus"
+        backgroundColor: '#A60000',
+    },
     plusSign: {
         height: (dimHeight *5) / 100,
         width: (dimWidth *5) / 100,
@@ -332,10 +367,12 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     activebutton:{
-        width: (dimHeight *5) / 100, // Largeur du bouton
+        width: (dimHeight *10) / 100, // Largeur du bouton
         height: (dimWidth *5) / 100, // Hauteur du bouton
         borderRadius: 50, // Moitié de la largeur/hauteur pour obtenir une forme de cercle
-        backgroundColor: 'blue', // Couleur de fond du bouton
+        backgroundColor: 'white', // Couleur de fond du bouton
+        borderColor: 'red',
+        borderWidth: 2,
         justifyContent: 'center',
         alignItems: 'center',
     },
