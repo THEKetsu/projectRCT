@@ -158,9 +158,8 @@ const DrawerLeft = ({ isOpen, onClose, onItemSelected }: { isOpen: boolean, onCl
                         </TouchableOpacity>
                     </View>
                     {/* List view */}
-                    <View style={styles.listDrawerLeft}> 
-                        <View style={styles.scrollStyle}>               
-                        <ScrollView>
+                    <View style={styles.listDrawerLeft}>               
+                        <ScrollView style={styles.scrollBar}>
                             <View style={styles.listItem}>
                                 <TouchableOpacity style={styles.plusButton} onPress={handleAddItem}>
                                     <Image source={plus} style={styles.plusButtonImage}/>
@@ -168,7 +167,6 @@ const DrawerLeft = ({ isOpen, onClose, onItemSelected }: { isOpen: boolean, onCl
                             </View>
                             {data.map((item) => renderImageItem({ item }))}
                         </ScrollView>
-                        </View>
                     </View>
                     
                     {/* Bottomn view */}
