@@ -13,6 +13,7 @@ import {
 } from "../../redux/actions/toolbarActions";
 import {triggerRefresh} from "../../redux/actions/optionActions";
 import {Position, Toolbar} from "../../utils/interfaces";
+import {parsePositionList} from "../../utils/functions";
 
 const dimWidth = Dimensions.get('window').width;
 const dimHeight = Dimensions.get('window').height;
@@ -36,7 +37,6 @@ export default function ToolBar() {
             duration: 300,
             useNativeDriver: false,
         }).start();
-
         setCollapsed(!collapsed);
     };
 
@@ -57,7 +57,7 @@ export default function ToolBar() {
         if (position.positionIndex != 0 && different) {
             setNumberOfPosition((prevPositions: number[]) => [...prevPositions, position.positionIndex]);
         }
-    }, [position.positionIndex]);
+    }, [position.positionIndex])
 
     const handlePress = (item: number) => {
         dispatch(setPositionIndex(item))
@@ -65,18 +65,23 @@ export default function ToolBar() {
         if (position.positionList != "[]" && JSON.parse(position.positionList)[0][0] != 0) {
             dispatch(setPositionList(position.positionList))
         }
-    };
+    }
 
     const handleCreateNewPosition = () => {
         const newPosition = Math.max(...numberOfPosition) + 1;
         setNumberOfPosition(prevPositions => [...prevPositions, newPosition]);
-    };
+        dispatch(setPositionIndex(position.positionIndex + 1))
+    }
+
     const handleDeletePosition = () => {
         if (selectedPosition !== null) {
             setNumberOfPosition(prevPositions => prevPositions.filter(position => position !== selectedPosition));
             setSelectedPosition(null);
+            let buffPL = parsePositionList(position.positionList)
+            buffPL = buffPL.filter((index: number): boolean => index !== selectedPosition)
+            dispatch(setPositionList(buffPL))
         }
-    };
+    }
 
     return (
         <View style={[styles.bottomBarContainer, !collapsed ? styles.bottomBarContainer_false_collapsed : styles.bottomBarContainer_true_collapsed]}>
@@ -203,8 +208,6 @@ const styles = StyleSheet.create({
     bottomBarContainer_false_collapsed: {
         flexGrow: 0,
         alignSelf: 'flex-start',
-
-
     },
     bottomBarContainer_true_collapsed: {},
     container: {
@@ -224,8 +227,6 @@ const styles = StyleSheet.create({
     poseContainer: {
         flex: 1,
         flexDirection: 'column',
-
-
     },
     positionContainer: {
         height: (dimHeight * 5) / 100,
