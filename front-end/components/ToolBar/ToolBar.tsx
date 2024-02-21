@@ -115,7 +115,6 @@ export default function ToolBar() {
                 setSelectedPosition(null); // Reset selected position
             }
         };
-        console.log("Position chosen : ", selectedPosition);
         console.log("Position list : ", numberOfPosition);
         return (
             <View

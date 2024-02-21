@@ -113,7 +113,6 @@ export function Field() {
     }, []);
 
     useEffect(() => {
-
         if (position.positionList != "[]" && JSON.parse(position.positionList)[0][0] != 0) {
             setDynamicPositionList((prevPositionList) => {
                 return prevPositionList.map((item) => {
@@ -149,7 +148,6 @@ export function Field() {
     }, [option.refresh]);
 
     useEffect(() => {
-
         if (dynamicPositionList.length > 0) {
             simulateRefresh();
         }
@@ -845,8 +843,6 @@ export function Field() {
                 });
             }
             dispatch(setInputPlayerId(""))
-            simulateMouveRefresh();
-            //showPlayer(false, position.positionIndex);
             setNumCCC(numCCC + 1)
         }
     };
@@ -1746,224 +1742,6 @@ export function Field() {
                     </TapGestureHandler>
                 </PanGestureHandler>
             </PinchGestureHandler>
-            {/* </LongPressGestureHandler> */}
-
-
-            <View
-                style={{
-                    position: "absolute",
-                    top: 0,
-                    right: 0,
-                    backgroundColor: "#D9D9D9",
-                    height: "100%",
-                    width: useWindowDimensions().width / 4,
-                    justifyContent: "center",
-                    alignItems: "center",
-                    padding: 10
-                }}
-            >
-                <Pressable
-                    onPress={() => animate(positionLogic.positionIndex)}
-                    style={({pressed}: { pressed: any }) => [
-                        {
-                            backgroundColor: pressed ? 'rgb(210, 230, 255)' : 'rgb(65, 105, 225)',
-                            padding: 10,
-                            borderRadius: 5,
-                            marginBottom: 10
-                        },
-                    ]}
-                >
-                    <Text>
-                        Animate
-                    </Text>
-                </Pressable>
-
-               
-
-                {toolbarLogic.playerMode && ((currentID == '') || (currentID[currentID.length - 1] == 'P'))
-                    && (<TextInput
-                        placeholder="Enter Player ID [B/R][Number] ex: B6"
-                        value={playerId}
-                        onChangeText={text => setPlayerId(text)}
-                        style={{
-                            height: 40,
-                            borderColor: 'gray',
-                            borderWidth: 1,
-                            marginBottom: 10,
-                            paddingLeft: 10,
-                        }}
-                    />)}
-
-                {toolbarLogic.playerMode && (currentID != '') && (currentID[currentID.length - 1] != 'P')
-                    && (<TextInput
-                        placeholder={currentID.slice(1)}
-                        onChangeText={text => setchangeID(text)}
-                        onSubmitEditing={() => replacePlayerID(`${currentID[0]}${changeID}`)}
-                        style={{
-                            height: 40,
-                            borderColor: 'gray',
-                            borderWidth: 1,
-                            marginBottom: 10,
-                            paddingLeft: 10,
-                        }}
-                    />)
-                }
-
-                {toolbarLogic.playerMode && (currentID != '') && (currentID[currentID.length - 1] != 'P')
-                    && (<Pressable
-                        onPress={() => deletePlayer()}
-                        style={({pressed}: { pressed: any }) => [
-                            {
-                                backgroundColor: pressed ? 'rgb(210, 230, 255)' : 'rgb(65, 105, 225)',
-                                padding: 10,
-                                borderRadius: 5,
-                                marginBottom: 10
-                            },
-                        ]}
-                    >
-                        <Text>
-                            POUBELLE
-                        </Text>
-                    </Pressable>)
-                }
-
-                {toolbarLogic.playerMode && (currentID != '') && (currentID[currentID.length - 1] != 'P')
-                    && (<Pressable
-                        onPress={() => replacePlayerID(`B${currentID.substring(1)}`)}
-                        style={({pressed}: { pressed: any }) => [
-                            {
-                                backgroundColor: pressed ? 'rgb(210, 230, 255)' : 'rgb(65, 105, 225)',
-                                padding: 10,
-                                borderRadius: 5,
-                                marginBottom: 10
-                            },
-                        ]}
-                    >
-                        <Text>
-                            BLUE
-                        </Text>
-                    </Pressable>)
-                }
-
-                {toolbarLogic.playerMode && (currentID != '') && (currentID[currentID.length - 1] != 'P')
-                    && (<Pressable
-                        onPress={() => replacePlayerID(`R${currentID.substring(1)}`)}
-                        style={({pressed}: { pressed: any }) => [
-                            {
-                                backgroundColor: pressed ? 'rgb(210, 230, 255)' : 'rgb(65, 105, 225)',
-                                padding: 10,
-                                borderRadius: 5,
-                                marginBottom: 10
-                            },
-                        ]}
-                    >
-                        <Text>
-                            RED
-                        </Text>
-                    </Pressable>)
-                }
-
-
-                {toolbarLogic.ballMode && (dynamicPositionList[positionLogic.positionIndex][2].length == 0) && (
-                    <Text>
-                        Posez le ballon sur le terrain
-                    </Text>
-                )}
-
-                {toolbarLogic.ballMode && (dynamicPositionList[positionLogic.positionIndex][2].length > 0) && (
-
-                    <Pressable
-                        onPress={() => linkToPlayer(true)}
-                        style={({pressed}: { pressed: any }) => [
-                            {
-                                backgroundColor: pressed ? 'rgb(210, 230, 255)' : 'rgb(65, 105, 225)',
-                                padding: 10,
-                                borderRadius: 5,
-                                marginBottom: 10
-                            },
-                        ]}
-                    >
-                        <Text>
-                            Link
-                        </Text>
-                    </Pressable>)}
-                {toolbarLogic.ballMode && (dynamicPositionList[positionLogic.positionIndex][2].length > 0) && (<Text>
-                    {closestPlayer[0]}
-                </Text>)}
-
-                {toolbarLogic.ballMode && (dynamicPositionList[positionLogic.positionIndex][2].length > 0) &&
-                    (
-                        <Pressable
-                            onPress={() => autoLinkOnOff()}
-                            style={({pressed}: { pressed: any }) => [
-                                {
-                                    backgroundColor: pressed ? 'rgb(210, 230, 255)' : 'rgb(65, 105, 225)',
-                                    padding: 10,
-                                    borderRadius: 5,
-                                    marginBottom: 10
-                                },
-                            ]}
-                        >
-                            <Text>
-                                AutoLink Mode
-                            </Text>
-                        </Pressable>
-                    )
-                }
-                {toolbarLogic.ballMode && (dynamicPositionList[positionLogic.positionIndex][2].length > 0)
-                    && (<Pressable
-                        onPress={() => deleteBallon()}
-                        style={({pressed}: { pressed: any }) => [
-                            {
-                                backgroundColor: pressed ? 'rgb(210, 230, 255)' : 'rgb(65, 105, 225)',
-                                padding: 10,
-                                borderRadius: 5,
-                                marginBottom: 10
-                            },
-                        ]}
-                    >
-                        <Text>
-                            POUBELLE
-                        </Text>
-                    </Pressable>)
-                }
-            </View>
-
-
-            {/* <Svg
-        width={svgSize.width}
-        height={svgSize.height}
-        style={styles.svgContainer}
-      > */}
-            {/* Replacing the Green Rectangle with Provided SVG Paths */}
-            {/* <Path
-        d="M0 795.739L149.014 1.837478H644.014L791.728 795.739H0Z"
-        fill="#006A24"
-        />
-        <Path
-        d="M1134 793.619H2.079037H793.814L646.09 0.3054196L793.619 793.619Z"
-        fill="#010101"
-        />
-        <Path
-        d="M75.6 692.3L728 692.3"
-        stroke="white"
-        stroke-width="2.1"
-        stroke-miterlimit="7"
-        />
-        <Path
-        d="M105.7 519.4L676.4 519.4"
-        stroke="white"
-        stroke-width="2.1"
-        stroke-miterlimit="7"
-        /> */}
-            {/* <Rect x="793" y="793" width="30" height="30" fill="red" />
-        <Rect x="149" y="0" width="30" height="30" fill="blue" /> 
-        <Rect x="0" y="793" width="30" height="30" fill="orange" />
-        <Rect x="646" y="0" width="30" height="30" fill="yellow" />  */}
-            {/* 2nd d= M... Longueur 793 ; Height 793 */}
-            {/* 1st d= M... Longueur 149 ; Height 0 ( at end H0Z) */}
-            {/* 2nd d= M... Longueur ? ; Height 793 ( at end H0Z) */}
-            {/* 2nd d= M... Longueur 646 ; 1st Height 0 ( at end H0Z) */}
 
             <Options animate={animate}/>
         </View>
@@ -1975,13 +1753,11 @@ const styles = StyleSheet.create({
         flex: 2,
         justifyContent: 'center',
         alignItems: 'center',
-        //borderColor: 'black',
-        //borderWidth: 1,
         overflow: 'hidden',
-        width: '100%', // Utilisez 100% de la largeur disponible
-        height: '100%', // Utilisez 100% de la hauteur disponible
+        width: '100%',
+        height: '100%',
     },
     svgContainer: {
-        backgroundColor: 'transparent', // Ensure the background is transparent
+        backgroundColor: 'transparent'
     },
 });
