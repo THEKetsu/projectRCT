@@ -10,6 +10,7 @@ import {
     TapGestureHandler,
     TapGestureHandlerEventPayload
 } from 'react-native-gesture-handler';
+import { returnPublicInstance } from '../../classes/ReturnPublicManager';
 import pointInPolygon from 'point-in-polygon';
 import Player from '../../classes/Player';
 import data from '../../assets/data2.json'
@@ -120,6 +121,8 @@ export function Field() {
     const positionLogic: PositionLogic = useAppSelector((state) => state.positionLogic)
     const toolbarLogic: ToolbarLogic = useAppSelector((state) => state.toolbarLogic)
 
+
+
     let animationEnCours = false;
 
     useEffect(() => {
@@ -127,6 +130,7 @@ export function Field() {
     }, []);
     
     useEffect(() => {
+        
         if (positionLogic.positionList != "[]" && JSON.parse(positionLogic.positionList)[0][0] != 0) {
             setDynamicPositionList((prevPositionList) => {
                 return prevPositionList.map((item) => {
@@ -879,6 +883,8 @@ export function Field() {
                     return newPositionList;
                 });
 
+                returnPublicInstance.returnActionList.push(["c",newPlayer.id]);
+
             } else {
                 let svg_Mode: number[] = proportionSVG(player, ((superField[0][5] - superField[0][0]) / (svg_fieldUNCHANGED[5] - svg_fieldUNCHANGED[0])))
 
@@ -899,7 +905,8 @@ export function Field() {
                 });
             }
             setPlayerId("");
-            showPlayer(false,positionLogic.positionIndex);
+            simulateMouveRefresh();
+            //showPlayer(false,positionLogic.positionIndex);
         }
     };
 
@@ -1493,6 +1500,8 @@ export function Field() {
         });
 
         showPlayer(false,positionLogic.positionIndex);
+
+        dispatch(setPositionList(JSON.stringify(dynamicPositionList)));
 
     };
 

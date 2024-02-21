@@ -5,6 +5,13 @@ import styles from './styles';
 import burger_menu from '../../assets/BurgerMenu.png';
 import play_button from '../../assets/PlayButton.png';
 import reload from '../../assets/Reload.png';
+import { returnPublicInstance } from '../../classes/ReturnPublicManager';
+import Player from '../../classes/Player';
+import Ballon from '../../classes/Ballon';
+import { PositionLogic } from '../../redux/slices/positionLogicSlice';
+import { useAppSelector } from '../../hooks/reduxHooks';
+
+
 
 
 
@@ -19,9 +26,56 @@ import reload from '../../assets/Reload.png';
  * @return {JSX.Element} JSX element representing the TopWidget component
  */
 const TopWidget = ({ onPlayButtonPress,  selectedItem  }: { onPlayButtonPress: (info: string) => void, selectedItem: string | null  }) => {
+;
+
+    const positionLogic: PositionLogic = useAppSelector((state) => state.positionLogic)
+
+    const [dynamicPositionList, setDynamicPositionList] = useState<[number, Player[], Ballon[]][]>([]);
+
     const handlePress = (info : String) => {
         // Faire quelque chose avec l'information remontée
         onPlayButtonPress(info);
+      };
+
+      const handleReturnPress = () => {
+        // Your logic for handling the press goes here
+        console.log(returnPublicInstance.returnActionList);
+        let eraseAction : any[];
+        if(returnPublicInstance.returnActionList.length > 0){
+
+            eraseAction = returnPublicInstance.returnActionList[returnPublicInstance.returnActionList.length - 1];
+          
+            //Prendredu redux,
+
+            setDynamicPositionList(
+                JSON
+                .parse(positionLogic.positionList)
+                .map((item: any) => [item[0],item[1].map(Player.from),item[2].map(Ballon.from)])
+                );
+
+
+            switch (eraseAction[0]) {
+                //Creation de joueur (id saved)
+                case 'c':
+                  
+                  console.log("Case c",dynamicPositionList);
+
+                  break;
+                
+                //Position de joueur modifié (ancienne position save)
+                case 'p':
+                  console.log('Case "p"');
+                  break;
+              
+                // Add more cases as needed
+              
+                default:
+                  // Handle the default case if none of the above matches
+                  console.log('Default case');
+              }
+        }
+
+
       };
 
     return (
@@ -36,7 +90,9 @@ const TopWidget = ({ onPlayButtonPress,  selectedItem  }: { onPlayButtonPress: (
                     <TouchableOpacity style={styles.topWidgetButton}>
                         <Image source={play_button} style={styles.PlayButton}/>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.topWidgetButton}>
+                    <TouchableOpacity
+                    style={styles.topWidgetButton}
+                    onPress={handleReturnPress}>
                         <Image source={reload}  style={styles.PlayButton}/>
                     </TouchableOpacity>
                 </View>
