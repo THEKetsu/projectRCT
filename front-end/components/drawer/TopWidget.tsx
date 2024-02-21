@@ -11,13 +11,6 @@ import Ballon from '../../classes/Ballon';
 import { PositionLogic } from '../../redux/slices/positionLogicSlice';
 import { useAppSelector } from '../../hooks/reduxHooks';
 
-
-
-
-
-
-
-
 /**
  * Renders the TopWidget component.
  *
@@ -77,6 +70,7 @@ const TopWidget = ({ onPlayButtonPress,  selectedItem  }: { onPlayButtonPress: (
 
 
       };
+
 
     return (
         <View style={styles.topWidget}>
