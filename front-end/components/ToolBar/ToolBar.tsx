@@ -12,6 +12,7 @@ import {
     selectZoomMode
 } from "../../redux/actions/toolbarActions";
 import {Position} from "../../redux/slices/positionSlice";
+import {Toolbar} from "../../utils/interfaces";
 
 const dimWidth = Dimensions.get('window').width;
 const dimHeight = Dimensions.get('window').height;
@@ -23,6 +24,7 @@ export default function ToolBar() {
 
     const dispatch = useAppDispatch()
     const position: Position = useAppSelector((state) => state.position)
+    const toolbar: Toolbar = useAppSelector((state) => state.toolbar)
 
     const toggleBar = (): void => {
         const toValue: 0 | 1 = collapsed ? 0 : 1;
@@ -104,7 +106,7 @@ export default function ToolBar() {
                     <Ionicons
                         name={"shirt-sharp"}
                         size={'200%'}
-                        color={"black"}
+                        color={toolbar.playerMode ? "red" : "black"}
                     />
                 </TouchableOpacity>
 
@@ -115,7 +117,7 @@ export default function ToolBar() {
                     <FontAwesome
                         name={"arrows"}
                         size={'200%'}
-                        color={"black"}
+                        color={toolbar.zoomMode ? "red" : "black"}
                     />
                 </TouchableOpacity>
 
@@ -126,7 +128,7 @@ export default function ToolBar() {
                     <MaterialIcons
                         name={"sports-rugby"}
                         size={'200%'}
-                        color={"black"}
+                        color={toolbar.ballMode ? "red" : "black"}
                     />
                 </TouchableOpacity>
                 <TouchableOpacity
@@ -136,7 +138,7 @@ export default function ToolBar() {
                     <FontAwesome
                         name={"pencil"}
                         size={'200%'}
-                        color={"black"}
+                        color={toolbar.drawMode ? "red" : "black"}
                     />
                 </TouchableOpacity>
             </Animated.View>

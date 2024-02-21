@@ -77,19 +77,21 @@ export default function Options({animate, linkToPlayer}) {
                 const newPlayerPath: PlayerPath[] = [...JSON.parse(option.playerPaths)];
 
                 newPlayerPath.splice(indexPathID, 1);
-                
+
                 dispatch(setPlayerPaths(JSON.stringify(newPlayerPath)))
             }
-            dispatch(triggerRefresh());
+
+            dispatch(triggerRefresh())
         }
     }
 
     const deleteBallon = () => {
-        const newPositionList = [...JSON.parse(position.positionList)];
+        const newPositionList = JSON.parse(position.positionList)
+
         newPositionList[position.positionIndex][2].splice(0, 1);
 
         dispatch(setPositionList(JSON.stringify(newPositionList)))
-        dispatch(triggerRefresh());
+        dispatch(triggerRefresh())
     }
 
     return (
@@ -107,7 +109,7 @@ export default function Options({animate, linkToPlayer}) {
             }}
         >
             <Pressable
-                onPress={() => animate()}
+                onPress={() => animate(position.positionIndex)}
                 style={({pressed}: { pressed: any }) => [
                     {
                         backgroundColor: pressed ? 'rgb(210, 230, 255)' : 'rgb(65, 105, 225)',
@@ -218,13 +220,15 @@ export default function Options({animate, linkToPlayer}) {
                 )
             }
 
-            {toolbar.ballMode && (JSON.parse(position.positionList)[position.positionIndex][2].length == 0)
+            {toolbar.ballMode && (JSON.parse(position.positionList)[position.positionIndex][2].length === 0) && (
+                <Text>
+                    Posez le ballon sur le terrain
+                </Text>
+            )}
+
+            {toolbar.ballMode && (JSON.parse(position.positionList)[position.positionIndex][2].length > 0)
                 && (
                     <>
-                        <Text>
-                            Posez le ballon sur le terrain
-                        </Text>
-
                         <Pressable
                             onPress={() => linkToPlayer(true)}
                             style={({pressed}: { pressed: any }) => [

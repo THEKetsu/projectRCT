@@ -50,7 +50,7 @@ export function Field() {
         [0, 2], [0, 2], [0, 2], [0, 2], [0, 2], [0, 2], [0, 2], [0, 2], [0, 2], [0, 2], [0, 2], [0, 2], [0, 2], [0, 2], [0, 2], [0, 2]
         , [0, 2], [0, 2], [0, 2], [0, 2], [0, 2], [0, 2], [0, 2], [0, 2], [0, 2], [0, 2], [0, 2], [0, 2], [0, 2], [0, 2],
         [0, 2], [0, 2], [0, 2], [0, 2], [0, 2], [0, 2], [0, 2], [0, 2], [0, 2], [0, 2, 4, 6, 8], [0], [0, 2], [0, 2], [0, 2], [0, 2], [0, 2]];
-    
+
     let receivedTranslationsCounter = 0;
     let center = [((superSvg_Field[0][0] + superSvg_Field[0][2] + superSvg_Field[0][4] + superSvg_Field[0][5]) / 4), ((superSvg_Field[0][1] + superSvg_Field[0][3] + superSvg_Field[0][3] + superSvg_Field[0][6]) / 4)]
     let proportionTotalSize = 0.5;
@@ -77,8 +77,8 @@ export function Field() {
     const [animationPathBallon, setAnimationPathBallon] = useState<number[][]>([]);
     const [currentDraw, setCurrentDraw] = useState<FreeDraw[]>([]);
     const [superField, setSuperField] = useState(superSvg_Field);
-    const [numCCC,setNumCCC] = useState(0);
-    const [numAnimation,setNumAnimation] = useState(0);
+    const [numCCC, setNumCCC] = useState(0);
+    const [numAnimation, setNumAnimation] = useState(0);
     const [currentID, setCurrentID] = useState('');
     const [changeID, setchangeID] = useState('');
     const [freeID, setFreeID] = useState(-1);
@@ -88,7 +88,7 @@ export function Field() {
     const [pathDrawing, setPathDrawing] = useState(false);
     const [isFirstLoad, setIsFirstLoad] = useState<boolean>(true)
     const [myPlayerID, setMyPlayerID] = useState("");
-    let myBase = [svgSize.width/2,svgSize.height/2];
+    let myBase = [svgSize.width / 2, svgSize.height / 2];
 
     const panRef = useRef<PanGestureHandler>(null);
     const pinchRef = useRef<PinchGestureHandler>(null);
@@ -111,22 +111,22 @@ export function Field() {
                 return prevPositionList.map((item) => {
                     let buffPL = JSON
                         .parse(position.positionList)
-                        .map((item: any) => item[1]?.length > 0 && item[2].map(Player.from))
-                        .map((item: any) => item[2]?.length > 0 && item[2].map(Ballon.from))
+                        .map((item: any) => [item[0], item[1].map(Player.from), item[2].map(Ballon.from)])
 
                     const matchingItem = buffPL.find(
                         (receivedItem: [number, Player[], Ballon[]]) => receivedItem[0] === item[0]
                     );
                     return matchingItem ? matchingItem : item;
                 });
-            });
+            })
+            console.log("setDynamicPositionList done")
         }
     }, [position.positionList]);
 
     useEffect(() => {
         dispatch(setPlayerPaths("[]"))
         setCurrentDraw([]);
-        setNumCCC(numCCC+1)
+        setNumCCC(numCCC + 1)
     }, [position.positionIndex]);
 
     useEffect(() => {
@@ -138,22 +138,22 @@ export function Field() {
     }, [option.refresh]);
 
     useEffect(() => {
-        if(numCCC == -1){
-            setNumAnimation(numAnimation+1);
+        if (numCCC == -1) {
+            setNumAnimation(numAnimation + 1);
         } else {
-            if(dynamicPositionList.length > 0 && numAnimation >= 0){
+            if (dynamicPositionList.length > 0 && numAnimation >= 0) {
                 simulateRefresh();
             }
         }
     }, [numCCC]);
 
     useEffect(() => {
-        
-        if(dynamicPositionList.length > 0){
+
+        if (dynamicPositionList.length > 0) {
             simulateRefresh();
         }
-        if(dynamicPositionList.length > position.positionIndex +1 ){
-            showPlayer(false,position.positionIndex+1)
+        if (dynamicPositionList.length > position.positionIndex + 1) {
+            showPlayer(false, position.positionIndex + 1)
         }
     }, [numAnimation]);
 
@@ -280,7 +280,8 @@ export function Field() {
                 svg_Mode = diffSVG(svg_Mode, getCenterBallon(svg_Mode), xBallon_Array, getPourcentageCenter(ball.position[0], ball.position[1]))
                 ball.svgValue(svg_Mode);
             });
-            showPlayer(false,position.positionIndex);
+
+            showPlayer(false, position.positionIndex);
         }
     };
 
@@ -293,10 +294,11 @@ export function Field() {
         onPinchGestureEvent(event);
     };
 
-    
+
     const onGestureEvent = (event: PanGestureHandlerGestureEvent) => {
         if (pathDrawing) {
             const {translationX, translationY} = event.nativeEvent;
+
             JSON.parse(option.playerPaths).map((chemin: PlayerPath) => {
                 if (chemin.id === option.selectedPlayer) {
                     const index = dynamicPositionList[position.positionIndex][1].findIndex(player => player.id + 'P' === chemin.id);
@@ -391,15 +393,12 @@ export function Field() {
                 });
             }
         } else if (toolbar.zoomMode) {
-            const {translationX, translationY, velocityX, velocityY} = event.nativeEvent;
-            
+            const {translationX, translationY} = event.nativeEvent;
 
             if ((event.nativeEvent.state === State.ACTIVE && (translationX > -1000 && translationX < 1000 &&
                 translationY > -1000 && translationY < 1000) && (translationPrev[0] != translationX && translationPrev[1] != translationY)) || translationX == 100) {
                 receivedTranslationsCounter++;
-                console.log("--");
 
-                
                 if (receivedTranslationsCounter === 3) {
                     setTranslationPrev([translationX, translationY]);
                     setTranslationInc([(translationIncrement[0] + (translationX - translationPrev[0])),
@@ -424,7 +423,7 @@ export function Field() {
                         ball.svgValue(svg_Mode);
                     })
 
-                    showPlayer(false,position.positionIndex);
+                    showPlayer(false, position.positionIndex);
                     receivedTranslationsCounter = 0;
                 }
             }
@@ -490,7 +489,7 @@ export function Field() {
                             return;
                         }
                     })
-                    showPlayer(grabB,position.positionIndex);
+                    showPlayer(grabB, position.positionIndex);
                     receivedTranslationsCounter = 0;
                 }
             }
@@ -579,7 +578,7 @@ export function Field() {
             ];
 
             setDynamicPositionList((prevPos) => [...prevPos, positionCurrent]);
-            setNumCCC(numCCC+1);
+            setNumCCC(numCCC + 1);
 
             myPlayersData = [];
             myBallonData = [];
@@ -601,31 +600,22 @@ export function Field() {
 
                 const existingIndex = JSON.parse(option.playerPaths).findIndex((p: PlayerPath): boolean => p.id === joueur.id + 'P');
 
-                if (existingIndex !== -1) {
-                    const newPaths: PlayerPath[] = [...JSON.parse(option.playerPaths)]
-                    newPaths[existingIndex].path = beginPath
+                const newPaths: PlayerPath[] = JSON.parse(option.playerPaths)
+                newPaths[existingIndex].path = beginPath
 
-                    dispatch(setPlayerPaths(JSON.stringify(newPaths)))
+                dispatch(setPlayerPaths(JSON.stringify(newPaths)))
 
-                    setDynamicPositionList((j0) => {
-                        const save: Player[] = j0[position.positionIndex][1].filter((c) => c.id === joueur.id);
-                        const updatedPlayer: Player[] = j0[position.positionIndex][1].filter((c) => c.id !== joueur.id);
-                        const updatedPlayerData: Player = save[0]; // Replace with your logic to update player properties
+                setDynamicPositionList((j0) => {
+                    const save: Player[] = j0[position.positionIndex][1].filter((c) => c.id === joueur.id);
+                    const updatedPlayer: Player[] = j0[position.positionIndex][1].filter((c) => c.id !== joueur.id);
+                    const updatedPlayerData: Player = save[0]; // Replace with your logic to update player properties
 
-                        return [
-                            ...j0.slice(0, position.positionIndex),
-                            [j0[position.positionIndex][0], [...updatedPlayer, updatedPlayerData], j0[position.positionIndex][2]],
-                            ...j0.slice(position.positionIndex + 1),
-                        ];
-                    });
-                } else {
-                    dispatch(setPlayerPaths(
-                        JSON.stringify([
-                            ...JSON.parse(option.playerPaths),
-                            {id: joueur.id + 'P', path: beginPath}
-                        ])
-                    ))
-                }
+                    return [
+                        ...j0.slice(0, position.positionIndex),
+                        [j0[position.positionIndex][0], [...updatedPlayer, updatedPlayerData], j0[position.positionIndex][2]],
+                        ...j0.slice(position.positionIndex + 1),
+                    ];
+                });
 
                 let mcenter = [((superField[0][0] + superField[0][2] + superField[0][4] + superField[0][5]) / 4), ((superField[0][1] + superField[0][3] + superField[0][3] + superField[0][6]) / 4)]
 
@@ -644,12 +634,13 @@ export function Field() {
                     svg_Mode = diffSVG(svg_Mode, getCenterBallon(svg_Mode), xBallon_Array, getPourcentageCenter(ball.position[0], ball.position[1]))
                     ball.svgValue(svg_Mode);
                 });
-                showPlayer(false,position.positionIndex);
+
+                showPlayer(false, position.positionIndex);
             }
         });
     };
 
-    const showPlayer = (grab: boolean,indexC: number) => {
+    const showPlayer = (grab: boolean, indexC: number) => {
         let maillot: ShirtDigit[] = [];
         let moveBallon = [-100, -100];
         let ballonShown = false;
@@ -657,9 +648,11 @@ export function Field() {
         setSvgPlayers([]);
         setSvgBallon([]);
 
-        dynamicPositionList[position.positionIndex][1].map((joueur) => {
+        dynamicPositionList[indexC][1].map((joueur) => {
             let color: string = "";
             let colorSpeed: string = "";
+
+            let getXY: number[] = getPourcentageCenter(joueur.position[0], joueur.position[1]);
 
             if (joueur.id[0] == 'B') {
                 color = "#0024A6";
@@ -674,15 +667,14 @@ export function Field() {
             } else {
                 colorSpeed = "black";
             }
-            if (dynamicPositionList[position.positionIndex][2].length > 0) {
-                if (joueur.id == dynamicPositionList[position.positionIndex][2][0].idJoueur && !grab) {
+            if (dynamicPositionList[indexC][2].length > 0) {
+                if (joueur.id == dynamicPositionList[indexC][2][0].idJoueur && !grab) {
                     ballonShown = true;
                     moveBallon = getCenter(joueur.svg_player);
                     dynamicPositionList[indexC][2][0].positionChange(joueur.position);
                 }
             }
 
-            let getXY = getPourcentageCenter(joueur.position[0], joueur.position[1]);
             if (joueur.myArray.length > 0 && !animationEnCours && !grab) {
                 let drawnPath = ``;
                 for (let i = 0; i < joueur.myArray.length; i++) {
@@ -707,8 +699,18 @@ export function Field() {
                             {id: joueur.id + 'P', path: drawnPath}
                         ])
                     ))
-
                 }
+            }
+
+            if (!JSON.parse(option.playerPaths).some((p: PlayerPath): boolean => p.id === joueur.id + "P")) {
+                let beginPath: string = `M${getXY[0]} ${getXY[1]}`;
+
+                dispatch(setPlayerPaths(
+                    JSON.stringify([
+                        ...JSON.parse(option.playerPaths),
+                        {id: joueur.id + 'P', path: beginPath}
+                    ])
+                ))
             }
 
             const svgPlayer = [
@@ -748,7 +750,7 @@ export function Field() {
         setlistMaillot(maillot);
 
         if (!ballonShown) {
-            dynamicPositionList[position.positionIndex][2].map((ball) => {
+            dynamicPositionList[indexC][2].map((ball) => {
                 const svgBall = [
                     <Path
                         d={`M${ball.svg_ballon[0]} ${ball.svg_ballon[1]}C${ball.svg_ballon[2]} ${ball.svg_ballon[3]} ${ball.svg_ballon[4]} ${ball.svg_ballon[5]} ${ball.svg_ballon[6]} ${ball.svg_ballon[7]}C${ball.svg_ballon[8]} ${ball.svg_ballon[9]} ${ball.svg_ballon[10]} ${ball.svg_ballon[11]} ${ball.svg_ballon[12]} ${ball.svg_ballon[13]}C${ball.svg_ballon[14]} ${ball.svg_ballon[15]} ${ball.svg_ballon[16]} ${ball.svg_ballon[17]} ${ball.svg_ballon[18]} ${ball.svg_ballon[19]}C${ball.svg_ballon[20]} ${ball.svg_ballon[21]} ${ball.svg_ballon[22]} ${ball.svg_ballon[23]} ${ball.svg_ballon[24]} ${ball.svg_ballon[25]}C${ball.svg_ballon[26]} ${ball.svg_ballon[27]} ${ball.svg_ballon[28]} ${ball.svg_ballon[29]} ${ball.svg_ballon[30]} ${ball.svg_ballon[31]}C${ball.svg_ballon[32]} ${ball.svg_ballon[33]} ${ball.svg_ballon[34]} ${ball.svg_ballon[35]} ${ball.svg_ballon[36]} ${ball.svg_ballon[37]}C${ball.svg_ballon[38]} ${ball.svg_ballon[39]} ${ball.svg_ballon[40]} ${ball.svg_ballon[41]} ${ball.svg_ballon[42]} ${ball.svg_ballon[43]}C${ball.svg_ballon[44]} ${ball.svg_ballon[45]} ${ball.svg_ballon[46]} ${ball.svg_ballon[47]} ${ball.svg_ballon[48]} ${ball.svg_ballon[49]}C${ball.svg_ballon[50]} ${ball.svg_ballon[51]} ${ball.svg_ballon[52]} ${ball.svg_ballon[53]} ${ball.svg_ballon[54]} ${ball.svg_ballon[55]}ZM${ball.svg_ballon[56]} ${ball.svg_ballon[57]}C${ball.svg_ballon[58]} ${ball.svg_ballon[59]} ${ball.svg_ballon[60]} ${ball.svg_ballon[61]} ${ball.svg_ballon[62]} ${ball.svg_ballon[63]}C${ball.svg_ballon[64]} ${ball.svg_ballon[65]} ${ball.svg_ballon[66]} ${ball.svg_ballon[67]} ${ball.svg_ballon[68]} ${ball.svg_ballon[69]}C${ball.svg_ballon[70]} ${ball.svg_ballon[71]} ${ball.svg_ballon[72]} ${ball.svg_ballon[73]} ${ball.svg_ballon[74]} ${ball.svg_ballon[75]}L${ball.svg_ballon[76]} ${ball.svg_ballon[77]}C${ball.svg_ballon[78]} ${ball.svg_ballon[79]} ${ball.svg_ballon[80]} ${ball.svg_ballon[81]} ${ball.svg_ballon[82]} ${ball.svg_ballon[83]}ZM${ball.svg_ballon[84]} ${ball.svg_ballon[85]}L${ball.svg_ballon[86]} ${ball.svg_ballon[87]}L${ball.svg_ballon[88]} ${ball.svg_ballon[89]}C${ball.svg_ballon[90]} ${ball.svg_ballon[91]} ${ball.svg_ballon[92]} ${ball.svg_ballon[93]} ${ball.svg_ballon[94]} ${ball.svg_ballon[95]}C${ball.svg_ballon[96]} ${ball.svg_ballon[97]} ${ball.svg_ballon[98]} ${ball.svg_ballon[99]} ${ball.svg_ballon[100]} ${ball.svg_ballon[101]}C${ball.svg_ballon[102]} ${ball.svg_ballon[103]} ${ball.svg_ballon[104]} ${ball.svg_ballon[105]} ${ball.svg_ballon[106]} ${ball.svg_ballon[107]}C${ball.svg_ballon[108]} ${ball.svg_ballon[109]} ${ball.svg_ballon[110]} ${ball.svg_ballon[111]} ${ball.svg_ballon[112]} ${ball.svg_ballon[113]}C${ball.svg_ballon[114]} ${ball.svg_ballon[115]} ${ball.svg_ballon[116]} ${ball.svg_ballon[117]} ${ball.svg_ballon[118]} ${ball.svg_ballon[119]}C${ball.svg_ballon[120]} ${ball.svg_ballon[121]} ${ball.svg_ballon[122]} ${ball.svg_ballon[123]} ${ball.svg_ballon[124]} ${ball.svg_ballon[125]}C${ball.svg_ballon[126]} ${ball.svg_ballon[127]} ${ball.svg_ballon[128]} ${ball.svg_ballon[129]} ${ball.svg_ballon[130]} ${ball.svg_ballon[131]}C${ball.svg_ballon[132]} ${ball.svg_ballon[133]} ${ball.svg_ballon[134]} ${ball.svg_ballon[135]} ${ball.svg_ballon[136]} ${ball.svg_ballon[137]}L${ball.svg_ballon[138]} ${ball.svg_ballon[139]}L${ball.svg_ballon[140]} ${ball.svg_ballon[141]}L${ball.svg_ballon[142]} ${ball.svg_ballon[143]}C${ball.svg_ballon[144]} ${ball.svg_ballon[145]} ${ball.svg_ballon[146]} ${ball.svg_ballon[147]} ${ball.svg_ballon[148]} ${ball.svg_ballon[149]}C${ball.svg_ballon[150]} ${ball.svg_ballon[151]} ${ball.svg_ballon[152]} ${ball.svg_ballon[153]} ${ball.svg_ballon[154]} ${ball.svg_ballon[155]}C${ball.svg_ballon[156]} ${ball.svg_ballon[157]} ${ball.svg_ballon[158]} ${ball.svg_ballon[159]} ${ball.svg_ballon[160]} ${ball.svg_ballon[161]}C${ball.svg_ballon[162]} ${ball.svg_ballon[163]} ${ball.svg_ballon[164]} ${ball.svg_ballon[165]} ${ball.svg_ballon[166]} ${ball.svg_ballon[167]}C${ball.svg_ballon[168]} ${ball.svg_ballon[169]} ${ball.svg_ballon[170]} ${ball.svg_ballon[171]} ${ball.svg_ballon[172]} ${ball.svg_ballon[173]}C${ball.svg_ballon[174]} ${ball.svg_ballon[175]} ${ball.svg_ballon[176]} ${ball.svg_ballon[177]} ${ball.svg_ballon[178]} ${ball.svg_ballon[179]}C${ball.svg_ballon[180]} ${ball.svg_ballon[181]} ${ball.svg_ballon[182]} ${ball.svg_ballon[183]} ${ball.svg_ballon[184]} ${ball.svg_ballon[185]}C${ball.svg_ballon[186]} ${ball.svg_ballon[187]} ${ball.svg_ballon[188]} ${ball.svg_ballon[189]} ${ball.svg_ballon[190]} ${ball.svg_ballon[191]}L${ball.svg_ballon[192]} ${ball.svg_ballon[193]}L${ball.svg_ballon[194]} ${ball.svg_ballon[195]}C${ball.svg_ballon[196]} ${ball.svg_ballon[197]} ${ball.svg_ballon[198]} ${ball.svg_ballon[199]} ${ball.svg_ballon[200]} ${ball.svg_ballon[201]}C${ball.svg_ballon[202]} ${ball.svg_ballon[203]} ${ball.svg_ballon[204]} ${ball.svg_ballon[205]} ${ball.svg_ballon[206]} ${ball.svg_ballon[207]}C${ball.svg_ballon[208]} ${ball.svg_ballon[209]} ${ball.svg_ballon[210]} ${ball.svg_ballon[211]} ${ball.svg_ballon[212]} ${ball.svg_ballon[213]}C${ball.svg_ballon[214]} ${ball.svg_ballon[215]} ${ball.svg_ballon[216]} ${ball.svg_ballon[217]} ${ball.svg_ballon[218]} ${ball.svg_ballon[219]}C${ball.svg_ballon[220]} ${ball.svg_ballon[221]} ${ball.svg_ballon[222]} ${ball.svg_ballon[223]} ${ball.svg_ballon[224]} ${ball.svg_ballon[225]}C${ball.svg_ballon[226]} ${ball.svg_ballon[227]} ${ball.svg_ballon[228]} ${ball.svg_ballon[229]} ${ball.svg_ballon[230]} ${ball.svg_ballon[231]}C${ball.svg_ballon[232]} ${ball.svg_ballon[233]} ${ball.svg_ballon[234]} ${ball.svg_ballon[235]} ${ball.svg_ballon[236]} ${ball.svg_ballon[237]}C${ball.svg_ballon[238]} ${ball.svg_ballon[239]} ${ball.svg_ballon[240]} ${ball.svg_ballon[241]} ${ball.svg_ballon[242]} ${ball.svg_ballon[243]}L${ball.svg_ballon[244]} ${ball.svg_ballon[245]}L${ball.svg_ballon[246]} ${ball.svg_ballon[247]}C${ball.svg_ballon[248]} ${ball.svg_ballon[249]} ${ball.svg_ballon[250]} ${ball.svg_ballon[251]} ${ball.svg_ballon[252]} ${ball.svg_ballon[253]}C${ball.svg_ballon[254]} ${ball.svg_ballon[255]} ${ball.svg_ballon[256]} ${ball.svg_ballon[257]} ${ball.svg_ballon[258]} ${ball.svg_ballon[259]}C${ball.svg_ballon[260]} ${ball.svg_ballon[261]} ${ball.svg_ballon[262]} ${ball.svg_ballon[263]} ${ball.svg_ballon[264]} ${ball.svg_ballon[265]}C${ball.svg_ballon[266]} ${ball.svg_ballon[267]} ${ball.svg_ballon[268]} ${ball.svg_ballon[269]} ${ball.svg_ballon[270]} ${ball.svg_ballon[271]}L${ball.svg_ballon[272]} ${ball.svg_ballon[273]}L${ball.svg_ballon[274]} ${ball.svg_ballon[275]}L${ball.svg_ballon[276]} ${ball.svg_ballon[277]}C${ball.svg_ballon[278]} ${ball.svg_ballon[279]} ${ball.svg_ballon[280]} ${ball.svg_ballon[281]} ${ball.svg_ballon[282]} ${ball.svg_ballon[283]}C${ball.svg_ballon[284]} ${ball.svg_ballon[285]} ${ball.svg_ballon[286]} ${ball.svg_ballon[287]} ${ball.svg_ballon[288]} ${ball.svg_ballon[289]}C${ball.svg_ballon[290]} ${ball.svg_ballon[291]} ${ball.svg_ballon[292]} ${ball.svg_ballon[293]} ${ball.svg_ballon[294]} ${ball.svg_ballon[295]}C${ball.svg_ballon[296]} ${ball.svg_ballon[297]} ${ball.svg_ballon[298]} ${ball.svg_ballon[299]} ${ball.svg_ballon[300]} ${ball.svg_ballon[301]}L${ball.svg_ballon[302]} ${ball.svg_ballon[303]}L${ball.svg_ballon[304]} ${ball.svg_ballon[305]}C${ball.svg_ballon[306]} ${ball.svg_ballon[307]} ${ball.svg_ballon[308]} ${ball.svg_ballon[309]} ${ball.svg_ballon[310]} ${ball.svg_ballon[311]}C${ball.svg_ballon[312]} ${ball.svg_ballon[313]} ${ball.svg_ballon[314]} ${ball.svg_ballon[315]} ${ball.svg_ballon[316]} ${ball.svg_ballon[317]}C${ball.svg_ballon[318]} ${ball.svg_ballon[319]} ${ball.svg_ballon[320]} ${ball.svg_ballon[321]} ${ball.svg_ballon[322]} ${ball.svg_ballon[323]}C${ball.svg_ballon[324]} ${ball.svg_ballon[325]} ${ball.svg_ballon[326]} ${ball.svg_ballon[327]} ${ball.svg_ballon[328]} ${ball.svg_ballon[329]}C${ball.svg_ballon[330]} ${ball.svg_ballon[331]} ${ball.svg_ballon[332]} ${ball.svg_ballon[333]} ${ball.svg_ballon[334]} ${ball.svg_ballon[335]}C${ball.svg_ballon[336]} ${ball.svg_ballon[337]} ${ball.svg_ballon[338]} ${ball.svg_ballon[339]} ${ball.svg_ballon[340]} ${ball.svg_ballon[341]}C${ball.svg_ballon[342]} ${ball.svg_ballon[343]} ${ball.svg_ballon[344]} ${ball.svg_ballon[345]} ${ball.svg_ballon[346]} ${ball.svg_ballon[347]}C${ball.svg_ballon[348]} ${ball.svg_ballon[349]} ${ball.svg_ballon[350]} ${ball.svg_ballon[351]} ${ball.svg_ballon[352]} ${ball.svg_ballon[353]}H${ball.svg_ballon[354]}ZM${ball.svg_ballon[355]} ${ball.svg_ballon[356]}L${ball.svg_ballon[357]} ${ball.svg_ballon[358]}C${ball.svg_ballon[359]} ${ball.svg_ballon[360]} ${ball.svg_ballon[361]} ${ball.svg_ballon[362]} ${ball.svg_ballon[363]} ${ball.svg_ballon[364]}C${ball.svg_ballon[365]} ${ball.svg_ballon[366]} ${ball.svg_ballon[367]} ${ball.svg_ballon[368]} ${ball.svg_ballon[369]} ${ball.svg_ballon[370]}C${ball.svg_ballon[371]} ${ball.svg_ballon[372]} ${ball.svg_ballon[373]} ${ball.svg_ballon[374]} ${ball.svg_ballon[375]} ${ball.svg_ballon[376]}C${ball.svg_ballon[377]} ${ball.svg_ballon[378]} ${ball.svg_ballon[379]} ${ball.svg_ballon[380]} ${ball.svg_ballon[381]} ${ball.svg_ballon[382]}C${ball.svg_ballon[383]} ${ball.svg_ballon[384]} ${ball.svg_ballon[385]} ${ball.svg_ballon[386]} ${ball.svg_ballon[387]} ${ball.svg_ballon[388]}Z`}
@@ -841,7 +843,8 @@ export function Field() {
                 });
             }
             dispatch(setInputPlayerId(""))
-            showPlayer(false,position.positionIndex);
+            showPlayer(false, position.positionIndex);
+            setNumCCC(numCCC + 1)
         }
     };
 
@@ -864,7 +867,8 @@ export function Field() {
 
             return newPositionList;
         });
-        showPlayer(false,position.positionIndex);
+        showPlayer(false, position.positionIndex);
+        setNumCCC(numCCC + 1)
     };
 
     const setupPlayerAdding = (event: HandlerStateChangeEvent<TapGestureHandlerEventPayload>) => {
@@ -969,7 +973,7 @@ export function Field() {
                         };
 
                         setFreeID(newFreePath.id);
-                        setCurrentDraw((prevDraw) => [...prevDraw, newFreePath]);
+                        setCurrentDraw((prevDraw: FreeDraw[]) => [...prevDraw, newFreePath]);
                         setPathDrawing(true);
                     });
                 }
@@ -977,8 +981,8 @@ export function Field() {
         }
     }
 
-    const animate = (indexC:number) => {
-       
+    const animate = (indexC: number) => {
+
         dispatch(setPositionList(JSON.stringify(dynamicPositionList)))
         superSvg_Field = superField;
         checkForIntersection();
@@ -993,26 +997,26 @@ export function Field() {
         let ballonMove = false;
 
         //Il exist un index après le current (?) si oui...
-        if (dynamicPositionList.length > position.positionIndex + 1) {
+        if (dynamicPositionList.length > indexC + 1) {
             //On va récupérez les changements entre ces index (en terme de position)
             let listJoueurA: [string, number[]][] = [];
             let listJoueurB: [string, number[]][] = [];
-            dynamicPositionList[position.positionIndex][1].map((joueur) => {
+            dynamicPositionList[indexC][1].map((joueur) => {
                 listJoueurA.push([joueur.id, joueur.position]);
             });
 
-            dynamicPositionList[position.positionIndex + 1][1].map((joueur) => {
+            dynamicPositionList[indexC + 1][1].map((joueur) => {
                 listJoueurB.push([joueur.id, joueur.position]);
             });
 
             //Le ballon est lançable par un joueur ? La position suivante a t-elle un ballon ? 
-            if (dynamicPositionList[position.positionIndex][2].length > 0) {
-                if (dynamicPositionList[position.positionIndex][2][0].idJoueur != "" && dynamicPositionList[position.positionIndex + 1][2].length > 0) {
+            if (dynamicPositionList[indexC][2].length > 0) {
+                if (dynamicPositionList[indexC][2][0].idJoueur != "" && dynamicPositionList[indexC + 1][2].length > 0) {
                     //Si OUI, l'a sa position varie t-elle ?
-                    if (dynamicPositionList[position.positionIndex][2][0].position != dynamicPositionList[position.positionIndex + 1][2][0].position) {
-                        let indexIDJoueur = dynamicPositionList[position.positionIndex][1].findIndex((joueur) => joueur.id === dynamicPositionList[position.positionIndex][2][0].idJoueur);
+                    if (dynamicPositionList[indexC][2][0].position != dynamicPositionList[indexC + 1][2][0].position) {
+                        let indexIDJoueur = dynamicPositionList[indexC][1].findIndex((joueur) => joueur.id === dynamicPositionList[indexC][2][0].idJoueur);
                         if (indexIDJoueur != -1) {
-                            if (dynamicPositionList[position.positionIndex][1][indexIDJoueur].myArray.length <= 1) {
+                            if (dynamicPositionList[indexC][1][indexIDJoueur].myArray.length <= 1) {
                                 ballonMove = true;
                             }
                         }
@@ -1030,16 +1034,16 @@ export function Field() {
         }
         if (ballonMove) {
             //On construit un array de déplacement
-            dynamicPositionList[position.positionIndex][2][0].idChange("");
-            let listNumb = [[-100, -100], [dynamicPositionList[position.positionIndex][2][0].position[0], 1 - dynamicPositionList[position.positionIndex][2][0].position[1]]];
+            dynamicPositionList[indexC][2][0].idChange("");
+            let listNumb = [[-100, -100], [dynamicPositionList[indexC][2][0].position[0], 1 - dynamicPositionList[indexC][2][0].position[1]]];
             let addCx = 1;
             let addCy = 1;
 
-            if (dynamicPositionList[position.positionIndex][2][0].position[0] > dynamicPositionList[position.positionIndex + 1][2][0].position[0]) {
+            if (dynamicPositionList[indexC][2][0].position[0] > dynamicPositionList[indexC + 1][2][0].position[0]) {
                 addCx = -1;
             }
 
-            if (dynamicPositionList[position.positionIndex][2][0].position[1] > dynamicPositionList[position.positionIndex + 1][2][0].position[1]) {
+            if (dynamicPositionList[indexC][2][0].position[1] > dynamicPositionList[indexC + 1][2][0].position[1]) {
                 addCy = -1;
             }
 
@@ -1048,9 +1052,9 @@ export function Field() {
             //Exemple : 0,0 towards 0.28,0.28 , list numb = [[0,0],[0.1,0.1],[0.2,0.2],[0.28,0.28]]
 
 
-            let [currentX, currentY] = dynamicPositionList[position.positionIndex][2][0].position;
+            let [currentX, currentY] = dynamicPositionList[indexC][2][0].position;
 
-            let [finalX, finalY] = dynamicPositionList[position.positionIndex + 1][2][0].position;
+            let [finalX, finalY] = dynamicPositionList[indexC + 1][2][0].position;
 
             let antiCrashIndex = 0;//Dans le cas où qqun met de mauvaise valeur JSON
             //On continue tant que x et y ne sont pas assez proche du final
@@ -1092,23 +1096,23 @@ export function Field() {
             let getXYListStart = getPourcentageCenter(newAnimationPathBallon[0][0], 1 - newAnimationPathBallon[0][1]);
             let getXYListEnd = getPourcentageCenter(newAnimationPathBallon[newAnimationPathBallon.length - 1][0], 1 - newAnimationPathBallon[newAnimationPathBallon.length - 1][1]);
             setAnimationPathBallon([getXYListStart, getXYListEnd]);
-            prioAnimation(listNumb, 0, atLeastOneChange, listJoueurModify,indexC);
+            prioAnimation(listNumb, 0, atLeastOneChange, listJoueurModify, indexC);
         } else {
-            animateSuite(atLeastOneChange, listJoueurModify,indexC);
+            animateSuite(atLeastOneChange, listJoueurModify, indexC);
         }
     };
 
     const animateSuite = (atLeastOneChange: boolean, listJoueurModify: [string, number[]][], indexC: number) => {
         let indexCheck: number = -1;
 
-        dynamicPositionList[position.positionIndex][1].map((joueur, index) => {
+        dynamicPositionList[indexC][1].map((joueur, index) => {
             //Check if ID === an ID of listJoueurModify, recup its index on listJoueurModify
             const modifyIndex = listJoueurModify.findIndex(([id]) => id === joueur.id);
 
             if (joueur.myArray.length > 0) {
                 atLeastOneChange = true;
                 setcheckForEnd([false]);
-                goAnimation(joueur, 0, indexCheck,indexC);
+                goAnimation(joueur, 0, indexCheck, indexC);
 
                 const existingIndex: number = JSON.parse(option.playerPaths).findIndex((p: PlayerPath): boolean => p.id === joueur.id + 'P');
 
@@ -1170,7 +1174,7 @@ export function Field() {
 
                 setcheckForEnd([false]);
                 indexCheck = indexCheck + 1;
-                goAnimation(joueur, 0, indexCheck,indexC);
+                goAnimation(joueur, 0, indexCheck, indexC);
             }
         });
 
@@ -1199,10 +1203,10 @@ export function Field() {
         }
     };
 
-    const goAnimation = (j: Player, index: number, indexCheck: number, indexC :number) => {
+    const goAnimation = (j: Player, index: number, indexCheck: number, indexC: number) => {
         let timingAnimation = 100;
 
-        
+
         if (j.myArray.length > index) {
             if (j.myArray[index][0] != -100) {
                 center = [((superSvg_Field[0][0] + superSvg_Field[0][2] + superSvg_Field[0][4] + superSvg_Field[0][5]) / 4), ((superSvg_Field[0][1] + superSvg_Field[0][3] + superSvg_Field[0][3] + superSvg_Field[0][6]) / 4)]
@@ -1219,16 +1223,15 @@ export function Field() {
                         dynamicPositionList[position.positionIndex][2][0].svgValue(svg_Mode);
                     }
                 }
-                showPlayer(false,indexC);
+                showPlayer(false, indexC);
             }
             if (j.myArray.length == index + 1 && j.myArray[index][0] != -100) {
                 j.positionChange([j.myArray[index][0], 1 - j.myArray[index][1]])
             }
             setTimeout(() => goAnimation(j, index + 1, indexCheck, indexC), timingAnimation / (j.speed + 1));
-        } else if(j.myArray.length == 0) {
+        } else if (j.myArray.length == 0) {
             //OK... il peut être vide je sais pas comment...
-        }
-        else {
+        } else {
             if (j.myArray[0][0] != -100) {
                 j.positionChange([j.myArray[0][0], 1 - j.myArray[0][1]]);
             } else {
@@ -1239,12 +1242,12 @@ export function Field() {
             setcheckForEnd((prevCheck) => {
                 let changeCheck = prevCheck;
                 changeCheck[indexCheck] = true;
-                
+
                 if (changeCheck.some((item) => item === false) || changeCheck.length < 1) {
-                    
-                } else if(changeCheck.length == 2) {
-                    
-                    checkEndingAnimation(indexC);
+
+                } else if (changeCheck.length == 2) {
+
+                    checkEndingAnimation();
                 }
                 return (changeCheck);
             });
@@ -1253,23 +1256,15 @@ export function Field() {
         }
     };
 
-    const checkEndingAnimation = (indexC : number) => {
-
-
+    const checkEndingAnimation = () => {
         if (dynamicPositionList.length - 1 > position.positionIndex) {
-            //On redonne le ballon aux joueurs
             dynamicPositionList[position.positionIndex][2][0].idChange(myPlayerID);
-            setNumCCC(numCCC*0 - 1);
+            setNumCCC(-1);
             dispatch(setPositionIndex(position.positionIndex + 1));
-
-            //Boucle d'animation EN COURS
-            // if(dynamicPositionList.length - 1 > indexC ){
-            //     setTimeout(() => animate(indexC+1),10000);
-            // }
         }
     };
 
-    const prioAnimation = (j: number[][], index: number, atLeastOneChange: boolean, listJoueurModify: [string, number[]][],indexC:number) => {
+    const prioAnimation = (j: number[][], index: number, atLeastOneChange: boolean, listJoueurModify: [string, number[]][], indexC: number) => {
         let timingAnimation = 600;
 
         if (j.length > index) {
@@ -1280,12 +1275,12 @@ export function Field() {
                 svg_Mode = diffSVG(svg_Mode, getCenterBallon(svg_Mode), xBallon_Array, getPourcentageCenter(j[index][0], 1 - j[index][1]));
                 dynamicPositionList[position.positionIndex][2][0].svgValue(svg_Mode);
 
-                showPlayer(false,indexC);
+                showPlayer(false, indexC);
             }
             if (j.length == index + 1 && j[index][0] != -100) {
                 dynamicPositionList[position.positionIndex][2][0].positionChange([j[index][0], 1 - j[index][1]])
             }
-            setTimeout(() => prioAnimation(j, index + 1, atLeastOneChange, listJoueurModify,indexC), timingAnimation / 4);
+            setTimeout(() => prioAnimation(j, index + 1, atLeastOneChange, listJoueurModify, indexC), timingAnimation / 4);
         } else {
             if (j[0][0] != -100) {
                 dynamicPositionList[position.positionIndex][2][0].positionChange([j[0][0], 1 - j[0][1]]);
@@ -1293,7 +1288,7 @@ export function Field() {
                 dynamicPositionList[position.positionIndex][2][0].positionChange([j[1][0], 1 - j[1][1]]);
                 setAnimationPathBallon([]);
             }
-            animateSuite(atLeastOneChange, listJoueurModify,indexC);
+            animateSuite(atLeastOneChange, listJoueurModify, indexC);
         }
     };
 
@@ -1313,7 +1308,6 @@ export function Field() {
                     if (closestValue < 0.05
                         && option.autoLink
                         && dynamicPositionList[position.positionIndex][2][0].idJoueur == "") {
-                        console.log("Auto Link done !");
                         linkToPlayer(false);
 
                         dispatch(setClosestPlayer(JSON.stringify(closestID)))
@@ -1333,8 +1327,6 @@ export function Field() {
             translationIncrement[1]]);
         setAll();
 
-        console.log("dynamicPositionList", dynamicPositionList)
-
         center = [((superSvg_Field[0][0] + superSvg_Field[0][2] + superSvg_Field[0][4] + superSvg_Field[0][5]) / 4), ((superSvg_Field[0][1] + superSvg_Field[0][3] + superSvg_Field[0][3] + superSvg_Field[0][6]) / 4)]
         let svg_Mode = proportionSVG(player, ((superSvg_Field[0][5] - superSvg_Field[0][0]) / (svg_fieldUNCHANGED[5] - svg_fieldUNCHANGED[0])))
         dynamicPositionList[position.positionIndex][1].map((joueur: Player) => {
@@ -1348,7 +1340,11 @@ export function Field() {
             ball.svgValue(svg_Mode);
         });
 
-        showPlayer(false,position.positionIndex);
+        showPlayer(false, position.positionIndex);
+
+        console.log("simulateRefresh done")
+
+        dispatch(setPositionList(JSON.stringify(dynamicPositionList)))
     };
 
     const linkToPlayer = (refresh: boolean) => {
@@ -1416,7 +1412,7 @@ export function Field() {
 
     return (
         <View style={styles.container}>
-            <PinchGestureHandler onGestureEvent={onPinchGestureEvent} simultaneousHandlers={[panRef, pressableRef]} >
+            <PinchGestureHandler onGestureEvent={onPinchGestureEvent} simultaneousHandlers={[panRef, pressableRef]}>
                 <PanGestureHandler ref={panRef} onGestureEvent={onGestureEvent}
                                    onHandlerStateChange={onHandlerStateChange}
                                    simultaneousHandlers={[pinchRef, pressableRef]}>
@@ -1831,8 +1827,8 @@ export function Field() {
                     </TapGestureHandler>
                 </PanGestureHandler>
             </PinchGestureHandler>
-            
-            
+
+
             <Options animate={animate} linkToPlayer={linkToPlayer}/>
         </View>
     )
