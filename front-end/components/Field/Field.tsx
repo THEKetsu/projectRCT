@@ -2341,12 +2341,14 @@ export function Field() {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        flex: 2, 
         justifyContent: 'center',
         alignItems: 'center',
         //borderColor: 'black',
         //borderWidth: 1,
         overflow: 'hidden',
+        width: '100%', // Utilisez 100% de la largeur disponible
+        height: '100%', // Utilisez 100% de la hauteur disponible
     },
     svgContainer: {
         backgroundColor: 'transparent', // Ensure the background is transparent
