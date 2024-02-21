@@ -49,39 +49,41 @@ export default function Position({
     setCollapsed(!collapsed);
   };
   
-  const [inline_maillot, setinline] = useState(false);
+  const [shirt_color, setColorShirt] = useState('black')
+  
   const maillot_inline = () => {
-    setinline(!inline_maillot)
-    setinline2(false)
-    setinline3(false)
-    setinline4(false)
+    setColorShirt('red')
+    setColorZoom('black')
+    setColorBall('black')
+    setPenColor('black')
 
   }
 
-  const [inline_zoom, setinline2] = useState(false);
+  const [zoom_color, setColorZoom] = useState('black');
   const zoom_inline = () => {
-    setinline2(!inline_zoom)
-    setinline(false)
-    setinline3(false)
-    setinline4(false)
+    setColorShirt('black')
+    setColorZoom('red')
+    setColorBall('black')
+    setPenColor('black')
 
   }
 
-  const [inline_ball, setinline3] = useState(false);
+  const [ball_color, setColorBall] = useState('black');
   const ball_inline = () => {
-    setinline(false)
-    setinline2(false)
-    setinline3(!inline_ball)
-    setinline4(false)
+    setColorShirt('black')
+    setColorZoom('black')
+    setColorBall('orange')
+    setPenColor('black')
 
   }
 
-  const [inline_pen, setinline4] = useState(false);
+  
+  const [pen_color, setPenColor] = useState('black');
   const pen_inline = () => {
-    setinline(false)
-    setinline2(false)
-    setinline3(false)
-    setinline4(!inline_pen)
+    setColorShirt('black')
+    setColorZoom('black')
+    setColorBall('black')
+    setPenColor('red')
 
   }
 
@@ -191,38 +193,38 @@ export default function Position({
 
             <View style={styles.buttonContainer}>
 
-            <TouchableOpacity onPress={() => { handleClickAdd(); maillot_inline(); }}style={[styles.buttonBase, !collapsed && {display: 'none'},inline_maillot ? styles.activebutton : null]}>
+            <TouchableOpacity onPress={() => { handleClickAdd(); maillot_inline(); }}style={[styles.buttonBase, !collapsed && {display: 'none'}]}>
                 {/* Add player */}
                 <Ionicons
                                     name={"shirt-sharp"}
                                     size={(dimWidth *4) / 100}
-                                    color={"black"}
+                                    color={shirt_color}
                                 />
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => {handleClickZoom();zoom_inline();}} style={[styles.buttonBase, !collapsed && {display: 'none'},inline_zoom ? styles.activebutton : null]}>
+            <TouchableOpacity onPress={() => {handleClickZoom();zoom_inline();}} style={[styles.buttonBase, !collapsed && {display: 'none'}]}>
                 {/* Mode Zoom */}
                 <FontAwesome
                                     name={"arrows"}
                                     size={(dimWidth *4) / 100}
-                                    color={"black"}
+                                    color={zoom_color}
                                 />
             </TouchableOpacity>
             
-            <TouchableOpacity onPress={() => {handleCLickBallMode();ball_inline();}} style={[styles.buttonBase, !collapsed && {display: 'none'},inline_ball ? styles.activebutton : null]}>
+            <TouchableOpacity onPress={() => {handleCLickBallMode();ball_inline();}} style={[styles.buttonBase, !collapsed && {display: 'none'}]}>
                 {/* Mode Ballon */}
                 <MaterialIcons
                                     name={"sports-rugby"}
                                     size={(dimWidth *4) / 100}
-                                    color={"black"}
+                                    color={ball_color}
                                 />
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => {handleClickDrawMode(); pen_inline();}} style={[styles.buttonBase, !collapsed && {display: 'none'},inline_pen ? styles.activebutton : null]}>
+            <TouchableOpacity onPress={() => {handleClickDrawMode(); pen_inline();}} style={[styles.buttonBase, !collapsed && {display: 'none'}]}>
                 {/* Mode crayon */}
                 <FontAwesome
                                     name={"pencil"}
                                     size={(dimWidth *4) / 100}
-                                    color={"black"}
+                                    color={pen_color}
                                 />
             </TouchableOpacity>
             </View>
