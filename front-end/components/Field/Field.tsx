@@ -109,6 +109,18 @@ export function Field() {
     }, []);
 
     useEffect(() => {
+
+        const numberOfFalse = checkForEnd.filter(value => value === false).length;
+        const numberOfTrue = checkForEnd.length - numberOfFalse;
+
+        if (numberOfFalse === numberOfTrue && numberOfFalse != 0) {
+        // Filter only the true elements
+            checkEndingAnimation();
+        }
+        
+    }, [checkForEnd]);
+
+    useEffect(() => {
     }, [option.playerPaths]);
 
     useEffect(() => {
@@ -134,13 +146,10 @@ export function Field() {
     }, [position.positionIndex]);
 
     useEffect(() => {
-        if (numCCC == -1) {
-            setNumAnimation(numAnimation + 1);
-        } else {
-            if (dynamicPositionList.length > 0 && numAnimation >= 0) {
-                simulateRefresh();
-                
-            }
+
+        if (dynamicPositionList.length > 0 && numAnimation >= 0) {
+            simulateRefresh(position.positionIndex,false);
+            
         }
     }, [numCCC]);
 
@@ -149,13 +158,18 @@ export function Field() {
     }, [option.refresh]);
 
     useEffect(() => {
-
+        console.log(dynamicPositionList.length,position.positionIndex)
         if (dynamicPositionList.length > 0) {
-            simulateRefresh();
+            simulateRefresh(position.positionIndex,true);
+            
+            if (dynamicPositionList.length >= position.positionIndex ) {
+                
+                console.log("****");
+                animate(position.positionIndex);
+            }
+    
         }
-        if (dynamicPositionList.length > position.positionIndex + 1) {
-            showPlayer(false, position.positionIndex + 1)
-        }
+        
     }, [numAnimation]);
 
 
@@ -696,10 +710,6 @@ export function Field() {
                 for (let i = 0; i < joueur.myArray.length; i++) {
                     if (i == 0) {
                         drawnPath = `M${getXY[0]} ${getXY[1]}`;
-                        if(joueur.id == "B1"){
-                            console.log(drawnPath);
-                        }
-                        
                     }
                     getXY = getPourcentageCenter(joueur.myArray[i][0], (1 - joueur.myArray[i][1]));
                     drawnPath = `${drawnPath}L${getXY[0]} ${getXY[1]}`
@@ -1127,7 +1137,7 @@ export function Field() {
 
             if (joueur.myArray.length > 0) {
                 atLeastOneChange = true;
-                setcheckForEnd([false]);
+                setcheckForEnd((prevC) => [...prevC, false]);
                 goAnimation(joueur, 0, indexCheck, indexC);
 
                 const existingIndex: number = JSON.parse(option.playerPaths).findIndex((p: PlayerPath): boolean => p.id === joueur.id + 'P');
@@ -1186,7 +1196,7 @@ export function Field() {
                 listNumb.push([listJoueurModify[modifyIndex][1][0], 1 - listJoueurModify[modifyIndex][1][1]]);
                 joueur.pathArraySetup(listNumb);
 
-                setcheckForEnd([false]);
+                setcheckForEnd((prevC) => [...prevC, false]);
                 indexCheck = indexCheck + 1;
                 goAnimation(joueur, 0, indexCheck, indexC);
             }
@@ -1249,26 +1259,19 @@ export function Field() {
                 
             } else {
                 j.positionChange([j.myArray[1][0], 1 - j.myArray[1][1]]);
-                console.log("***");
                 j.pathArraySetup([]);
             }
 
+            setcheckForEnd((prevC) => [...prevC, true]);
 
-            setcheckForEnd((prevCheck) => {
-                let changeCheck = prevCheck;
-                changeCheck[indexCheck] = true;
+            //Here i want to check if there the number of false is equal to the number of true
+            //If it is filter to only have the true one.
 
-                if (changeCheck.some((item) => item === false) || changeCheck.length < 1) {
-
-                } else if (changeCheck.length == 2) {
-                    checkEndingAnimation();
-                }
-                return (changeCheck);
-            });
-
-            checkEndingAnimation();
+            
         }
     };
+
+
 
     const checkEndingAnimation = () => {
         if (dynamicPositionList.length - 1 > position.positionIndex) {
@@ -1276,9 +1279,9 @@ export function Field() {
                 dynamicPositionList[position.positionIndex][2][0].idChange(option.inputPlayerId);
             }
 
-            console.log(dynamicPositionList[position.positionIndex][1][1].myArray);
-            setNumCCC(-1);
+            setNumAnimation(numAnimation+1);
             dispatch(setPositionIndex(position.positionIndex + 1));
+            
         }
     };
 
@@ -1337,29 +1340,33 @@ export function Field() {
         }
     };
 
-    const simulateRefresh = () => {
-        setTranslationInc([translationIncrement[0],
-            translationIncrement[1]]);
-        setLock(true);
-        proportionAll(proportion);
-        diffMovingAll([translationIncrement[0],
-            translationIncrement[1]]);
+    const simulateRefresh = (positionI: number,debugZoom: boolean) => {
+        
+
+        if(!debugZoom){
+            proportionAll(proportion);
+            setTranslationInc([translationIncrement[0],
+                translationIncrement[1]]);
+            setLock(true);
+            diffMovingAll([translationIncrement[0],
+                translationIncrement[1]]);
+        }
         setAll();
 
         center = [((superSvg_Field[0][0] + superSvg_Field[0][2] + superSvg_Field[0][4] + superSvg_Field[0][5]) / 4), ((superSvg_Field[0][1] + superSvg_Field[0][3] + superSvg_Field[0][3] + superSvg_Field[0][6]) / 4)]
         let svg_Mode = proportionSVG(player, ((superSvg_Field[0][5] - superSvg_Field[0][0]) / (svg_fieldUNCHANGED[5] - svg_fieldUNCHANGED[0])))
-        dynamicPositionList[position.positionIndex][1].map((joueur: Player) => {
+        dynamicPositionList[positionI][1].map((joueur: Player) => {
             svg_Mode = diffSVG(svg_Mode, getCenter(svg_Mode), xArrayPlayer, getPourcentageCenter(joueur.position[0], joueur.position[1]))
             joueur.svgValue(svg_Mode);
         });
 
         svg_Mode = proportionSVG(ballon_svg, ((superSvg_Field[0][5] - superSvg_Field[0][0]) / (svg_fieldUNCHANGED[5] - svg_fieldUNCHANGED[0])))
-        dynamicPositionList[position.positionIndex][2].map((ball: Ballon) => {
+        dynamicPositionList[positionI][2].map((ball: Ballon) => {
             svg_Mode = diffSVG(svg_Mode, getCenterBallon(svg_Mode), xBallon_Array, getPourcentageCenter(ball.position[0], ball.position[1]))
             ball.svgValue(svg_Mode);
         });
 
-        showPlayer(false, position.positionIndex);
+        showPlayer(false, positionI);
 
         dispatch(setPositionList(JSON.stringify(dynamicPositionList)))
     };
