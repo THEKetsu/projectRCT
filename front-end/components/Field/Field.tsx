@@ -2335,8 +2335,8 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        borderColor: 'black',
-        borderWidth: 1,
+        //borderColor: 'black',
+        //borderWidth: 1,
         overflow: 'hidden',
     },
     svgContainer: {

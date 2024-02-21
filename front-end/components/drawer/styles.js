@@ -1,6 +1,7 @@
 import { StyleSheet } from 'react-native';
 let styles =  StyleSheet.create({
   imageContainer: {
+    width: '95%',
     flexDirection: 'row',
   },
   iconContainer: {
@@ -184,6 +185,7 @@ let styles =  StyleSheet.create({
         alignItems: 'center',
       },
       Field:{
+        width: '90%',
       },
       plusButton:{
         padding: 10,
