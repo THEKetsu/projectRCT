@@ -43,6 +43,8 @@ let styles =  StyleSheet.create({
         height: '90%',
     },
     topWidget: {
+        flexGrow: 0,
+        flexShrink: 0,
         flexDirection: 'row',
         width: '40%',
         height: '10%',

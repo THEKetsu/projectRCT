@@ -77,16 +77,16 @@ export default function Strategy() {
     <View style={styles.container}>
       {isDrawerOpen && <DrawerLeft onClose={handleCloseDrawer} isOpen={isDrawerOpen} onItemSelected={handleItemSelected} />}
       {!isDrawerOpen && <TopWidget onPlayButtonPress={handlePressPlayButton}  selectedItem={selectedItem}/>}
-
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <ViewShot ref={viewShotRef} options={{ format: 'png', quality: 0.9 }}>
-          <Field />
-        </ViewShot>
-
+        {/* <ViewShot ref={viewShotRef} options={{ format: 'png', quality: 0.9 }}>
+        </ViewShot> */}
+        <Field />
         <Position />
         {/* <Image style={{ width: 100, height: 100 }} source={{ uri: base64Icon }} /> */}
       </GestureHandlerRootView>
-      <Pressable
+
+      {/* 
+            <Pressable
         onPress={captureScreen}
         style={({ pressed }) => [
           {
@@ -99,7 +99,7 @@ export default function Strategy() {
         ]}
       >
       </Pressable>
-
+      */}
     </View>
   );
 }
@@ -108,7 +108,6 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: '#5FB07B',
     width: '100%',
-    height: '100%',
-    zIndex:1
+    height: '110%',
   },
 });

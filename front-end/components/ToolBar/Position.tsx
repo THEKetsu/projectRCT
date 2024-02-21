@@ -5,15 +5,6 @@ import Ballon from '../../classes/Ballon';
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import {useAppDispatch, useAppSelector} from "../../hooks/reduxHooks";
-import {setPositionIndex, setPositionList} from "../../redux/actions/positionLogicActions";
-import {
-    selectBallMode,
-    selectDrawMode,
-    selectPlayerMode,
-    selectZoomMode
-} from "../../redux/actions/toolbarLogicActions";
-
 const dimWidth = Dimensions.get('window').width;
 const dimHeight = Dimensions.get('window').height;
 
@@ -39,7 +30,7 @@ export default function Position({
     handleCLickBallMode,
     handleClickDrawMode
   }: PositionProps) {
-    const [numberOfPosition, setNumberOfPosition] = useState<number[]>([1, 2]);
+    const [numberOfPosition, setNumberOfPosition] = useState<number[]>([1]);
     const [selectedPosition, setSelectedPosition] = useState<number | null>(null);
     const [collapsed, setCollapsed] = useState(false); // État pour suivre l'état de la barre (repliée ou non)
   const [animation] = useState(new Animated.Value(0)); // Utilisation d'Animated pour gérer l'animation
@@ -65,9 +56,7 @@ export default function Position({
     setColorZoom('black')
     setColorBall('black')
     setPenColor('black')
-
   }
-
   const [zoom_color, setColorZoom] = useState('black');
   const zoom_inline = () => {
     setColorShirt('black')
@@ -93,7 +82,6 @@ export default function Position({
     setColorZoom('black')
     setColorBall('black')
     setPenColor('red')
-
   }
 
   // Création d'une interpolation pour ajuster la hauteur de la barre
@@ -103,24 +91,22 @@ export default function Position({
   });
   
     useEffect(() => {
+        console.log("RECEIVE DATA",receivedData);
         let different = true;
-
         numberOfPosition.map((i) => {
-            if (i == positionLogic.positionIndex) {
+            if (i == receivedData ) {
                 different = false;
             }
         })
-
-        if (positionLogic.positionIndex != 0 && different) {
-            setNumberOfPosition(prevPositions => [...prevPositions, positionLogic.positionIndex]);
+        if (receivedData != 0 && different && receivedData != undefined) {
+            setNumberOfPosition(prevPositions => [...prevPositions, receivedData]);
         }
     }, [receivedData]);
     const [position_chosen, setChoosenPosition] = useState(0);
     const handlePress = (item: number) => {
+        console.log("Position : ", item);
         setSelectedPosition(item);
         sendDataToB(item);
-        
-        
         if (receivedPosition[0][0] != 0) {
             console.log("Position reçu", receivedPosition)
             sendSavedData(receivedPosition);
@@ -131,6 +117,7 @@ export default function Position({
 
     }
     const handleCreateNewPosition = () => {
+        console.log("New position created");
         const newPosition = Math.max(...numberOfPosition) + 1;
         setNumberOfPosition(prevPositions => [...prevPositions, newPosition]);
     };
@@ -140,7 +127,8 @@ export default function Position({
             setSelectedPosition(null); // Reset selected position
         }
     };
-
+    console.log("Position chosen : ", selectedPosition);
+    console.log("Position list : ", numberOfPosition);
     return (
         <View style={[styles.bottomBarContainer, !collapsed ? styles.bottomBarContainer_false_collapsed : styles.bottomBarContainer_true_collapsed]}>
             <View style={[styles.retract_and_position, !collapsed ? styles.retract_and_position_false_collapsed : styles.retract_and_position_true_collapsed]}>
@@ -306,7 +294,7 @@ const styles = StyleSheet.create({
         
     },
     buttonContainer: {
-        flexDirection: "row",
+        flexDirection:"row",
         justifyContent: "space-between",
         alignItems: "center",
         width: "90%"
@@ -320,7 +308,7 @@ const styles = StyleSheet.create({
         borderTopRightRadius: 25,
         marginLeft: "45%",
         width: (dimWidth *10) / 100,
-        height: (dimHeight *10) / 100,
+        height: (dimHeight * 7.5) / 100,
         justifyContent:"center",
         alignItems:"center",
         // zIndex: 5,

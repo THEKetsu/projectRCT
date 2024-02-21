@@ -2078,12 +2078,14 @@ export function Field() {
                     position: "absolute",
                     top: 0,
                     right: 0,
+                    borderRadius:10,
                     backgroundColor: "#D9D9D9",
-                    height: "100%",
+                    height: "80%",
                     width: useWindowDimensions().width / 4,
                     justifyContent: "center",
                     alignItems: "center",
-                    padding: 10
+                    padding: 10,
+                    zIndex: 4
                 }}
             >
                 <Pressable
