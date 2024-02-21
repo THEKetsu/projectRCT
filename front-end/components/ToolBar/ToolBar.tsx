@@ -13,6 +13,7 @@ import {
 } from "../../redux/actions/toolbarActions";
 import {Position} from "../../redux/slices/positionSlice";
 import {Toolbar} from "../../utils/interfaces";
+import {triggerRefresh} from "../../redux/actions/optionActions";
 
 const dimWidth = Dimensions.get('window').width;
 const dimHeight = Dimensions.get('window').height;
@@ -91,7 +92,14 @@ export default function ToolBar() {
                         activeOpacity={0.7}
                         key={index}
                         onPress={() => handlePress(item)}
-                        style={styles.buttonPos}
+                        style={{
+                            height: 20,
+                            width: 100,
+                            backgroundColor: position.positionIndex === index ? "red" : "green",
+                            borderRadius: 20,
+                            justifyContent: "center",
+                            alignItems: "center",
+                        }}
                     >
                         <Text>{item + 1}</Text>
                     </TouchableOpacity>
@@ -132,7 +140,10 @@ export default function ToolBar() {
                     />
                 </TouchableOpacity>
                 <TouchableOpacity
-                    onPress={() => dispatch(selectDrawMode())}
+                    onPress={() => {
+                        dispatch(selectDrawMode())
+                        dispatch(triggerRefresh())
+                    }}
                     style={[styles.buttonBase, !collapsed && {display: 'none'}]}
                 >
                     <FontAwesome

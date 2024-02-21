@@ -56,3 +56,9 @@ export interface OptionActionsType {
     setClosestPlayer: ActionCreatorWithPayload<string>,
     toggleAutoLink: ActionCreatorWithoutPayload
 }
+
+export interface dispatchType {
+    option: Option,
+    position: Position,
+    toolbar: Toolbar
+}
