@@ -26,6 +26,7 @@ export default function Position({
     handleCLickBallMode
 }: PositionProps) {
     const [numberOfPosition, setNumberOfPosition] = useState<number[]>([1, 2]);
+    const [selectedPosition, setSelectedPosition] = useState<number | null>(null);
 
     useEffect(() => {
         console.log(receivedData);
@@ -42,6 +43,7 @@ export default function Position({
     }, [receivedData]);
 
     const handlePress = (item: number) => {
+        setSelectedPosition(item);
         sendDataToB(item);
 
         if (receivedPosition[0][0] != 0) {
@@ -50,38 +52,54 @@ export default function Position({
         }
     };
 
-    // New function to handle the creation of a new position
     const handleCreateNewPosition = () => {
-        const newPosition = numberOfPosition.length + 1;
+        const newPosition = Math.max(...numberOfPosition) + 1;
         setNumberOfPosition(prevPositions => [...prevPositions, newPosition]);
     };
 
+    const handleDeletePosition = () => {
+        if (selectedPosition !== null) {
+            setNumberOfPosition(prevPositions => prevPositions.filter(position => position !== selectedPosition));
+            setSelectedPosition(null); // Reset selected position
+        }
+    };
+
     return (
-        <View style={styles.container}>
-            <View style={styles.positionContainer}>
-                <ScrollView horizontal={true} showsHorizontalScrollIndicator={true}>
-                    <View style={{flexDirection: "row"}}>
-                        {numberOfPosition.map((item, index) => (
-                            <TouchableOpacity
-                                activeOpacity={0.7}
-                                key={index}
-                                onPress={() => handlePress(item)}
-                                style={styles.buttonPos}
-                            >
-                                <Text>{item}</Text>
-                            </TouchableOpacity>
-                        ))}
-                        {/* New "Plus" button */}
+<View style={styles.container}>
+    <View style={styles.positionContainer}>
+        <ScrollView horizontal={true} showsHorizontalScrollIndicator={true}>
+            <View style={{flexDirection: "row", alignItems: 'center', justifyContent: 'space-between'}}>
+                <View style={{flexDirection: "row"}}>
+                    {numberOfPosition.map((item, index) => (
                         <TouchableOpacity
                             activeOpacity={0.7}
-                            onPress={handleCreateNewPosition}
-                            style={styles.plusSign}
+                            key={index}
+                            onPress={() => handlePress(item)}
+                            style={styles.buttonPos}
                         >
-                            <Text>+</Text>
+                            <Text>{item}</Text>
                         </TouchableOpacity>
-                    </View>
-                </ScrollView>
+                    ))}
+                    {/* New "Plus" button */}
+                    <TouchableOpacity
+                        activeOpacity={0.7}
+                        onPress={handleCreateNewPosition}
+                        style={styles.plusSign}
+                    >
+                        <Text>+</Text>
+                    </TouchableOpacity>
+                </View>
+                {/* Unique "Delete" button */}
+                <TouchableOpacity
+                    activeOpacity={0.7}
+                    onPress={handleDeletePosition}
+                    style={styles.deleteSign}
+                >
+                    <Text style={{color: 'white'}}>🗑️</Text>
+                </TouchableOpacity>
             </View>
+        </ScrollView>
+    </View>
 
             <View style={styles.buttonBaseContainer}>
                 <TouchableOpacity onPress={handleClickZoom} style={styles.buttonBase}>
@@ -131,6 +149,22 @@ const styles = StyleSheet.create({
         borderColor: 'lightgrey',
         backgroundColor: 'white', // Bouton de position en blanc
     },
+
+
+    deleteSign: {
+        height: 30,
+        width: 100,
+        justifyContent: 'center',
+        alignItems: 'center',
+        elevation: 4,
+        borderTopRightRadius: 10,
+        borderRightWidth: 2,
+        borderColor: 'lightgrey',
+        color: 'red', // Couleur grise pour le bouton "plus"
+        backgroundColor: '#A60000',
+    },
+
+
     plusSign: {
         height: 30,
         width: 100,
