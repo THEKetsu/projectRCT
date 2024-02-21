@@ -50,24 +50,36 @@ export default function Position({
   const [inline_maillot, setinline] = useState(false);
   const maillot_inline = () => {
     setinline(!inline_maillot)
+    setinline2(false)
+    setinline3(false)
+    setinline4(false)
 
   }
 
   const [inline_zoom, setinline2] = useState(false);
   const zoom_inline = () => {
-    setinline2(!inline_maillot)
+    setinline2(!inline_zoom)
+    setinline(false)
+    setinline3(false)
+    setinline4(false)
 
   }
 
   const [inline_ball, setinline3] = useState(false);
   const ball_inline = () => {
-    setinline3(!inline_maillot)
+    setinline(false)
+    setinline2(false)
+    setinline3(!inline_ball)
+    setinline4(false)
 
   }
 
   const [inline_pen, setinline4] = useState(false);
   const pen_inline = () => {
-    setinline4(!inline_maillot)
+    setinline(false)
+    setinline2(false)
+    setinline3(false)
+    setinline4(!inline_pen)
 
   }
 
@@ -165,7 +177,7 @@ export default function Position({
                                 />
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={handleClickZoom} style={[styles.buttonBase, !collapsed && {display: 'none'}]}>
+            <TouchableOpacity onPress={() => {handleClickZoom();zoom_inline();}} style={[styles.buttonBase, !collapsed && {display: 'none'},inline_zoom ? styles.activebutton : null]}>
                 {/* Mode Zoom */}
                 <FontAwesome
                                     name={"arrows"}
@@ -174,7 +186,7 @@ export default function Position({
                                 />
             </TouchableOpacity>
             
-            <TouchableOpacity onPress={handleCLickBallMode} style={[styles.buttonBase, !collapsed && {display: 'none'}]}>
+            <TouchableOpacity onPress={() => {handleCLickBallMode();ball_inline();}} style={[styles.buttonBase, !collapsed && {display: 'none'},inline_ball ? styles.activebutton : null]}>
                 {/* Mode Ballon */}
                 <MaterialIcons
                                     name={"sports-rugby"}
@@ -182,7 +194,7 @@ export default function Position({
                                     color={"black"}
                                 />
             </TouchableOpacity>
-            <TouchableOpacity onPress={handleClickDrawMode} style={[styles.buttonBase, !collapsed && {display: 'none'}]}>
+            <TouchableOpacity onPress={() => {handleClickDrawMode(); pen_inline();}} style={[styles.buttonBase, !collapsed && {display: 'none'},inline_pen ? styles.activebutton : null]}>
                 {/* Mode crayon */}
                 <FontAwesome
                                     name={"pencil"}
