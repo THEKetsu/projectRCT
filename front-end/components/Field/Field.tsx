@@ -153,7 +153,6 @@ export function Field() {
 
         if (dynamicPositionList.length > 0 && numAnimation >= 0) {
             simulateRefresh(position.positionIndex,false);
-
         }
     }, [numCCC]);
 
