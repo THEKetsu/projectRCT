@@ -84,7 +84,7 @@ export default function Strategy() {
         </ViewShot>
 
         <Position />
-        <Image style={{ width: 100, height: 100 }} source={{ uri: base64Icon }} />
+        {/* <Image style={{ width: 100, height: 100 }} source={{ uri: base64Icon }} /> */}
       </GestureHandlerRootView>
       <Pressable
         onPress={captureScreen}
