@@ -30,7 +30,7 @@ export default function Position({
     handleCLickBallMode,
     handleClickDrawMode
   }: PositionProps) {
-    const [numberOfPosition, setNumberOfPosition] = useState<number[]>([1, 2]);
+    const [numberOfPosition, setNumberOfPosition] = useState<number[]>([1]);
     const [selectedPosition, setSelectedPosition] = useState<number | null>(null);
     const [collapsed, setCollapsed] = useState(false); // État pour suivre l'état de la barre (repliée ou non)
   const [animation] = useState(new Animated.Value(0)); // Utilisation d'Animated pour gérer l'animation
@@ -90,7 +90,7 @@ export default function Position({
   // Création d'une interpolation pour ajuster la hauteur de la barre
   const barHeight = animation.interpolate({
     inputRange: [0, 1], // Plage des valeurs à interpréter
-    outputRange: [0, (dimHeight *28) / 100], // Hauteur initiale et finale de la barre 28 valeur de base
+    outputRange: [0, (dimHeight *27.8) / 100], // Hauteur initiale et finale de la barre 28 valeur de base
   });
   
     useEffect(() => {
@@ -102,7 +102,7 @@ export default function Position({
                 different = false;
             }
         })
-        if (receivedData != 0 && different) {
+        if (receivedData != 0 && different && receivedData != undefined) {
             setNumberOfPosition(prevPositions => [...prevPositions, receivedData]);
         }
     }, [receivedData]);
@@ -311,7 +311,7 @@ const styles = StyleSheet.create({
         borderTopRightRadius: 25,
         marginLeft: "45%",
         width: (dimWidth *10) / 100,
-        height: (dimHeight *10) / 100,
+        height: (dimHeight *7.5) / 100,
         justifyContent:"center",
         alignItems:"center",
         // zIndex: 5,
