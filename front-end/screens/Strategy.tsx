@@ -53,6 +53,7 @@ export default function Strategy() {
   const [videoURL, setVideoURL] = useState('');
 
   const captureScreen = async () => {
+    console.log('Capture successful');
     try {
       //@ts-ignore
       const result = await viewShotRef.current.capture();
@@ -78,14 +79,14 @@ export default function Strategy() {
       {!isDrawerOpen && <TopWidget onPlayButtonPress={handlePressPlayButton}  selectedItem={selectedItem}/>}
 
       <GestureHandlerRootView style={{ flex: 1 }}>
-        {/* <ViewShot ref={viewShotRef} options={{ format: 'png', quality: 0.9 }}> */}
+        <ViewShot ref={viewShotRef} options={{ format: 'png', quality: 0.9 }}>
           <Field />
-        {/* </ViewShot> */}
+        </ViewShot>
 
         <Position />
-        {/* <Image style={{ width: 50, height: 50 }} source={{ uri: base64Icon }} /> */}
+        <Image style={{ width: 100, height: 100 }} source={{ uri: base64Icon }} />
       </GestureHandlerRootView>
-      {/* <Pressable
+      <Pressable
         onPress={captureScreen}
         style={({ pressed }) => [
           {
@@ -97,7 +98,7 @@ export default function Strategy() {
           },
         ]}
       >
-      </Pressable> */}
+      </Pressable>
 
     </View>
   );
