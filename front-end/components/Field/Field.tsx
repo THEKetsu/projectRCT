@@ -10,13 +10,14 @@ import {
     TapGestureHandler,
     TapGestureHandlerEventPayload
 } from 'react-native-gesture-handler';
+import { returnPublicInstance } from '../../classes/ReturnPublicManager';
 import pointInPolygon from 'point-in-polygon';
 import Player from '../../classes/Player';
 import data from '../../assets/data2.json'
 import Ballon from '../../classes/Ballon';
 import {useAppDispatch, useAppSelector} from "../../hooks/reduxHooks";
 import {setPositionIndex, setPositionList} from "../../redux/actions/positionActions";
-import {unselectAll} from "../../redux/actions/toolbarActions";
+import {selectZoomMode, unselectAll} from "../../redux/actions/toolbarActions";
 import {
     linkToPlayer,
     selectPlayer,
@@ -102,6 +103,9 @@ export function Field() {
 
     const position: Position = useAppSelector((state) => state.position)
     const toolbar: Toolbar = useAppSelector((state) => state.toolbar)
+
+
+
     const option: Option = useAppSelector((state) => state.option)
 
     useEffect(() => {
@@ -158,20 +162,13 @@ export function Field() {
     }, [option.refresh]);
 
     useEffect(() => {
-        console.log(dynamicPositionList.length,position.positionIndex)
         if (dynamicPositionList.length > 0) {
-            simulateRefresh(position.positionIndex,true);
-            
-            if (dynamicPositionList.length >= position.positionIndex ) {
-                
-                console.log("****");
-                animate(position.positionIndex);
-            }
-    
+            simulateRefresh();
         }
-        
+        if (dynamicPositionList.length > position.positionIndex + 1) {
+            showPlayer(false, position.positionIndex + 1)
+        }
     }, [numAnimation]);
-
 
     const setAll = () => {
         setSuperField(superSvg_Field);
@@ -203,7 +200,6 @@ export function Field() {
 
         superSvg_Field.map((Thefield, index) => {
             superSvg_Field[index] = proportionSVG2(Thefield, prop, center, superXArray[index]);
-            //superSvg_Field[index] = proportionSVG(Thefield, prop);
         });
         lineSize = proportionSVG(lineSize, prop);
     };
@@ -266,7 +262,7 @@ export function Field() {
 
     const onPinchGestureEvent = (event: any) => {
         if (toolbar.zoomMode) {
-            let scale = 1;
+            let scale;
 
             if (Platform.OS === 'web') {
                 scale = delta;
@@ -309,7 +305,6 @@ export function Field() {
         setDelta(Math.abs(newDelta));
         onPinchGestureEvent(event);
     };
-
 
     const onGestureEvent = (event: PanGestureHandlerGestureEvent) => {
         if (pathDrawing) {
@@ -386,17 +381,17 @@ export function Field() {
 
                         if (!isInside) {
                             setCurrentDraw((prevPaths) => {
-                                const newPaths = prevPaths.filter((p) => p.id !== freeID);
-                                let i = -1;
-                                return newPaths.map((free) => {
+                                const newPaths: FreeDraw[] = prevPaths.filter((p: FreeDraw): boolean => p.id !== freeID);
+                                let i: number = -1;
+                                return newPaths.map((free: FreeDraw) => {
                                     return {...free, id: i++};
                                 });
                             });
                         } else {
-                            setCurrentDraw(prevPaths => {
-                                return prevPaths.map(prevChemin => {
+                            setCurrentDraw((prevPaths: FreeDraw[]) => {
+                                return prevPaths.map((prevChemin: FreeDraw) => {
                                     if (prevChemin.id === freeID) {
-                                        const newNumbers = prevChemin.numbers;
+                                        const newNumbers: number[][] = prevChemin.numbers;
                                         newNumbers.push([pourcentX, pourcentY]);
 
                                         return {...prevChemin, path: updatedPath, numbers: newNumbers};
@@ -426,7 +421,7 @@ export function Field() {
                     setAll();
 
                     center = [((superSvg_Field[0][0] + superSvg_Field[0][2] + superSvg_Field[0][4] + superSvg_Field[0][5]) / 4), ((superSvg_Field[0][1] + superSvg_Field[0][3] + superSvg_Field[0][3] + superSvg_Field[0][6]) / 4)]
-                    let svg_Mode = proportionSVG(player, ((superSvg_Field[0][5] - superSvg_Field[0][0]) / (svg_fieldUNCHANGED[5] - svg_fieldUNCHANGED[0])))
+                    let svg_Mode: number[] = proportionSVG(player, ((superSvg_Field[0][5] - superSvg_Field[0][0]) / (svg_fieldUNCHANGED[5] - svg_fieldUNCHANGED[0])))
 
                     dynamicPositionList[position.positionIndex][1].map((joueur: Player) => {
                         svg_Mode = diffSVG(svg_Mode, getCenter(svg_Mode), xArrayPlayer, getPourcentageCenter(joueur.position[0], joueur.position[1]))
@@ -444,20 +439,20 @@ export function Field() {
                 }
             }
         } else if (toolbar.playerMode && option.selectedPlayer != "") {
-            const {translationX, translationY, velocityX, velocityY} = event.nativeEvent;
+            const {translationX, translationY} = event.nativeEvent;
 
             if (event.nativeEvent.state === State.ACTIVE && (translationX > -1000 && translationX < 1000 &&
                 translationY > -1000 && translationY < 1000) && (translationPrev[0] != translationX && translationPrev[1] != translationY)) {
                 receivedTranslationsCounter++;
 
                 if (receivedTranslationsCounter === 3) {
-                    let grabB = false;
+                    let grabB: boolean = false;
 
                     setTranslationPrevPlayer([translationX, translationY]);
 
-                    dynamicPositionList[position.positionIndex][1].map((j) => {
+                    dynamicPositionList[position.positionIndex][1].map((j: Player) => {
                         if (j.id == option.selectedPlayer) {
-                            let centerPlayer = [(j.svg_player[74] + j.svg_player[139] + (translationX - translationPrevPlayer[0]) * 2) / 2,
+                            let centerPlayer: number[] = [(j.svg_player[74] + j.svg_player[139] + (translationX - translationPrevPlayer[0]) * 2) / 2,
                                 (j.svg_player[9] + j.svg_player[105] + (translationY - translationPrevPlayer[1]) * 2) / 2]
                             const polygonPoints: number[][] = [
                                 [superField[0][0], superField[0][1]],
@@ -478,7 +473,7 @@ export function Field() {
                             j.pathArraySetup([]);
                             dispatch(setPlayerPaths("[]"))
 
-                            dynamicPositionList[position.positionIndex][1].map((joueur, index) => {
+                            dynamicPositionList[position.positionIndex][1].map((joueur: Player) => {
                                 if (option.selectedPlayer == joueur.id) {
                                     let centerXY = getCenter(joueur.svg_player);
                                     let pourcentX = (centerXY[0] - superField[0][0]) / (superField[0][5] - superField[0][0]);
@@ -488,7 +483,6 @@ export function Field() {
 
                                 if (dynamicPositionList[position.positionIndex][2].length > 0) {
                                     if (j.id == dynamicPositionList[position.positionIndex][2][0].idJoueur) {
-                                        //let svg_Mode = proportionSVG(ballon_svg, ((superSvg_Field[0][5] - superSvg_Field[0][0]) / (svg_fieldUNCHANGED[5] - svg_fieldUNCHANGED[0])))
                                         let svg_Mode = dynamicPositionList[position.positionIndex][2][0].svg_ballon;
 
                                         svg_Mode = diffSVG(svg_Mode, getCenterBallon(svg_Mode), xBallon_Array, getPourcentageCenter2(j.position[0], j.position[1]));
@@ -866,7 +860,10 @@ export function Field() {
                     }
 
                     return newPositionList;
-                })
+                });
+
+                returnPublicInstance.returnActionList.push(["c",newPlayer.id]);
+
             } else {
                 let svg_Mode: number[] = proportionSVG(player, ((superField[0][5] - superField[0][0]) / (svg_fieldUNCHANGED[5] - svg_fieldUNCHANGED[0])))
 
@@ -887,7 +884,6 @@ export function Field() {
                 });
             }
             dispatch(setInputPlayerId(""))
-            showPlayer(false, position.positionIndex);
             setNumCCC(numCCC + 1)
         }
     };
@@ -1278,10 +1274,9 @@ export function Field() {
             if (dynamicPositionList[position.positionIndex][2].length > 0) {
                 dynamicPositionList[position.positionIndex][2][0].idChange(option.inputPlayerId);
             }
-
-            setNumAnimation(numAnimation+1);
+            setNumCCC(numCCC + 1);
             dispatch(setPositionIndex(position.positionIndex + 1));
-            
+            dispatch(selectZoomMode())
         }
     };
 
@@ -1796,14 +1791,14 @@ export function Field() {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        flex: 2,
         justifyContent: 'center',
         alignItems: 'center',
-        borderColor: 'black',
-        borderWidth: 1,
         overflow: 'hidden',
+        width: '100%',
+        height: '100%',
     },
     svgContainer: {
-        backgroundColor: 'transparent', // Ensure the background is transparent
+        backgroundColor: 'transparent'
     },
 });

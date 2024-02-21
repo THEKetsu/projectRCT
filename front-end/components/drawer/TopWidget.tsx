@@ -1,7 +1,6 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, { useState } from 'react';
 import { View, TouchableOpacity,Image,Text} from 'react-native';
 import styles from './styles';
-
 
 import burger_menu from '../../assets/BurgerMenu.png';
 import play_button from '../../assets/PlayButton.png';
@@ -10,19 +9,7 @@ import { returnPublicInstance } from '../../classes/ReturnPublicManager';
 import Player from '../../classes/Player';
 import Ballon from '../../classes/Ballon';
 import { PositionLogic } from '../../redux/slices/positionLogicSlice';
-import {ToolbarLogic} from "../../redux/slices/toolbarLogicSlice";
-import {unselectAll} from "../../redux/actions/toolbarLogicActions";
-import {setPositionIndex, setPositionList} from "../../redux/actions/positionLogicActions";
-import {useAppDispatch, useAppSelector} from "../../hooks/reduxHooks";
-
-
-
-
-
-
-
-
-
+import { useAppSelector } from '../../hooks/reduxHooks';
 
 /**
  * Renders the TopWidget component.
@@ -35,8 +22,7 @@ const TopWidget = ({ onPlayButtonPress,  selectedItem  }: { onPlayButtonPress: (
 ;
 
     const positionLogic: PositionLogic = useAppSelector((state) => state.positionLogic)
-    const toolbarLogic: ToolbarLogic = useAppSelector((state) => state.toolbarLogic)
-    const dispatch = useAppDispatch()
+
     const [dynamicPositionList, setDynamicPositionList] = useState<[number, Player[], Ballon[]][]>([]);
 
     const handlePress = (info : String) => {
@@ -44,25 +30,30 @@ const TopWidget = ({ onPlayButtonPress,  selectedItem  }: { onPlayButtonPress: (
         onPlayButtonPress(info);
       };
 
-      
-
-      const handleReturnPress = (eraseAction:any[]) => {
+      const handleReturnPress = () => {
         // Your logic for handling the press goes here
-    
-            console.log(">>>",eraseAction)
+        console.log(returnPublicInstance.returnActionList);
+        let eraseAction : any[];
+        if(returnPublicInstance.returnActionList.length > 0){
+
+            eraseAction = returnPublicInstance.returnActionList[returnPublicInstance.returnActionList.length - 1];
+          
+            //Prendredu redux,
+
+            setDynamicPositionList(
+                JSON
+                .parse(positionLogic.positionList)
+                .map((item: any) => [item[0],item[1].map(Player.from),item[2].map(Ballon.from)])
+                );
+
+
             switch (eraseAction[0]) {
                 //Creation de joueur (id saved)
                 case 'c':
                   
-                  console.log("Case c",dynamicPositionList[positionLogic.positionIndex]);
-                  deletePlayer(eraseAction[1])
+                  console.log("Case c",dynamicPositionList);
 
                   break;
-
-                //Deletion d'un joueur (joueur saved)
-                case 'd':
-
-                    restorePlayer(eraseAction[1]);
                 
                 //Position de joueur modifié (ancienne position save)
                 case 'p':
@@ -78,63 +69,8 @@ const TopWidget = ({ onPlayButtonPress,  selectedItem  }: { onPlayButtonPress: (
         }
 
 
+      };
 
-      const retrieveReduxPosition = () => {
-        let eraseAction : any[];
-        if(returnPublicInstance.returnActionList.length > 0){
-
-            eraseAction = returnPublicInstance.returnActionList[returnPublicInstance.returnActionList.length - 1];
-          
-
-            setDynamicPositionList(
-                JSON
-                .parse(positionLogic.positionList)
-                .map((item: any) => [item[0],item[1].map(Player.from),item[2].map(Ballon.from)])
-                );
-
-                if(dynamicPositionList.length>0){
-                    handleReturnPress(eraseAction);
-                }
-
-        };
-        
-    }
-
-      
-      const deletePlayer = (currentID: string) => {
-        let indexID = dynamicPositionList[positionLogic.positionIndex][1].findIndex((joueur) => joueur.id === currentID);
-        if (indexID != -1) {
-            const newPositionList = [...dynamicPositionList];
-            newPositionList[positionLogic.positionIndex][1].splice(indexID, 1);
-            setDynamicPositionList(newPositionList);
-
-        }
-        returnPublicInstance.returnActionList.splice((returnPublicInstance.returnActionList.length - 1),1);
-        dispatch(setPositionList(JSON.stringify(dynamicPositionList)))
-    };
-
-    const restorePlayer = (myPlayer: Player) => {
-        
-        setDynamicPositionList((prevPos) => {
-            const newPositionList = [...prevPos];
-
-            if (newPositionList[positionLogic.positionIndex]) {
-                newPositionList[positionLogic.positionIndex][1] = [...newPositionList[positionLogic.positionIndex][1], myPlayer];
-            }
-
-
-            return newPositionList;
-        });
-
-        
-
-        if(dynamicPositionList){
-            returnPublicInstance.returnActionList.splice((returnPublicInstance.returnActionList.length - 1),1);
-     
-            dispatch(setPositionList(JSON.stringify(dynamicPositionList)))
-        }
-       
-    };
 
     return (
         <View style={styles.topWidget}>
@@ -150,7 +86,7 @@ const TopWidget = ({ onPlayButtonPress,  selectedItem  }: { onPlayButtonPress: (
                     </TouchableOpacity>
                     <TouchableOpacity
                     style={styles.topWidgetButton}
-                    onPress={retrieveReduxPosition}>
+                    onPress={handleReturnPress}>
                         <Image source={reload}  style={styles.PlayButton}/>
                     </TouchableOpacity>
                 </View>

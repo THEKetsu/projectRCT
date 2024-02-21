@@ -5,17 +5,10 @@ import {
     deleteBallon,
     deletePlayer, linkToPlayer,
     replacePlayerID,
-    selectPlayer,
     setInputPlayerId,
-    setPlayerPaths,
     toggleAutoLink,
-    triggerRefresh
 } from "../../redux/actions/optionActions";
-import Player from "../../classes/Player";
-import Ballon from "../../classes/Ballon";
-import {isValidString, parsePositionList} from "../../utils/functions";
-import {setPositionList} from "../../redux/actions/positionActions";
-import {Option, PlayerPath, Position, Toolbar} from "../../utils/interfaces";
+import {Option, Position, Toolbar} from "../../utils/interfaces";
 
 
 // @ts-ignore
