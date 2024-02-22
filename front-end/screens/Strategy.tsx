@@ -43,10 +43,10 @@ export default function Strategy() {
     return (
         <View style={styles.container}>
             {isDrawerOpen && <DrawerLeft onClose={handleCloseDrawer} isOpen={isDrawerOpen} onItemSelected={handleItemSelected} />}
-            {!isDrawerOpen && <TopWidget onPlayButtonPress={handlePressPlayButton} selectedItem={selectedItem}/>}
+            {!isDrawerOpen && <TopWidget onPlayButtonPress={handlePressPlayButton} selectedItem={selectedItem} animate={animate} />}
             <GestureHandlerRootView style={{flex: 1}}>
-                <Field/>
-                <ToolBar/>
+            <Field/>
+            <ToolBar/>
             </GestureHandlerRootView>
         </View>
     )
@@ -56,6 +56,6 @@ const styles = StyleSheet.create({
     container: {
         backgroundColor: '#5FB07B',
         width: '100%',
-        height: '110%',
+        height: '100%',
     },
 });

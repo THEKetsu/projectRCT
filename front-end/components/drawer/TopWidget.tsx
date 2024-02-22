@@ -81,7 +81,7 @@ const TopWidget = ({ onPlayButtonPress,  selectedItem  }: { onPlayButtonPress: (
                     <Text style={styles.topWidgetText}>{selectedItem || "Selectionner un scenario"}</Text>
                 </View>
                 <View style={styles.topWidgetElementRight}>
-                    <TouchableOpacity style={styles.topWidgetButton}>
+                    <TouchableOpacity style={styles.topWidgetButton} >
                         <Image source={play_button} style={styles.PlayButton}/>
                     </TouchableOpacity>
                     <TouchableOpacity

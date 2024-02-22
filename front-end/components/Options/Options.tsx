@@ -1,9 +1,10 @@
-import React, {Dispatch, useState} from "react";
-import {Pressable, Text, TextInput, useWindowDimensions, View} from "react-native";
-import {useAppDispatch, useAppSelector} from "../../hooks/reduxHooks";
+import React, { Dispatch, useState } from "react";
+import { Pressable, Text, TextInput, View, TouchableOpacity } from "react-native";
+import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
 import {
     deleteBallon,
-    deletePlayer, linkToPlayer,
+    deletePlayer,
+    linkToPlayer,
     replacePlayerID,
     selectPlayer,
     setInputPlayerId,
@@ -11,67 +12,90 @@ import {
     toggleAutoLink,
     triggerRefresh
 } from "../../redux/actions/optionActions";
-import Player from "../../classes/Player";
-import Ballon from "../../classes/Ballon";
-import {isValidString, parsePositionList} from "../../utils/functions";
-import {setPositionList} from "../../redux/actions/positionActions";
-import {Option, PlayerPath, Position, Toolbar} from "../../utils/interfaces";
+import { Option, PlayerPath, Position, Toolbar } from "../../utils/interfaces";
+import styles from "./styles";
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
+export default function Options({ animate, setIsOpen }) {
+    const toggleBar = () => {
+        setIsOpen((prevState: any) => !prevState); // Inverser la valeur de isOpen
+    };
+    const [selectedTeam, setSelectedTeam] = useState<string>("B");
+    const [changeId, setChangeId] = useState<string>("");
+    const dispatch: Dispatch<any> = useAppDispatch();
 
-// @ts-ignore
-export default function Options({animate}) {
-    const [changeId, setChangeId] = useState<string>("")
+    const toolbar: Toolbar = useAppSelector((state) => state.toolbar);
+    const position: Position = useAppSelector((state) => state.position);
+    const option: Option = useAppSelector((state) => state.option);
 
-    const dispatch: Dispatch<any> = useAppDispatch()
-
-    const toolbar: Toolbar = useAppSelector((state) => state.toolbar)
-    const position: Position = useAppSelector((state) => state.position)
-    const option: Option = useAppSelector((state) => state.option)
+    // Logique pour déterminer le texte de la barre de rappel
+    let reminderText = "Se déplacer";
+    if (toolbar.ballMode) {
+        reminderText = "Ballon mode activé";
+    } else if (toolbar.playerMode) {
+        reminderText = "Gestion des joueurs";
+    }
+    const AddPlayer = (text: string) => {
+        const regex = /^[1-9](?:[0-9])?$/;
+        //test if the input is a number between 1 and 99 if not return a alert message
+        if (text.length === 2 && regex.test(text.substring(1))) {
+            dispatch(setInputPlayerId(text));
+        } else {
+            alert("Please enter a valid player ID");
+        }
+        dispatch(selectPlayer(`${selectedTeam}${text}`));
+        dispatch(setInputPlayerId(""));
+    }
 
     return (
-        <View
-            style={{
-                position: "absolute",
-                top: 0,
-                right: 0,
-                backgroundColor: "#D9D9D9",
-                height: "100%",
-                width: useWindowDimensions().width / 4,
-                justifyContent: "center",
-                alignItems: "center",
-                padding: 10
-            }}
-        >
-            <Pressable
-                onPress={() => animate(position.positionIndex)}
-                style={({pressed}: { pressed: any }) => [
-                    {
-                        backgroundColor: pressed ? 'rgb(210, 230, 255)' : 'rgb(65, 105, 225)',
-                        padding: 10,
-                        borderRadius: 5,
-                        marginBottom: 10
-                    },
-                ]}
-            >
-                <Text>
-                    Animate
-                </Text>
-            </Pressable>
+        <View style={styles.optioncontainer}>
+            {/* Barre de rappel */}
+            <View style={styles.widgetPage} >
+            <TouchableOpacity style={styles.containerRight} onPress={toggleBar}>
+                <MaterialIcons name="chevron-right" style={styles.icon} />
+            </TouchableOpacity>
+            
+            <View style={styles.widgetElement}> 
+            <View style={styles.textPlacement}>
+                <Text style={styles.reminderText}>{reminderText}</Text>
+            </View>
+                  {/* Boutons */}
+                {/* <TouchableOpacity
+                    onPress={() => animate(position.positionIndex)}
+                    style={styles.button}>
+                    <Text>
+                        Animate
+                    </Text>
+                </TouchableOpacity> */}
 
             {toolbar.playerMode && ((option.selectedPlayer == '') || (option.selectedPlayer[option.selectedPlayer.length - 1] == 'P'))
                 && (
+                    <View style={styles.playerList}>
+                    <Text style={styles.titleTeam}>Equipe</Text>
+                    <View style={styles.teamButton}>
+                    <TouchableOpacity
+                    onPress={() => setSelectedTeam('blue')}
+                    style={[
+                    styles.buttonLeft,
+                    selectedTeam === 'B' && styles.selectedButton,
+                    ]}
+                    />
+                    <TouchableOpacity
+                    onPress={() => setSelectedTeam('red')}
+                    style={[
+                        styles.buttonRight,
+                        selectedTeam === 'R' && styles.selectedButton,
+                    ]}
+                    />
+                    </View>
+                    <Text style={styles.titleTeam}>Poste</Text>
                     <TextInput
                         placeholder="Enter Player ID [B/R][Number] ex: B6"
                         value={option.inputPlayerId}
-                        onChangeText={(text) => dispatch(setInputPlayerId(text))}
-                        style={{
-                            height: 40,
-                            borderColor: 'gray',
-                            borderWidth: 1,
-                            marginBottom: 10,
-                            paddingLeft: 10,
-                        }}
+                        onChangeText={(text) => AddPlayer(text)}
+                        style={styles.input}
                     />
+                    </View>
                 )}
 
             {toolbar.playerMode && (option.selectedPlayer != '') && (option.selectedPlayer[option.selectedPlayer.length - 1] != 'P')
@@ -81,39 +105,18 @@ export default function Options({animate}) {
                             placeholder="Enter Player ID [B/R][Number] ex: B6"
                             value={option.inputPlayerId}
                             onChangeText={(text) => dispatch(setInputPlayerId(text))}
-                            style={{
-                                height: 40,
-                                borderColor: 'gray',
-                                borderWidth: 1,
-                                marginBottom: 10,
-                                paddingLeft: 10,
-                            }}
-                        />
 
+                        />
                         <TextInput
                             placeholder={option.selectedPlayer.slice(1)}
                             onChangeText={text => setChangeId(text)}
                             onSubmitEditing={() => replacePlayerID(`${option.selectedPlayer[0]}${changeId}`, dispatch, position, option)}
-                            style={{
-                                height: 40,
-                                borderColor: 'gray',
-                                borderWidth: 1,
-                                marginBottom: 10,
-                                paddingLeft: 10,
-                            }}
+                            style={styles.input}
                         />
 
                         <Pressable
                             onPress={() => deletePlayer(dispatch, position, option)}
-                            style={({pressed}: { pressed: any }) => [
-                                {
-                                    backgroundColor: pressed ? 'rgb(210, 230, 255)' : 'rgb(65, 105, 225)',
-                                    padding: 10,
-                                    borderRadius: 5,
-                                    marginBottom: 10
-                                },
-                            ]}
-                        >
+                            style={styles.pressable}>
                             <Text>
                                 POUBELLE
                             </Text>
@@ -121,15 +124,7 @@ export default function Options({animate}) {
 
                         <Pressable
                             onPress={() => replacePlayerID(`B${option.selectedPlayer.substring(1)}`, dispatch, position, option)}
-                            style={({pressed}: { pressed: any }) => [
-                                {
-                                    backgroundColor: pressed ? 'rgb(210, 230, 255)' : 'rgb(65, 105, 225)',
-                                    padding: 10,
-                                    borderRadius: 5,
-                                    marginBottom: 10
-                                },
-                            ]}
-                        >
+                            style={styles.pressable}>
                             <Text>
                                 BLUE
                             </Text>
@@ -137,15 +132,7 @@ export default function Options({animate}) {
 
                         <Pressable
                             onPress={() => replacePlayerID(`R${option.selectedPlayer.substring(1)}`, dispatch, position, option)}
-                            style={({pressed}: { pressed: any }) => [
-                                {
-                                    backgroundColor: pressed ? 'rgb(210, 230, 255)' : 'rgb(65, 105, 225)',
-                                    padding: 10,
-                                    borderRadius: 5,
-                                    marginBottom: 10
-                                },
-                            ]}
-                        >
+                            style={styles.pressable}>
                             <Text>
                                 RED
                             </Text>
@@ -165,15 +152,7 @@ export default function Options({animate}) {
                     <>
                         <Pressable
                             onPress={() => linkToPlayer(true, dispatch, position, option)}
-                            style={({pressed}: { pressed: any }) => [
-                                {
-                                    backgroundColor: pressed ? 'rgb(210, 230, 255)' : 'rgb(65, 105, 225)',
-                                    padding: 10,
-                                    borderRadius: 5,
-                                    marginBottom: 10
-                                },
-                            ]}
-                        >
+                            style={styles.pressable}>
                             <Text>
                                 Link
                             </Text>
@@ -185,15 +164,7 @@ export default function Options({animate}) {
 
                         <Pressable
                             onPress={() => dispatch(toggleAutoLink())}
-                            style={({pressed}: { pressed: any }) => [
-                                {
-                                    backgroundColor: pressed ? 'rgb(210, 230, 255)' : 'rgb(65, 105, 225)',
-                                    padding: 10,
-                                    borderRadius: 5,
-                                    marginBottom: 10
-                                },
-                            ]}
-                        >
+                            style={styles.pressable}>
                             <Text>
                                 AutoLink Mode
                             </Text>
@@ -201,21 +172,15 @@ export default function Options({animate}) {
 
                         <Pressable
                             onPress={() => deleteBallon(dispatch, position)}
-                            style={({pressed}: { pressed: any }) => [
-                                {
-                                    backgroundColor: pressed ? 'rgb(210, 230, 255)' : 'rgb(65, 105, 225)',
-                                    padding: 10,
-                                    borderRadius: 5,
-                                    marginBottom: 10
-                                },
-                            ]}
-                        >
+                            style={styles.pressable}>
                             <Text>
                                 POUBELLE
                             </Text>
                         </Pressable>
                     </>
-                )}
+                )}    
+            </View>
+            </View>
         </View>
-    )
+    );
 }
