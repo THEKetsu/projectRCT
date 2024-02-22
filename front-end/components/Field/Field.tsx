@@ -1273,6 +1273,7 @@ export function Field({}) {
 
             dispatch(setPlayerPaths("[]"))
             setCurrentDraw([]);
+            setNumCCC(numCCC + 1)
             dispatch(setPositionList(JSON.stringify(dynamicPositionList)))
         }
     };
@@ -1315,10 +1316,7 @@ export function Field({}) {
 
             setcheckForEnd((prevC) => [...prevC, true]);
 
-            //Here i want to check if there the number of false is equal to the number of true
-            //If it is filter to only have the true one.
-
-
+            dispatch(setPositionList(JSON.stringify(dynamicPositionList)))
         }
     };
 
@@ -1335,7 +1333,6 @@ export function Field({}) {
             } else {
                 setNumAnimation(numAnimation * -1 + 1);
             }
-
             dispatch(setPositionIndex(position.positionIndex + 1));
             dispatch(selectZoomMode())
         }
