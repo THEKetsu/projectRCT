@@ -1183,7 +1183,7 @@ export function Field() {
             animateSuite(atLeastOneChange, listJoueurModify, indexC);
             }
         }else{
-            dynamicPositionList[indexC][2][0].idChange("B2");
+            dynamicPositionList[indexC][2][0].idChange(JSON.parse(option.closestPlayer)[0]);
             if(numAnimation>0){
                 setNumAnimation(numAnimation*-1 -1);
             }else{
