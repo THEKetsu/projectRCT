@@ -38,7 +38,7 @@ export default function Login () {
         if (email != null){
           localStorage.setItem("email", email);
         }
-        navigation.navigate("Strategy")
+        navigation.navigate("StrategyMenu")
       })
       .catch((error) => {
         console.log(error);

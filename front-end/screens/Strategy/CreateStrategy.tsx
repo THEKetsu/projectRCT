@@ -2,7 +2,9 @@ import React from 'react';
 import { useFonts } from 'expo-font';
 import {ImageBackground, Image, TouchableOpacity, View, StyleSheet, TextInput, Text, Dimensions} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-
+import { addDoc, collection, getDocs } from 'firebase/firestore';
+import field from '../../assets/star.png';
+import { db } from '../../firebase/firebase';
 
 export default function CreateStrategy () {
   const navigation = useNavigation();
@@ -19,6 +21,31 @@ export default function CreateStrategy () {
   const screenWidth = Dimensions.get('window').width;
   const starSize = screenWidth * 0.02; // Adjust this factor according to your preference
   const backButtonSize = screenWidth * 0.03;
+  
+  const getNextId = async () => {
+    const querySnapshot = await getDocs(collection(db, 'Strategy'));
+    const documents = querySnapshot.docs;
+    const lastDocument = documents[documents.length - 1];
+    return lastDocument.id + 1;
+  };
+
+  const AddStrategytoDB = async () => {
+    try {
+      const newItem = {
+          id: getNextId(), // Utiliser getNextId() pour obtenir le prochain ID
+          name: strategyName,
+          image: field,
+          timestamp: Date.now(),
+          data: []
+      };
+      const docRef = await addDoc(collection(db, 'Strategy'), newItem);
+      console.log('Document written with ID: ', docRef.id);
+  } catch (error) {
+      console.error('Error adding document: ', error);
+  }
+    }
+
+
   return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
         <ImageBackground  source={require('../../assets/login.png')} 
@@ -45,7 +72,7 @@ export default function CreateStrategy () {
                   }}
               />
             </View>
-          <TouchableOpacity style={[styles.button]} activeOpacity={0.7} onPress={() => navigation.navigate('Strategy')}>
+          <TouchableOpacity style={[styles.button]} activeOpacity={0.7} onPress={() => AddStrategytoDB()}>
               <Text style={[styles.buttonText, { fontWeight: 'bold' }]}>GO</Text>
           </TouchableOpacity>
         </ImageBackground>
