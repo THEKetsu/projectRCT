@@ -134,16 +134,7 @@ export function Field({ }) {
 
     useEffect(() => {
         if (position.positionList != "[]" && JSON.parse(position.positionList)[0][0] != 0) {
-            setDynamicPositionList((prevPositionList) => {
-                return prevPositionList.map((item) => {
-                    let buffPL = parsePositionList(position.positionList)
-
-                    const matchingItem = buffPL.find(
-                        (receivedItem: [number, Player[], Ballon[]]) => receivedItem[0] === item[0]
-                    );
-                    return matchingItem ? matchingItem : item;
-                });
-            })
+            setDynamicPositionList(parsePositionList(position.positionList))
             setNumCCC(numCCC+1);
         }
     }, [position.positionList]);
@@ -152,9 +143,6 @@ export function Field({ }) {
         dispatch(setPlayerPaths("[]"))
         setCurrentDraw([]);
         setNumCCC(numCCC + 1);
-        
-
-
     }, [position.positionIndex]);
 
     useEffect(() => {
@@ -1073,6 +1061,8 @@ export function Field({ }) {
         }
     }
 
+    const [isLinekd,setIsLinked] = useState(false);
+
     const animate = (indexC: number): void => {
         let waitForLink = false;
         if(dynamicPositionList[indexC].length > 0){
@@ -1084,7 +1074,7 @@ export function Field({ }) {
                     let joueur = dynamicPositionList[indexC][1][indexJ];
                     let positionBallon = dynamicPositionList[indexC][2][0].position
                     currentValue = Math.abs(joueur.position[0] - positionBallon[0]) + Math.abs(joueur.position[1] - positionBallon[1]);
-    
+
                     if(currentValue < 0.01){
                         waitForLink = true;
                     }
@@ -1195,7 +1185,7 @@ export function Field({ }) {
             animateSuite(atLeastOneChange, listJoueurModify, indexC);
             }
         }else{
-           
+
             dynamicPositionList[indexC][2][0].idChange(JSON.parse(option.closestPlayer)[0]);
             if(numAnimation>0){
                 setNumAnimation(numAnimation*-1 -1);
@@ -1300,7 +1290,9 @@ export function Field({ }) {
                 [indexC + 2, newList, prevPos[indexC][2]],
             ]);
 
-            dispatch(setPositionIndex(indexC + 1))
+            dispatch(setPlayerPaths("[]"))
+            setCurrentDraw([]);
+            setNumCCC(numCCC + 1);
             dispatch(setPositionList(JSON.stringify(dynamicPositionList)))
         }
     };
@@ -1424,7 +1416,6 @@ export function Field({ }) {
     };
 
     const simulateRefresh = (positionI: number,debugZoom: boolean) => {
-
 
         if(!debugZoom){
             proportionAll(proportion);
