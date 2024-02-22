@@ -111,6 +111,7 @@ export function Field({ }) {
     useEffect(() => {
         retrievePlayer();
     }, []);
+    
 
     useEffect(() => {
         if (returnPublicInstance.indexAnimation != 0) {
@@ -143,13 +144,17 @@ export function Field({ }) {
                     return matchingItem ? matchingItem : item;
                 });
             })
+            setNumCCC(numCCC+1);
         }
     }, [position.positionList]);
 
     useEffect(() => {
         dispatch(setPlayerPaths("[]"))
         setCurrentDraw([]);
-        setNumCCC(numCCC + 1)
+        setNumCCC(numCCC + 1);
+        
+
+
     }, [position.positionIndex]);
 
     useEffect(() => {
@@ -166,24 +171,21 @@ export function Field({ }) {
     useEffect(() => {
 
         if (dynamicPositionList.length > 0) {
-            simulateRefresh(position.positionIndex,true);
+            if(numAnimation > 0){
+                simulateRefresh(position.positionIndex,true);
+            }else{
+                simulateRefresh(position.positionIndex,false);
+            }
+            
 
             if (dynamicPositionList.length >= position.positionIndex ) {
 
-                console.log("****");
                 animate(position.positionIndex);
             }
 
-        }
 
+        }
     }, [numAnimation]);
-
-    useEffect(() => {
-        if (dynamicPositionList.length > 0) {
-            setNumCCC(numCCC + 1)
-        }
-    }, [position.positionIndex]);
-
 
     const setAll = () => {
         setSuperField(superSvg_Field);
@@ -877,7 +879,17 @@ export function Field({ }) {
                     return newPositionList;
                 });
 
-                returnPublicInstance.returnActionList.push(["c",newPlayer.id]);
+                const foundIndex = returnPublicInstance.returnActionList.findIndex(
+                    (number) => number[0] === position.positionIndex
+                  );
+                
+                if(foundIndex != -1){
+                    returnPublicInstance.returnActionList[foundIndex][1].push(["c",newPlayer.id]);
+                    
+                }else{
+                    returnPublicInstance.returnActionList.push([position.positionIndex,[["c",newPlayer.id]]]);
+                }
+                
 
             } else {
                 let svg_Mode: number[] = proportionSVG(player, ((superField[0][5] - superField[0][0]) / (svg_fieldUNCHANGED[5] - svg_fieldUNCHANGED[0])))
@@ -913,6 +925,20 @@ export function Field({ }) {
         svg_Mode = diffSVG(svg_Mode, getCenterBallon(svg_Mode), xBallon_Array, getPourcentageCenter2(newBall.position[0], newBall.position[1]))
         newBall.svgValue(svg_Mode);
 
+
+        //Si il y'avais un ballon, cette action va le supprimer puis en mettre un nouveau (il faut l'anoncer au return button)
+        if(dynamicPositionList[position.positionIndex][2].length > 0){
+            const foundIndex = returnPublicInstance.returnActionList.findIndex(
+                (number) => number[0] === position.positionIndex
+              );
+            
+            if(foundIndex != -1){
+                returnPublicInstance.returnActionList[foundIndex][1].push(["b-",dynamicPositionList[position.positionIndex][2][0]]);
+            }else{
+                returnPublicInstance.returnActionList.push([position.positionIndex,[["b-",dynamicPositionList[position.positionIndex][2][0]]]]);
+            }
+        }
+
         setDynamicPositionList((prevPos) => {
             const newPositionList = [...prevPos];
 
@@ -922,6 +948,17 @@ export function Field({ }) {
 
             return newPositionList;
         });
+
+        const foundIndex = returnPublicInstance.returnActionList.findIndex(
+            (number) => number[0] === position.positionIndex
+          );
+        
+        if(foundIndex != -1){
+            returnPublicInstance.returnActionList[foundIndex][1].push(["b+",[]]);
+        }else{
+            returnPublicInstance.returnActionList.push([position.positionIndex,[["b+",[]]]]);
+        }
+
         showPlayer(false, position.positionIndex);
         setNumCCC(numCCC + 1)
     };
@@ -1037,7 +1074,26 @@ export function Field({ }) {
     }
 
     const animate = (indexC: number): void => {
-        dispatch(setPositionList(JSON.stringify(dynamicPositionList)))
+        let waitForLink = false;
+        if(dynamicPositionList[indexC].length > 0){
+            if(dynamicPositionList[indexC][2].length > 0){
+
+                let currentValue = 1000;
+                let indexJ = dynamicPositionList[indexC][1].findIndex((j) => j.id === JSON.parse(option.closestPlayer)[0]);
+                if(indexJ != -1 && dynamicPositionList[indexC][2][0].idJoueur == ""){
+                    let joueur = dynamicPositionList[indexC][1][indexJ];
+                    let positionBallon = dynamicPositionList[indexC][2][0].position
+                    currentValue = Math.abs(joueur.position[0] - positionBallon[0]) + Math.abs(joueur.position[1] - positionBallon[1]);
+    
+                    if(currentValue < 0.01){
+                        waitForLink = true;
+                    }
+                }
+            }
+        }
+
+        if(!waitForLink){
+            dispatch(setPositionList(JSON.stringify(dynamicPositionList)))
         superSvg_Field = superField;
         dispatch(unselectAll())
         setPathDrawing(false);
@@ -1135,9 +1191,22 @@ export function Field({ }) {
             let getXYListEnd = getPourcentageCenter(newAnimationPathBallon[newAnimationPathBallon.length - 1][0], 1 - newAnimationPathBallon[newAnimationPathBallon.length - 1][1]);
             setAnimationPathBallon([getXYListStart, getXYListEnd]);
             prioAnimation(listNumb, 0, atLeastOneChange, listJoueurModify, indexC);
-        } else {
+            } else {
             animateSuite(atLeastOneChange, listJoueurModify, indexC);
+            }
+        }else{
+           
+            dynamicPositionList[indexC][2][0].idChange(JSON.parse(option.closestPlayer)[0]);
+            if(numAnimation>0){
+                setNumAnimation(numAnimation*-1 -1);
+            }else{
+                setNumAnimation(numAnimation -1);
+            }
+            
         }
+
+
+        
     };
 
     const animateSuite = (atLeastOneChange: boolean, listJoueurModify: [string, number[]][], indexC: number) => {
@@ -1288,8 +1357,12 @@ export function Field({ }) {
             if (dynamicPositionList[position.positionIndex][2].length > 0) {
                 dynamicPositionList[position.positionIndex][2][0].idChange(option.inputPlayerId);
             }
-
-            setNumAnimation(numAnimation+1);
+            
+            if(numAnimation>0){
+                setNumAnimation(numAnimation+1);
+            }else{
+                setNumAnimation(numAnimation*-1 +1);
+            }
             dispatch(setPositionIndex(position.positionIndex + 1));
             dispatch(selectZoomMode())
         }
