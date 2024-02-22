@@ -2,10 +2,7 @@ import React from 'react';
 import { useFonts } from 'expo-font';
 import {ImageBackground, Image, TouchableOpacity, View, StyleSheet, TextInput, Text, Dimensions} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { addDoc, collection, getDocs } from 'firebase/firestore';
-import field from '../../assets/star.png';
-import { db } from '../../firebase/firebase';
-
+import { addStrategyToDB } from '../../firebase/firebase';
 export default function CreateStrategy () {
   const navigation = useNavigation();
   const [loaded] = useFonts({
@@ -13,7 +10,6 @@ export default function CreateStrategy () {
     roboto: require('../../assets/font/Roboto-Medium.ttf'),
   });
   const [strategyName, setStrategyName] = React.useState('');
-  
   if (!loaded) {
     return null;
   }
@@ -22,28 +18,10 @@ export default function CreateStrategy () {
   const starSize = screenWidth * 0.02; // Adjust this factor according to your preference
   const backButtonSize = screenWidth * 0.03;
   
-  const getNextId = async () => {
-    const querySnapshot = await getDocs(collection(db, 'Strategy'));
-    const documents = querySnapshot.docs;
-    const lastDocument = documents[documents.length - 1];
-    return lastDocument.id + 1;
-  };
-
   const AddStrategytoDB = async () => {
-    try {
-      const newItem = {
-          id: getNextId(), // Utiliser getNextId() pour obtenir le prochain ID
-          name: strategyName,
-          image: field,
-          timestamp: Date.now(),
-          data: []
-      };
-      const docRef = await addDoc(collection(db, 'Strategy'), newItem);
-      console.log('Document written with ID: ', docRef.id);
-  } catch (error) {
-      console.error('Error adding document: ', error);
-  }
-    }
+    addStrategyToDB(strategyName);
+    navigation.navigate('Home');
+};
 
 
   return (
