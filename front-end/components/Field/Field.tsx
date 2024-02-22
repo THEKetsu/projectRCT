@@ -147,7 +147,9 @@ export function Field() {
     useEffect(() => {
         dispatch(setPlayerPaths("[]"))
         setCurrentDraw([]);
-        setNumCCC(numCCC + 1)
+        setNumCCC(numCCC + 1);
+        
+
 
     }, [position.positionIndex]);
 
@@ -165,11 +167,15 @@ export function Field() {
 
     useEffect(() => {
         if (dynamicPositionList.length > 0) {
-            simulateRefresh(position.positionIndex,true);
+            if(numAnimation > 0){
+                simulateRefresh(position.positionIndex,true);
+            }else{
+                simulateRefresh(position.positionIndex,false);
+            }
+            
 
             if (dynamicPositionList.length >= position.positionIndex ) {
 
-         
                 animate(position.positionIndex);
             }
 
@@ -1062,8 +1068,20 @@ export function Field() {
         }
     }
 
+    const [isLinekd,setIsLinked] = useState(false);
+
     const animate = (indexC: number): void => {
-        dispatch(setPositionList(JSON.stringify(dynamicPositionList)))
+        let waitForLink = false;
+        if(dynamicPositionList[indexC].length > 0){
+            if(dynamicPositionList[indexC][2].length > 0){
+                if(dynamicPositionList[indexC][2][0].idJoueur == ""){
+                    waitForLink = true;
+                }
+            }
+        }
+
+        if(!waitForLink){
+            dispatch(setPositionList(JSON.stringify(dynamicPositionList)))
         superSvg_Field = superField;
         dispatch(unselectAll())
         setPathDrawing(false);
@@ -1161,9 +1179,21 @@ export function Field() {
             let getXYListEnd = getPourcentageCenter(newAnimationPathBallon[newAnimationPathBallon.length - 1][0], 1 - newAnimationPathBallon[newAnimationPathBallon.length - 1][1]);
             setAnimationPathBallon([getXYListStart, getXYListEnd]);
             prioAnimation(listNumb, 0, atLeastOneChange, listJoueurModify, indexC);
-        } else {
+            } else {
             animateSuite(atLeastOneChange, listJoueurModify, indexC);
+            }
+        }else{
+            dynamicPositionList[indexC][2][0].idChange("B2");
+            if(numAnimation>0){
+                setNumAnimation(numAnimation*-1 -1);
+            }else{
+                setNumAnimation(numAnimation -1);
+            }
+            
         }
+
+
+        
     };
 
     const animateSuite = (atLeastOneChange: boolean, listJoueurModify: [string, number[]][], indexC: number) => {
@@ -1315,7 +1345,12 @@ export function Field() {
             if (dynamicPositionList[position.positionIndex][2].length > 0) {
                 dynamicPositionList[position.positionIndex][2][0].idChange(option.inputPlayerId);
             }
-            setNumAnimation(numAnimation+1);
+            
+            if(numAnimation>0){
+                setNumAnimation(numAnimation+1);
+            }else{
+                setNumAnimation(numAnimation*-1 +1);
+            }
             dispatch(setPositionIndex(position.positionIndex + 1));
             dispatch(selectZoomMode())
         }
