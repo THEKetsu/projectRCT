@@ -94,6 +94,7 @@ export function Field({ }) {
     const [svgPlayers, setSvgPlayers] = useState<React.ReactNode[]>([]);
     const [svgBallon, setSvgBallon] = useState<React.ReactNode>();
     const [pathDrawing, setPathDrawing] = useState(false);
+    const [isFirstLoad, setIsFirstLoad] = useState<boolean>(true)
 
     let myBase = [svgSize.width / 2, svgSize.height / 2];
 
@@ -146,21 +147,17 @@ export function Field({ }) {
     }, [position.positionIndex]);
 
     useEffect(() => {
-
         if (dynamicPositionList.length > 0 && numAnimation >= 0) {
             simulateRefresh(position.positionIndex,false);
         }
     }, [numCCC]);
 
     useEffect(() => {
-
         if (option.refresh != null) {
             if (option.refresh > 0 ) {
                 setNumCCC(numCCC + 1)
             }
-        }
-
-        else {
+        } else {
             setNumAnimation(numAnimation + 1)
         }
     }, [option.refresh]); 
@@ -171,42 +168,37 @@ export function Field({ }) {
                 setNumCCC(numCCC + 1)
             }
         }
-
         else {
             setNumAnimation(numAnimation + 1)
         }
-    }, [option.refreshAnimation]); 
-    useEffect(() => {
+    }, [option.refreshAnimation])
 
+    useEffect(() => {
         if (dynamicPositionList.length > 0) {
             if(numAnimation > 0){
                 simulateRefresh(position.positionIndex,true);
-            }else{
+            } else {
                 simulateRefresh(position.positionIndex,false);
             }
-            
 
-            if (dynamicPositionList.length >= position.positionIndex ) {
-
-                animate(position.positionIndex);
+            if (!isFirstLoad) {
+                if (dynamicPositionList.length >= position.positionIndex) {
+                    animate(position.positionIndex);
+                }
+            } else {
+                setIsFirstLoad(false)
             }
-
-
         }
     }, [numAnimation]);
 
     const setAll = () => {
         setSuperField(superSvg_Field);
 
-
         if (currentDraw) {
             const buffDraw: FreeDraw[] = currentDraw
-
             buffDraw.map((free) => {
                 let redrawPath = '';
-
                 for (let i = 0; i < free.numbers.length; i++) {
-
                     let myNumberXY = getPourcentageCenter(free.numbers[i][0], 1 - free.numbers[i][1]);
                     if (i == 0) {
                         redrawPath = `M${myNumberXY[0]} ${myNumberXY[1]}`;
@@ -258,9 +250,7 @@ export function Field({ }) {
 
     const diffSVG = (svgArray: number[], centerNew: number[], xArray: number[], centerBase: number[]) => {
         let numb = [centerBase[0] - centerNew[0], centerBase[1] - centerNew[1]];
-
         svgArray = svgArray.map((value, index) => {
-
             if (xArray.includes(index)) {
                 // Subtract numb from the value
                 return value + numb[0];

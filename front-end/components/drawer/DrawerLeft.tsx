@@ -11,6 +11,7 @@ import share from '../../assets/share.png';
 import importAllData from './JsonFile';
 import { auth,db } from '../../firebase/firebase';
 import {collection, addDoc, getDocs, updateDoc, doc, onSnapshot, deleteDoc } from "firebase/firestore";
+
 /**
  * Store data to Firestore database.
  *
