@@ -122,7 +122,7 @@ export function Field() {
         // Filter only the true elements
             checkEndingAnimation();
         }
-        
+
     }, [checkForEnd]);
 
     useEffect(() => {
@@ -157,7 +157,6 @@ export function Field() {
 
         if (dynamicPositionList.length > 0 && numAnimation >= 0) {
             simulateRefresh(position.positionIndex,false);
-            
         }
     }, [numCCC]);
 
@@ -166,6 +165,7 @@ export function Field() {
     }, [option.refresh]);
 
     useEffect(() => {
+
         if (dynamicPositionList.length > 0) {
             if(numAnimation > 0){
                 simulateRefresh(position.positionIndex,true);
@@ -179,12 +179,13 @@ export function Field() {
                 animate(position.positionIndex);
             }
 
+
         }
     }, [numAnimation]);
 
     const setAll = () => {
         setSuperField(superSvg_Field);
-        
+
 
         if (currentDraw) {
             const buffDraw: FreeDraw[] = currentDraw
@@ -663,7 +664,7 @@ export function Field() {
         });
     };
 
- 
+
 
     const showPlayer = (grab: boolean, indexC: number) => {
         let maillot: ShirtDigit[] = [];
@@ -677,13 +678,13 @@ export function Field() {
         let newPaths: PlayerPath[] = JSON.parse(option.playerPaths);
 
 
-        
+
 
         dynamicPositionList[indexC][1].map((joueur) => {
             let color: string;
             let colorSpeed: string;
 
-            
+
 
             let getXY: number[] = getPourcentageCenter(joueur.position[0], joueur.position[1]);
 
@@ -701,7 +702,7 @@ export function Field() {
                 colorSpeed = "black";
             }
 
-            
+
             if (dynamicPositionList[indexC][2].length > 0) {
                 if (joueur.id == dynamicPositionList[indexC][2][0].idJoueur && !grab) {
                     ballonShown = true;
@@ -709,9 +710,9 @@ export function Field() {
                     dynamicPositionList[indexC][2][0].positionChange(joueur.position);
                 }
             }
-            
+
             if (joueur.myArray.length > 0 && !animationEnCours && !grab) {
-                
+
                 let drawnPath = ``;
                 for (let i = 0; i < joueur.myArray.length; i++) {
                     if (i == 0) {
@@ -722,14 +723,14 @@ export function Field() {
                 }
 
                 const existingIndex = JSON.parse(option.playerPaths).findIndex((p: PlayerPath) => p.id === joueur.id + 'P');
-                
+
                 if (existingIndex != -1) {
 
                     newPaths[existingIndex].path = drawnPath
-                    
+
                     dispatchAt = true;
-                    
-                    
+
+
                 } else {
                     newPaths.push({id: joueur.id + 'P', path: drawnPath});
                     dispatchAt = true;
@@ -739,7 +740,7 @@ export function Field() {
                     //         {id: joueur.id + 'P', path: drawnPath}
                     //     ])
                     // ))
-                   
+
                 }
             }else if(animationEnCours){
                 newPaths = [];
@@ -807,7 +808,7 @@ export function Field() {
         } else {
             showBallon(moveBallon);
         }
-  
+
         if (!animationEnCours) {
             closestPlayerToBallon();
         }
@@ -1323,7 +1324,7 @@ export function Field() {
         } else {
             if (j.myArray[0][0] != -100) {
                 j.positionChange([j.myArray[0][0], 1 - j.myArray[0][1]]);
-                
+
             } else {
                 j.positionChange([j.myArray[1][0], 1 - j.myArray[1][1]]);
                 j.pathArraySetup([]);
@@ -1334,7 +1335,7 @@ export function Field() {
             //Here i want to check if there the number of false is equal to the number of true
             //If it is filter to only have the true one.
 
-            
+
         }
     };
 
@@ -1412,7 +1413,7 @@ export function Field() {
     };
 
     const simulateRefresh = (positionI: number,debugZoom: boolean) => {
-        
+
 
         if(!debugZoom){
             proportionAll(proportion);
