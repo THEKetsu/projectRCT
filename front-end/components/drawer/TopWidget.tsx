@@ -10,7 +10,8 @@ import Ballon from '../../classes/Ballon';
 import {setPositionList} from "../../redux/actions/positionActions";
 import {useAppDispatch, useAppSelector} from "../../hooks/reduxHooks";
 import {Position} from "../../utils/interfaces";
-
+import { ReturnPublic } from '../../classes/ReturnPublic';
+import { triggerRefresh } from '../../redux/actions/optionActions';
 /**
  * Renders the TopWidget component.
  *
@@ -18,7 +19,7 @@ import {Position} from "../../utils/interfaces";
  * @param {string | null} selectedItem - The selected item or null
  * @return {JSX.Element} JSX element representing the TopWidget component
  */
-const TopWidget = ({ onPlayButtonPress,  selectedItem  }: { onPlayButtonPress: (info: string) => void, selectedItem: string | null  }) => {
+const TopWidget = ({ onPlayButtonPress,  selectedItem  }: { onPlayButtonPress: (info: string) => void, selectedItem: string | null  }): JSX.Element => {
 ;
 
     const position: Position = useAppSelector((state) => state.position)
@@ -112,6 +113,12 @@ const TopWidget = ({ onPlayButtonPress,  selectedItem  }: { onPlayButtonPress: (
         }
        
     };
+    const launchAnimate = () => {
+        returnPublicInstance.indexAnimation = returnPublicInstance.indexAnimation + 1;
+        dispatch(triggerRefresh());
+        console.log("Change indexAnimation : ",returnPublicInstance.indexAnimation);
+    }
+
 
     return (
         <View style={styles.topWidget}>
@@ -122,7 +129,7 @@ const TopWidget = ({ onPlayButtonPress,  selectedItem  }: { onPlayButtonPress: (
                     <Text style={styles.topWidgetText}>{selectedItem || "Selectionner un scenario"}</Text>
                 </View>
                 <View style={styles.topWidgetElementRight}>
-                    <TouchableOpacity style={styles.topWidgetButton}>
+                    <TouchableOpacity style={styles.topWidgetButton} onPress={launchAnimate} >
                         <Image source={play_button} style={styles.PlayButton}/>
                     </TouchableOpacity>
                     <TouchableOpacity
