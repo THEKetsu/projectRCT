@@ -1069,14 +1069,21 @@ export function Field() {
         }
     }
 
-    const [isLinekd,setIsLinked] = useState(false);
-
     const animate = (indexC: number): void => {
         let waitForLink = false;
         if(dynamicPositionList[indexC].length > 0){
             if(dynamicPositionList[indexC][2].length > 0){
-                if(dynamicPositionList[indexC][2][0].idJoueur == ""){
-                    waitForLink = true;
+
+                let currentValue = 1000;
+                let indexJ = dynamicPositionList[indexC][1].findIndex((j) => j.id === JSON.parse(option.closestPlayer)[0]);
+                if(indexJ != -1 && dynamicPositionList[indexC][2][0].idJoueur == ""){
+                    let joueur = dynamicPositionList[indexC][1][indexJ];
+                    let positionBallon = dynamicPositionList[indexC][2][0].position
+                    currentValue = Math.abs(joueur.position[0] - positionBallon[0]) + Math.abs(joueur.position[1] - positionBallon[1]);
+    
+                    if(currentValue < 0.01){
+                        waitForLink = true;
+                    }
                 }
             }
         }
@@ -1184,6 +1191,7 @@ export function Field() {
             animateSuite(atLeastOneChange, listJoueurModify, indexC);
             }
         }else{
+           
             dynamicPositionList[indexC][2][0].idChange(JSON.parse(option.closestPlayer)[0]);
             if(numAnimation>0){
                 setNumAnimation(numAnimation*-1 -1);
