@@ -19,11 +19,10 @@ const dimWidth = Dimensions.get('window').width;
 const dimHeight = Dimensions.get('window').height;
 
 export default function ToolBar() {
-    const [numberOfPosition, setNumberOfPosition] = useState<number[]>([0, 1]);
-    const [collapsed, setCollapsed] = useState(false); // État pour suivre l'état de la barre (repliée ou non)
-    const [animation] = useState(new Animated.Value(0)); // Utilisation d'Animated pour gérer l'animation
-    const [selectedPosition, setSelectedPosition] = useState<number | null>(null);
-    const [chosenPosition, setChosenPosition] = useState<number>(0)
+    const [positionIndexList, setPositionIndexList] = useState<number[]>([0, 1]);
+    const [collapsed, setCollapsed] = useState(false)
+    const [animation] = useState(new Animated.Value(0))
+    const [selectedPosition, setSelectedPosition] = useState<number>(0)
 
     const dispatch = useAppDispatch()
     const position: Position = useAppSelector((state) => state.position)
@@ -46,45 +45,50 @@ export default function ToolBar() {
     });
 
     useEffect((): void => {
-        let different = true;
-
-        numberOfPosition.map((i): void => {
-            if (i == position.positionIndex) {
-                different = false;
-            }
-        })
-
-        if (position.positionIndex != 0 && different) {
-            setNumberOfPosition((prevPositions: number[]) => [...prevPositions, position.positionIndex]);
+        if (position.positionIndex != 0 && !positionIndexList.some((item) => item === position.positionIndex)) {
+            setPositionIndexList((prevPositions: number[]) => [...prevPositions, position.positionIndex]);
         }
     }, [position.positionIndex])
 
     const handlePress = (item: number) => {
+        setSelectedPosition(item)
         dispatch(setPositionIndex(item))
-
-        if (position.positionList != "[]" && JSON.parse(position.positionList)[0][0] != 0) {
-            dispatch(setPositionList(position.positionList))
-        }
     }
 
     const handleCreateNewPosition = () => {
-        const newPosition = Math.max(...numberOfPosition) + 1;
-        setNumberOfPosition(prevPositions => [...prevPositions, newPosition]);
-        dispatch(setPositionIndex(position.positionIndex + 1))
+        let buffPL = parsePositionList(position.positionList)
+
+        buffPL.push([positionIndexList.length + 1, buffPL[positionIndexList.length-1][1], buffPL[positionIndexList.length-1][2]])
+
+        dispatch(setPositionList(JSON.stringify(buffPL)))
+
+        setPositionIndexList([...positionIndexList, positionIndexList.length])
+
+        setSelectedPosition(positionIndexList.length)
+
+        dispatch(setPositionIndex(positionIndexList.length))
     }
 
     const handleDeletePosition = () => {
-        if (selectedPosition !== null) {
-            setNumberOfPosition(prevPositions => prevPositions.filter(position => position !== selectedPosition));
-            setSelectedPosition(null);
+        console.log(selectedPosition)
+        if (selectedPosition > 0) {
+            setPositionIndexList((prevPositions) => {
+                return prevPositions.filter((position) => position !== selectedPosition)
+            })
             let buffPL = parsePositionList(position.positionList)
-            buffPL = buffPL.filter((index: number): boolean => index !== selectedPosition)
-            dispatch(setPositionList(buffPL))
+            buffPL.splice(selectedPosition, 1)
+            setSelectedPosition(position.positionIndex - 1)
+            dispatch(setPositionIndex(position.positionIndex - 1))
+            dispatch(setPositionList(JSON.stringify(buffPL)))
+        } else {
+            dispatch(setPositionList(JSON.stringify([[1, [], []]])))
+            triggerRefresh()
         }
     }
 
     return (
-        <View style={[styles.bottomBarContainer, !collapsed ? styles.bottomBarContainer_false_collapsed : styles.bottomBarContainer_true_collapsed]}>
+        <View
+            style={[styles.bottomBarContainer, !collapsed ? styles.bottomBarContainer_false_collapsed : styles.bottomBarContainer_true_collapsed]}>
             <View
                 style={[styles.retract_and_position, !collapsed ? styles.retract_and_position_false_collapsed : styles.retract_and_position_true_collapsed]}>
                 <TouchableOpacity onPress={toggleBar} style={styles.retractable}>
@@ -109,20 +113,17 @@ export default function ToolBar() {
                     <View style={styles.positionContainer}>
                         <ScrollView horizontal={true} showsHorizontalScrollIndicator={true}>
                             <View style={{flexDirection: "row"}}>
-                                {numberOfPosition.map((item, index) => (
+                                {positionIndexList.map((item, index) => (
                                     <TouchableOpacity
                                         activeOpacity={0.7}
                                         key={index}
-                                        onPress={() => {
-                                            handlePress(item);
-                                            setChosenPosition(item)
-                                        }}
-                                        style={[styles.buttonPos, index === chosenPosition ? {
+                                        onPress={() => handlePress(item)}
+                                        style={[styles.buttonPos, index === selectedPosition ? {
                                             borderWidth: 2,
                                             borderColor: 'red'
                                         } : null]}
                                     >
-                                        <Text>{item}</Text>
+                                        <Text>{item+1}</Text>
                                     </TouchableOpacity>
                                 ))}
                                 <TouchableOpacity
@@ -133,13 +134,15 @@ export default function ToolBar() {
                                     <Text>+</Text>
                                 </TouchableOpacity>
 
-                                <TouchableOpacity
-                                    activeOpacity={0.7}
-                                    onPress={handleDeletePosition}
-                                    style={styles.deleteSign}
-                                >
-                                    <Text style={{color: 'white'}}>🗑️</Text>
-                                </TouchableOpacity>
+                                {selectedPosition === positionIndexList.length - 1 && (
+                                    <TouchableOpacity
+                                        activeOpacity={0.7}
+                                        onPress={handleDeletePosition}
+                                        style={styles.deleteSign}
+                                    >
+                                        <Text style={{color: 'white'}}>🗑️</Text>
+                                    </TouchableOpacity>
+                                )}
                             </View>
                         </ScrollView>
                     </View>

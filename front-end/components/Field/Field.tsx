@@ -129,15 +129,10 @@ export function Field() {
 
     useEffect(() => {
         if (position.positionList != "[]" && JSON.parse(position.positionList)[0][0] != 0) {
-            setDynamicPositionList((prevPositionList) => {
-                return prevPositionList.map((item) => {
-                    let buffPL = parsePositionList(position.positionList)
-
-                    const matchingItem = buffPL.find(
-                        (receivedItem: [number, Player[], Ballon[]]) => receivedItem[0] === item[0]
-                    );
-                    return matchingItem ? matchingItem : item;
-                });
+            setDynamicPositionList(() => {
+                const buffPL = parsePositionList(position.positionList)
+                console.log(buffPL)
+                return buffPL
             })
         }
     }, [position.positionList]);
@@ -157,22 +152,20 @@ export function Field() {
     }, [numCCC]);
 
     useEffect(() => {
-        setNumCCC(numCCC + 1)
+        if (dynamicPositionList.length > 0) {
+            simulateRefresh(position.positionIndex,true);
+        }
     }, [option.refresh]);
 
     useEffect(() => {
-
+        console.log(position.positionIndex)
         if (dynamicPositionList.length > 0) {
             simulateRefresh(position.positionIndex,true);
 
             if (dynamicPositionList.length >= position.positionIndex ) {
-
-                console.log("****");
                 animate(position.positionIndex);
             }
-
         }
-
     }, [numAnimation]);
 
     useEffect(() => {
@@ -676,15 +669,9 @@ export function Field() {
         let dispatchAt = false;
         let newPaths: PlayerPath[] = JSON.parse(option.playerPaths);
 
-
-
-
         dynamicPositionList[indexC][1].map((joueur) => {
             let color: string;
             let colorSpeed: string;
-
-
-
             let getXY: number[] = getPourcentageCenter(joueur.position[0], joueur.position[1]);
 
             if (joueur.id[0] == 'B') {
@@ -700,7 +687,6 @@ export function Field() {
             } else {
                 colorSpeed = "black";
             }
-
 
             if (dynamicPositionList[indexC][2].length > 0) {
                 if (joueur.id == dynamicPositionList[indexC][2][0].idJoueur && !grab) {
@@ -733,13 +719,6 @@ export function Field() {
                 } else {
                     newPaths.push({id: joueur.id + 'P', path: drawnPath});
                     dispatchAt = true;
-                    // dispatch(setPlayerPaths(
-                    //     JSON.stringify([
-                    //         ...JSON.parse(option.playerPaths),
-                    //         {id: joueur.id + 'P', path: drawnPath}
-                    //     ])
-                    // ))
-
                 }
             }else if(animationEnCours){
                 newPaths = [];
@@ -815,8 +794,6 @@ export function Field() {
         if(dispatchAt){
             dispatch(setPlayerPaths(JSON.stringify(newPaths)))
         }
-
-
     }
 
     const showBallon = (move: number[]) => {
@@ -1360,6 +1337,8 @@ export function Field() {
                 translationIncrement[1]]);
         }
         setAll();
+
+        console.log(positionI)
 
         center = [((superSvg_Field[0][0] + superSvg_Field[0][2] + superSvg_Field[0][4] + superSvg_Field[0][5]) / 4), ((superSvg_Field[0][1] + superSvg_Field[0][3] + superSvg_Field[0][3] + superSvg_Field[0][6]) / 4)]
         let svg_Mode = proportionSVG(player, ((superSvg_Field[0][5] - superSvg_Field[0][0]) / (svg_fieldUNCHANGED[5] - svg_fieldUNCHANGED[0])))
