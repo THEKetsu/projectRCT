@@ -43,6 +43,7 @@ export interface Option {
     selectedPlayer: string,
     inputPlayerId: string,
     refresh: number | null,
+    refreshAnimation: number | null,
     playerPaths: string,
     closestPlayer: string,
     autoLink: boolean
@@ -52,6 +53,7 @@ export interface OptionActionsType {
     selectPlayer: ActionCreatorWithPayload<string>,
     setInputPlayerId: ActionCreatorWithPayload<string>,
     triggerRefresh: ActionCreatorWithoutPayload,
+    triggerRefreshAnimation: ActionCreatorWithoutPayload,
     setPlayerPaths: ActionCreatorWithPayload<string>,
     setClosestPlayer: ActionCreatorWithPayload<string>,
     toggleAutoLink: ActionCreatorWithoutPayload

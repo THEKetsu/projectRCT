@@ -5,6 +5,7 @@ const initialState : Option = {
     selectedPlayer: "",
     inputPlayerId: "",
     refresh: null,
+    refreshAnimation: null,
     playerPaths: "[]",
     closestPlayer: "[\"\", []]",
     autoLink: true
@@ -22,6 +23,9 @@ export const optionSlice: Slice<Option>  = createSlice({
         },
         triggerRefresh: (state: Option): void => {
             state.refresh = Date.now()
+        },
+        triggerRefreshAnimation: (state: Option): void => {
+            state.refreshAnimation = Date.now()
         },
         setPlayerPaths: (state: Option, action: PayloadAction<string>): void => {
             state.playerPaths = action.payload

@@ -124,6 +124,26 @@ let styles =  StyleSheet.create({
         justifyContent: 'flex-start',
         alignItems: 'flex-start',
     },
+    linkButton: {
+        backgroundColor: 'rgb(65, 105, 225)',
+        padding: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 5,
+        marginBottom: 10,
+        width: '50%',
+    },
+
+    textStyle: {
+        fontSize: 13,
+        color: 'black',
+        textAlign: 'flex-start',
+        textWeight: 'bold', 
+    },  
+    missingBall:{
+        justifyContent: 'center',
+        alignItems: 'center',
+    }
 });
 
 export default styles;

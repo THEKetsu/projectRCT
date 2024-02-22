@@ -8,18 +8,13 @@ import reload from '../../assets/Reload.png';
 import { returnPublicInstance } from '../../classes/ReturnPublicManager';
 import Player from '../../classes/Player';
 import Ballon from '../../classes/Ballon';
-<<<<<<< HEAD
-import {setPositionList} from "../../redux/actions/positionActions";
 import {useAppDispatch, useAppSelector} from "../../hooks/reduxHooks";
-import {Position} from "../../utils/interfaces";
 import { ReturnPublic } from '../../classes/ReturnPublic';
-import { triggerRefresh } from '../../redux/actions/optionActions';
-=======
+import { triggerRefresh} from '../../redux/actions/optionActions';
+import { triggerRefreshAnimation} from '../../redux/actions/optionActions';
 import {setPositionIndex, setPositionList} from "../../redux/actions/positionActions";
 import {FreeDraw, Option, PlayerPath, Position, ShirtDigit, Toolbar} from '../../utils/interfaces';
-import { useAppDispatch, useAppSelector } from '../../hooks/reduxHooks';
 
->>>>>>> b8b043d7b50b8fd72404391f81e10131fcc4a0b0
 /**
  * Renders the TopWidget component.
  *
@@ -232,13 +227,9 @@ const TopWidget = ({ onPlayButtonPress,  selectedItem  }: { onPlayButtonPress: (
     };
     const launchAnimate = () => {
         returnPublicInstance.indexAnimation = returnPublicInstance.indexAnimation + 1;
-        dispatch(triggerRefresh());
+        dispatch(triggerRefreshAnimation());
         console.log("Change indexAnimation : ",returnPublicInstance.indexAnimation);
     }
-
-
-
-
 
     return (
         <View style={styles.topWidget}>

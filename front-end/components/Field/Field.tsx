@@ -153,9 +153,29 @@ export function Field({ }) {
     }, [numCCC]);
 
     useEffect(() => {
-        setNumCCC(numCCC + 1)
-    }, [option.refresh]);
 
+        if (option.refresh != null) {
+            if (option.refresh > 0 ) {
+                setNumCCC(numCCC + 1)
+            }
+        }
+
+        else {
+            setNumAnimation(numAnimation + 1)
+        }
+    }, [option.refresh]); 
+    
+    useEffect(() => {
+        if (option.refreshAnimation != null) {
+            if (option.refreshAnimation > 0 ) {
+                setNumCCC(numCCC + 1)
+            }
+        }
+
+        else {
+            setNumAnimation(numAnimation + 1)
+        }
+    }, [option.refreshAnimation]); 
     useEffect(() => {
 
         if (dynamicPositionList.length > 0) {

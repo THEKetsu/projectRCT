@@ -140,21 +140,25 @@ export default function Options({ animate, setIsOpen }) {
             }
 
             {toolbar.ballMode && (JSON.parse(position.positionList)[position.positionIndex][2].length === 0) && (
-                <Text>
-                    Posez le ballon sur le terrain
-                </Text>
+                <View style={styles.missingBall}>
+                     <Text style={styles.textStyle}>
+                        Posez le ballon sur le terrain
+                    </Text>
+                </View>
+               
             )}
 
             {toolbar.ballMode && (JSON.parse(position.positionList)[position.positionIndex][2].length > 0)
                 && (
                     <>
-                        <Pressable
+                    
+                        <TouchableOpacity
                             onPress={() => linkToPlayer(true, dispatch, position, option)}
-                            style={styles.pressable}>
+                            style={styles.linkButton}>
                             <Text>
                                 Link
                             </Text>
-                        </Pressable>
+                        </TouchableOpacity>
 
                         <Text>
                             {JSON.parse(option.closestPlayer)[0]}
