@@ -5,6 +5,7 @@ import Player from "../../classes/Player";
 import {setPositionList} from "./positionActions";
 import Ballon from "../../classes/Ballon";
 import {Dispatch} from "react";
+import { returnPublicInstance } from '../../classes/ReturnPublicManager';
 
 // @ts-ignore
 export const {
@@ -85,6 +86,18 @@ export function deletePlayer (dispatch: Dispatch<any>, position: Position, optio
         let newPositionList: [number, Player[], Ballon[]][] = [...JSON.parse(position.positionList)];
         let indexPathID: number = JSON.parse(option.playerPaths).findIndex((p: PlayerPath): boolean => p.id === option.selectedPlayer + 'P');
 
+        const foundIndex = returnPublicInstance.returnActionList.findIndex(
+            (number) => number[0] === position.positionIndex
+          );
+        
+        if(foundIndex != -1){
+            returnPublicInstance.returnActionList[foundIndex][1].push(["d",newPositionList[position.positionIndex][1][indexID]]);
+        }else{
+            returnPublicInstance.returnActionList.push([position.positionIndex,[["d",newPositionList[position.positionIndex][1][indexID]]]]);
+        }
+          
+
+       
         newPositionList[position.positionIndex][1].splice(indexID, 1);
 
         dispatch(setPositionList(JSON.stringify(newPositionList)))
