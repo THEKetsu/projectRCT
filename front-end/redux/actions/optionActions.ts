@@ -12,6 +12,7 @@ export const {
     selectPlayer,
     setInputPlayerId,
     triggerRefresh,
+    triggerRefreshAnimation,
     setPlayerPaths,
     setClosestPlayer,
     toggleAutoLink

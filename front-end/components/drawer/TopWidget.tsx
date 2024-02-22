@@ -8,9 +8,12 @@ import reload from '../../assets/Reload.png';
 import { returnPublicInstance } from '../../classes/ReturnPublicManager';
 import Player from '../../classes/Player';
 import Ballon from '../../classes/Ballon';
+import {useAppDispatch, useAppSelector} from "../../hooks/reduxHooks";
+import { ReturnPublic } from '../../classes/ReturnPublic';
+import { triggerRefresh} from '../../redux/actions/optionActions';
+import { triggerRefreshAnimation} from '../../redux/actions/optionActions';
 import {setPositionIndex, setPositionList} from "../../redux/actions/positionActions";
 import {FreeDraw, Option, PlayerPath, Position, ShirtDigit, Toolbar} from '../../utils/interfaces';
-import { useAppDispatch, useAppSelector } from '../../hooks/reduxHooks';
 
 /**
  * Renders the TopWidget component.
@@ -19,7 +22,7 @@ import { useAppDispatch, useAppSelector } from '../../hooks/reduxHooks';
  * @param {string | null} selectedItem - The selected item or null
  * @return {JSX.Element} JSX element representing the TopWidget component
  */
-const TopWidget = ({ onPlayButtonPress,  selectedItem  }: { onPlayButtonPress: (info: string) => void, selectedItem: string | null  }) => {
+const TopWidget = ({ onPlayButtonPress,  selectedItem  }: { onPlayButtonPress: (info: string) => void, selectedItem: string | null  }): JSX.Element => {
 ;
 
         const positionLogic: Position = useAppSelector((state) => state.position)
@@ -222,9 +225,11 @@ const TopWidget = ({ onPlayButtonPress,  selectedItem  }: { onPlayButtonPress: (
         }
 
     };
-
-
-
+    const launchAnimate = () => {
+        returnPublicInstance.indexAnimation = returnPublicInstance.indexAnimation + 1;
+        dispatch(triggerRefreshAnimation());
+        console.log("Change indexAnimation : ",returnPublicInstance.indexAnimation);
+    }
 
     return (
         <View style={styles.topWidget}>
@@ -235,7 +240,7 @@ const TopWidget = ({ onPlayButtonPress,  selectedItem  }: { onPlayButtonPress: (
                     <Text style={styles.topWidgetText}>{selectedItem || "Selectionner un scenario"}</Text>
                 </View>
                 <View style={styles.topWidgetElementRight}>
-                    <TouchableOpacity style={styles.topWidgetButton}>
+                    <TouchableOpacity style={styles.topWidgetButton} onPress={launchAnimate} >
                         <Image source={play_button} style={styles.PlayButton}/>
                     </TouchableOpacity>
                     <TouchableOpacity

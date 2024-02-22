@@ -23,13 +23,16 @@ import {
     selectPlayer,
     setClosestPlayer,
     setInputPlayerId,
-    setPlayerPaths
+    setPlayerPaths,
+    triggerRefresh
 } from "../../redux/actions/optionActions";
 import {comparePositions, isValidString, parsePositionList} from '../../utils/functions';
 import {FreeDraw, Option, PlayerPath, Position, ShirtDigit, Toolbar} from '../../utils/interfaces';
 import Options from "../Options/Options";
+import RightDrawer from '../Options/RightDrawer';
 
-export function Field() {
+export function Field({ }) {
+    const position: Position = useAppSelector((state) => state.position);
     let [px1, py1] = [0, 0];
     let svg_fieldUNCHANGED = [0, 1136.77, 212.877, 2.62354, 920.021, 1131.04, 1136.77]
     let lineSize = [3, 10];
@@ -66,7 +69,7 @@ export function Field() {
     let xBallon_Array = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62, 64, 66, 68, 70, 72, 74, 76, 78, 80, 82, 84, 86, 88, 90, 92, 94, 96, 98, 100, 102, 104, 106, 108, 110, 112, 114, 116, 118, 120, 122, 124, 126, 128, 130, 132, 134, 136, 138, 140, 142, 144, 146, 148, 150, 152, 154, 156, 158, 160, 162, 164, 166, 168, 170, 172, 174, 176, 178, 180, 182, 184, 186, 188, 190, 192, 194, 196, 198, 200, 202, 204, 206, 208, 210, 212, 214, 216, 218, 220, 222, 224, 226, 228, 230, 232, 234, 236, 238, 240, 242, 244, 246, 248, 250, 252, 254, 256, 258, 260, 262, 264, 266, 268, 270, 272, 274, 276, 278, 280, 282, 284, 286, 288, 290, 292, 294, 296, 298, 300, 302, 304, 306, 308, 310, 312, 314, 316, 318, 320, 322, 324, 326, 328, 330, 332, 334, 336, 338, 340, 342, 344, 346, 348, 350, 352, 354, 355, 357, 359, 361, 363, 365, 367, 369, 371, 373, 375, 377, 379, 381, 383, 385, 387]
     const xArrayPlayer = [0, 2, 4, 6, 8, 10, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39, 41, 43, 45, 47, 49, 51, 53, 55, 57, 59, 60, 62, 64, 66, 68, 70, 72, 74, 76, 78, 80, 82, 84, 86, 88, 90, 92, 94, 96, 98, 100, 102, 104, 106, 108, 109, 111, 113, 115, 117, 119, 122, 123, 125, 127, 129, 131, 133, 135, 137, 139, 141, 143, 145, 147, 149, 151, 153, 155, 157, 159, 162, 163, 165, 167, 169, 171, 173, 175, 177, 179, 181];
     let animationEnCours = false;
-
+    const [isOpen, setIsOpen] = useState<boolean>(false);
     const [prevPourcent, setPrevPourcent] = useState([0, 0]);
     const [boolLock, setLock] = useState(false);
     const [grabEnCours, setgrabEnCours] = useState(false);
@@ -101,20 +104,21 @@ export function Field() {
 
     const dispatch: Dispatch<any> = useAppDispatch()
 
-    const position: Position = useAppSelector((state) => state.position)
     const toolbar: Toolbar = useAppSelector((state) => state.toolbar)
-
-
-
     const option: Option = useAppSelector((state) => state.option)
-
+    const [value,setValue] = useState(0);
+    
     useEffect(() => {
         retrievePlayer();
     }, []);
     
 
     useEffect(() => {
-
+        if (returnPublicInstance.indexAnimation != 0) {
+            animate(position.positionIndex);
+        }
+    }, [returnPublicInstance.indexAnimation]);
+    useEffect(() => {
         const numberOfFalse = checkForEnd.filter(value => value === false).length;
         const numberOfTrue = checkForEnd.length - numberOfFalse;
 
@@ -149,9 +153,29 @@ export function Field() {
     }, [numCCC]);
 
     useEffect(() => {
-        setNumCCC(numCCC + 1)
-    }, [option.refresh]);
 
+        if (option.refresh != null) {
+            if (option.refresh > 0 ) {
+                setNumCCC(numCCC + 1)
+            }
+        }
+
+        else {
+            setNumAnimation(numAnimation + 1)
+        }
+    }, [option.refresh]); 
+    
+    useEffect(() => {
+        if (option.refreshAnimation != null) {
+            if (option.refreshAnimation > 0 ) {
+                setNumCCC(numCCC + 1)
+            }
+        }
+
+        else {
+            setNumAnimation(numAnimation + 1)
+        }
+    }, [option.refreshAnimation]); 
     useEffect(() => {
 
         if (dynamicPositionList.length > 0) {
@@ -1201,7 +1225,6 @@ export function Field() {
 
     const animateSuite = (atLeastOneChange: boolean, listJoueurModify: [string, number[]][], indexC: number) => {
         let indexCheck: number = -1;
-
         dynamicPositionList[indexC][1].map((joueur) => {
             const modifyIndex = listJoueurModify.findIndex(([id]) => id === joueur.id);
 
@@ -1446,6 +1469,7 @@ export function Field() {
         dispatch(setPositionList(JSON.stringify(dynamicPositionList)))
     };
 
+
     return (
         <View style={styles.container}>
             <PinchGestureHandler onGestureEvent={onPinchGestureEvent} simultaneousHandlers={[panRef, pressableRef]}>
@@ -1453,7 +1477,7 @@ export function Field() {
                                    onHandlerStateChange={onHandlerStateChange}
                                    simultaneousHandlers={[pinchRef, pressableRef]}>
                     <TapGestureHandler ref={pressableRef} onHandlerStateChange={setupPlayerAdding}>
-                        <View ref={svgRef} {...(Platform.OS === 'web' ? {onWheel: handleWheel} : {})}>
+                       <View style={styles.Field} ref={svgRef} {...(Platform.OS === 'web' ? {onWheel: handleWheel} : {})}>
                             <Svg
                                 width={svgSize.width}
                                 height={svgSize.height}
@@ -1847,7 +1871,6 @@ export function Field() {
                                 {svgPlayers}
                                 {svgBallon}
                             </Svg>
-
                             {listMaillot.map(({id, position, textContent, textSize}) => (
                                 <Text key={id} style={{
                                     position: 'absolute',
@@ -1863,8 +1886,8 @@ export function Field() {
                     </TapGestureHandler>
                 </PanGestureHandler>
             </PinchGestureHandler>
-
-            <Options animate={animate}/>
+            {!isOpen && <RightDrawer setIsOpen={setIsOpen} />}
+            {isOpen  && <Options animate={animate} setIsOpen={setIsOpen}/>}
         </View>
     )
 }
@@ -1872,13 +1895,26 @@ export function Field() {
 const styles = StyleSheet.create({
     container: {
         flex: 2,
+        flexDirection: 'row',
         justifyContent: 'center',
-        alignItems: 'center',
+        alignItems: 'flex-start',
         overflow: 'hidden',
         width: '100%',
         height: '100%',
+        zIndex: 0,
     },
     svgContainer: {
         backgroundColor: 'transparent'
     },
+    Field: {    
+        width: '98%',
+        height: '100%',
+        justifyContent: 'flex-start',
+        alignItems: 'flex-start',
+        zIndex: 0,
+    }
 });
+
+function retrievePlayer() {
+        throw new Error('Function not implemented.');
+    }
