@@ -5,8 +5,9 @@ import Register from "./screens/Connection/Register";
 import Login from "./screens/Connection/Login";
 import {Provider} from "react-redux";
 import {store} from "./redux/store";
-import Success from "./screens/Connection/Success";
+import StrategyMenu from "./screens/Strategy/StrategyMenu";
 import ForgotPassword from "./screens/Connection/ForgotPassword";
+import CreateStrategy from "./screens/Strategy/CreateStrategy";
 
 const Stack = createNativeStackNavigator()
 
@@ -18,8 +19,9 @@ export default function App() {
             <Stack.Screen name={"Home"} component={Home} options={{headerShown: false, gestureEnabled: false}}/>
             <Stack.Screen name={"Register"} component={Register} options={{headerShown: false, gestureEnabled: false}}/>
             <Stack.Screen name={"Login"} component={Login} options={{headerShown: false, gestureEnabled: false}}/>
-            <Stack.Screen name={"Success"} component={Success} options={{headerShown: false, gestureEnabled: false}}/>
+            <Stack.Screen name={"StrategyMenu"} component={StrategyMenu} options={{headerShown: false, gestureEnabled: false}}/>
             <Stack.Screen name={"ForgotPassword"} component={ForgotPassword} options={{headerShown: false, gestureEnabled: false}}/>
+            <Stack.Screen name={"CreateStrategy"} component={CreateStrategy} options={{headerShown: false, gestureEnabled: false}}/>
           </Stack.Navigator>
         </Provider>
       </NavigationContainer>

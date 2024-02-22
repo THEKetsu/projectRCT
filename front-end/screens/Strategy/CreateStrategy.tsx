@@ -1,33 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useFonts } from 'expo-font';
 import {ImageBackground, Image, TouchableOpacity, View, StyleSheet, TextInput, Text, Dimensions} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { sendPasswordResetEmail } from "firebase/auth";
-import { auth } from '../../firebase/firebase'
 
-export default function Success () {
+
+export default function CreateStrategy () {
   const navigation = useNavigation();
   const [loaded] = useFonts({
-      oswald: require('../../assets/font/Oswald-Medium.ttf'),
-      roboto: require('../../assets/font/Roboto-Medium.ttf'),
+    oswald: require('../../assets/font/Oswald-Medium.ttf'),
+    roboto: require('../../assets/font/Roboto-Medium.ttf'),
   });
-  const [email, setEmail] = React.useState('');
-
-  const handleForgotPassword = () => {
-    if (email.trim() !== '') {
-      sendPasswordResetEmail(auth, email)
-        .then(() => {
-          console.log("Password reset email sent successfully");
-          navigation.navigate("Login")
-        })
-        .catch((error) => {
-          console.error("Error sending password reset email: ", error);
-        });
-    } else {
-      console.error("Please enter your email address");
-    }
-  };
-
+  const [strategyName, setStrategyName] = React.useState('');
+  
   if (!loaded) {
     return null;
   }
@@ -38,35 +22,36 @@ export default function Success () {
   return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
         <ImageBackground  source={require('../../assets/login.png')} 
-          style={{width: "100%", height: "100%"}}>
-          <TouchableOpacity style={[styles.leftButton, { width: backButtonSize, height: backButtonSize }]} onPress={() => navigation.goBack()}>
-            <Image source={require('../../assets/left_arrow.png')} style={{ width: backButtonSize, height: backButtonSize }} />
-          </TouchableOpacity>
+        style={{width: "100%", height: "100%"}}>
           <View style={styles.title}>
-            <Text style={styles.titleText}>Mot de pa<Text style={styles.redText}>sse oublié</Text></Text>
+            <Text style={styles.titleText}>Créer une <Text style={styles.redText}>Stratégie</Text></Text>
           </View>
+          <TouchableOpacity style={[styles.leftButton, { width: backButtonSize, height: backButtonSize }]} onPress={() => navigation.goBack()}>
+                <Image source={require('../../assets/left_arrow.png')} style={{ width: backButtonSize, height: backButtonSize }} />
+          </TouchableOpacity>
           <View style={styles.starContainer}>
             <Image source={require('../../assets/star.png')} style={[styles.starImage, { width: starSize, height: starSize }]} />
             <Image source={require('../../assets/star.png')} style={[styles.starImage, { width: starSize, height: starSize }]} />
             <Image source={require('../../assets/star.png')} style={[styles.starImage, { width: starSize, height: starSize }]} />
           </View>
           <View style={styles.overlay}>
-            <TextInput
-                style={styles.input}
-                placeholder="E-mail"
-                placeholderTextColor="rgba(255, 255, 255, 0.5)" // Couleur du placeholder avec opacité
-                underlineColorAndroid="transparent"
-                onChangeText={(text) => setEmail(text)}
-            />
-          </View>
-          <TouchableOpacity style={styles.button} activeOpacity={0.7} onPress={() => handleForgotPassword()}>
-            <Text style={[styles.buttonText, { fontWeight: 'bold' }]}>Envoyer</Text>
+              <TextInput
+                  style={styles.input}
+                  placeholder="Nom de la stratégie..."
+                  placeholderTextColor="rgba(255, 255, 255, 0.5)" // Couleur du placeholder avec opacité
+                  underlineColorAndroid="transparent"
+                  onChangeText={(text) => {
+                    setStrategyName(text);
+                  }}
+              />
+            </View>
+          <TouchableOpacity style={[styles.button]} activeOpacity={0.7} onPress={() => navigation.navigate('Strategy')}>
+              <Text style={[styles.buttonText, { fontWeight: 'bold' }]}>GO</Text>
           </TouchableOpacity>
         </ImageBackground>
     </View>
   )
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -140,13 +125,17 @@ const styles = StyleSheet.create({
     fontFamily: "roboto",
   },
   forgotPasswordButton: {
+    width: "15%",
+    height: "5.5%",
     position: 'absolute',
+    justifyContent: 'center',
     alignSelf: 'center',
     top: '70%',
   },
   forgotPasswordText: {
     color: '#fff',
     textDecorationLine: 'underline',
+    textAlign: "center",
     fontSize: 18,
     fontFamily: "roboto",
   },
@@ -164,10 +153,6 @@ const styles = StyleSheet.create({
     top: 40, // Décaler vers le bas
     left: 30, // Décaler vers la droite
     zIndex: 999, // Assure que le bouton est au-dessus de tout autre contenu
-  },
-  leftButtonImage: {
-      width: 40,
-      height: 40,
   },
   buttonActive: {
     backgroundColor: '#fff', // Change button color to white when both fields are valid

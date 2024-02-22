@@ -4,9 +4,9 @@ import { useNavigation } from '@react-navigation/native';
 import {ImageBackground, Image, TouchableOpacity, View, StyleSheet, Text, Dimensions} from 'react-native';
 
 export default function Home () {
-      const [loaded] = useFonts({
-        oswald: require('../assets/font/Oswald-Medium.ttf'),
-        roboto: require('../assets/font/Roboto-Medium.ttf'),
+    const [loaded] = useFonts({
+      oswald: require('../assets/font/Oswald-Medium.ttf'),
+      roboto: require('../assets/font/Roboto-Medium.ttf'),
     });
     const navigation = useNavigation();
     if (!loaded) {

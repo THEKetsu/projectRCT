@@ -5,6 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import { auth } from '../../firebase/firebase'
 import { signInWithEmailAndPassword } from "firebase/auth";
 
+
 export default function Login () {
   const regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
   const navigation = useNavigation();
@@ -19,7 +20,6 @@ export default function Login () {
 
 
   const login = () => {
-    console.log("Test register")
 
     if (!isEmailValid) {
       console.error("Invalid email address")
@@ -33,7 +33,12 @@ export default function Login () {
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         console.log(userCredential);
-        navigation.navigate("Success")
+        const email = userCredential.user.email;
+        console.log(email)
+        if (email != null){
+          localStorage.setItem("email", email);
+        }
+        navigation.navigate("Strategy")
       })
       .catch((error) => {
         console.log(error);
@@ -50,7 +55,7 @@ export default function Login () {
   
   const screenWidth = Dimensions.get('window').width;
   const starSize = screenWidth * 0.02; // Adjust this factor according to your preference
-  const backButtonSize = screenWidth * 0.02;
+  const backButtonSize = screenWidth * 0.03;
   return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
         <ImageBackground  source={require('../../assets/login.png')} 
