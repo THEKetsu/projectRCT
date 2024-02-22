@@ -111,6 +111,7 @@ export function Field() {
     useEffect(() => {
         retrievePlayer();
     }, []);
+    
 
     useEffect(() => {
 
@@ -139,6 +140,7 @@ export function Field() {
                     return matchingItem ? matchingItem : item;
                 });
             })
+            setNumCCC(numCCC+1);
         }
     }, [position.positionList]);
 
@@ -163,10 +165,14 @@ export function Field() {
 
     useEffect(() => {
         if (dynamicPositionList.length > 0) {
-            simulateRefresh();
-        }
-        if (dynamicPositionList.length > position.positionIndex + 1) {
-            showPlayer(false, position.positionIndex + 1)
+            simulateRefresh(position.positionIndex,true);
+
+            if (dynamicPositionList.length >= position.positionIndex ) {
+
+         
+                animate(position.positionIndex);
+            }
+
         }
     }, [numAnimation]);
 
@@ -862,7 +868,17 @@ export function Field() {
                     return newPositionList;
                 });
 
-                returnPublicInstance.returnActionList.push(["c",newPlayer.id]);
+                const foundIndex = returnPublicInstance.returnActionList.findIndex(
+                    (number) => number[0] === position.positionIndex
+                  );
+                
+                if(foundIndex != -1){
+                    returnPublicInstance.returnActionList[foundIndex][1].push(["c",newPlayer.id]);
+                    
+                }else{
+                    returnPublicInstance.returnActionList.push([position.positionIndex,[["c",newPlayer.id]]]);
+                }
+                
 
             } else {
                 let svg_Mode: number[] = proportionSVG(player, ((superField[0][5] - superField[0][0]) / (svg_fieldUNCHANGED[5] - svg_fieldUNCHANGED[0])))
@@ -898,6 +914,20 @@ export function Field() {
         svg_Mode = diffSVG(svg_Mode, getCenterBallon(svg_Mode), xBallon_Array, getPourcentageCenter2(newBall.position[0], newBall.position[1]))
         newBall.svgValue(svg_Mode);
 
+
+        //Si il y'avais un ballon, cette action va le supprimer puis en mettre un nouveau (il faut l'anoncer au return button)
+        if(dynamicPositionList[position.positionIndex][2].length > 0){
+            const foundIndex = returnPublicInstance.returnActionList.findIndex(
+                (number) => number[0] === position.positionIndex
+              );
+            
+            if(foundIndex != -1){
+                returnPublicInstance.returnActionList[foundIndex][1].push(["b-",dynamicPositionList[position.positionIndex][2][0]]);
+            }else{
+                returnPublicInstance.returnActionList.push([position.positionIndex,[["b-",dynamicPositionList[position.positionIndex][2][0]]]]);
+            }
+        }
+
         setDynamicPositionList((prevPos) => {
             const newPositionList = [...prevPos];
 
@@ -907,6 +937,17 @@ export function Field() {
 
             return newPositionList;
         });
+
+        const foundIndex = returnPublicInstance.returnActionList.findIndex(
+            (number) => number[0] === position.positionIndex
+          );
+        
+        if(foundIndex != -1){
+            returnPublicInstance.returnActionList[foundIndex][1].push(["b+",[]]);
+        }else{
+            returnPublicInstance.returnActionList.push([position.positionIndex,[["b+",[]]]]);
+        }
+
         showPlayer(false, position.positionIndex);
         setNumCCC(numCCC + 1)
     };
@@ -1274,7 +1315,7 @@ export function Field() {
             if (dynamicPositionList[position.positionIndex][2].length > 0) {
                 dynamicPositionList[position.positionIndex][2][0].idChange(option.inputPlayerId);
             }
-            setNumCCC(numCCC + 1);
+            setNumAnimation(numAnimation+1);
             dispatch(setPositionIndex(position.positionIndex + 1));
             dispatch(selectZoomMode())
         }
