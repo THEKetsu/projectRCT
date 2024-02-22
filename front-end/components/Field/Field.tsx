@@ -866,14 +866,14 @@ export function Field() {
                 const foundIndex = returnPublicInstance.returnActionList.findIndex(
                     (number) => number[0] === position.positionIndex
                   );
-                
+
                 if(foundIndex != -1){
                     returnPublicInstance.returnActionList[foundIndex][1].push(["c",newPlayer.id]);
-                    
+
                 }else{
                     returnPublicInstance.returnActionList.push([position.positionIndex,[["c",newPlayer.id]]]);
                 }
-                
+
 
             } else {
                 let svg_Mode: number[] = proportionSVG(player, ((superField[0][5] - superField[0][0]) / (svg_fieldUNCHANGED[5] - svg_fieldUNCHANGED[0])))
@@ -909,16 +909,17 @@ export function Field() {
         svg_Mode = diffSVG(svg_Mode, getCenterBallon(svg_Mode), xBallon_Array, getPourcentageCenter2(newBall.position[0], newBall.position[1]))
         newBall.svgValue(svg_Mode);
 
-
-        //Si il y'avais un ballon, cette action va le supprimer puis en mettre un nouveau (il faut l'anoncer au return button)
         if(dynamicPositionList[position.positionIndex][2].length > 0){
             const foundIndex = returnPublicInstance.returnActionList.findIndex(
+                // @ts-ignore
                 (number) => number[0] === position.positionIndex
               );
-            
+
             if(foundIndex != -1){
+                // @ts-ignore
                 returnPublicInstance.returnActionList[foundIndex][1].push(["b-",dynamicPositionList[position.positionIndex][2][0]]);
             }else{
+                // @ts-ignore
                 returnPublicInstance.returnActionList.push([position.positionIndex,[["b-",dynamicPositionList[position.positionIndex][2][0]]]]);
             }
         }
@@ -933,13 +934,16 @@ export function Field() {
             return newPositionList;
         });
 
+        // @ts-ignore
         const foundIndex = returnPublicInstance.returnActionList.findIndex(
             (number) => number[0] === position.positionIndex
           );
-        
+
         if(foundIndex != -1){
+            // @ts-ignore
             returnPublicInstance.returnActionList[foundIndex][1].push(["b+",[]]);
         }else{
+            // @ts-ignore
             returnPublicInstance.returnActionList.push([position.positionIndex,[["b+",[]]]]);
         }
 
@@ -1188,11 +1192,11 @@ export function Field() {
             }else{
                 setNumAnimation(numAnimation -1);
             }
-            
+
         }
 
 
-        
+
     };
 
     const animateSuite = (atLeastOneChange: boolean, listJoueurModify: [string, number[]][], indexC: number) => {
