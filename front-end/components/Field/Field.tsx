@@ -1902,7 +1902,7 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
         alignItems: 'flex-start',
         zIndex: 0,
-    }
+    },
 });
 
 function retrievePlayer() {

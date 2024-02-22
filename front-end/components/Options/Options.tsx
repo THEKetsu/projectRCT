@@ -1,5 +1,5 @@
 import React, { Dispatch, useState } from "react";
-import { Pressable, Text, TextInput, View, TouchableOpacity } from "react-native";
+import { Pressable, Text, TextInput, View, TouchableOpacity, Image} from "react-native";
 import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
 import {
     deleteBallon,
@@ -12,6 +12,8 @@ import {
 } from "../../redux/actions/optionActions";
 import { Option, PlayerPath, Position, Toolbar } from "../../utils/interfaces";
 import styles from "./styles";
+import link from "../../assets/link.png";
+import trash from "../../assets/trash.png";
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 export default function Options({ animate, setIsOpen }) {
@@ -21,7 +23,8 @@ export default function Options({ animate, setIsOpen }) {
     const [selectedTeam, setSelectedTeam] = useState<string>("B");
     const [changeId, setChangeId] = useState<string>("");
     const dispatch: Dispatch<any> = useAppDispatch();
-
+    const [isAutoLinkModeHighlighted, setIsAutoLinkModeHighlighted] = useState(false);
+    const [isLinkButtonClicked, setIsLinkButtonClicked] = useState(false);
     const toolbar: Toolbar = useAppSelector((state) => state.toolbar);
     const position: Position = useAppSelector((state) => state.position);
     const option: Option = useAppSelector((state) => state.option);
@@ -115,9 +118,7 @@ export default function Options({ animate, setIsOpen }) {
                         <Pressable
                             onPress={() => deletePlayer(dispatch, position, option)}
                             style={styles.pressable}>
-                            <Text>
-                                POUBELLE
-                            </Text>
+                            <Image source={trash} style={styles.linkImageButton}/>
                         </Pressable>
 
                         <Pressable
@@ -151,34 +152,34 @@ export default function Options({ animate, setIsOpen }) {
             {toolbar.ballMode && (JSON.parse(position.positionList)[position.positionIndex][2].length > 0)
                 && (
                     <>
-                    
-                        <TouchableOpacity
-                            onPress={() => linkToPlayer(true, dispatch, position, option)}
-                            style={styles.linkButton}>
-                            <Text>
-                                Link
+                        <View style={styles.elementW}>
+                            <Text >
+                                Liéer avec un joueur
                             </Text>
-                        </TouchableOpacity>
+                            <TouchableOpacity onPress={() => { linkToPlayer(true, dispatch, position, option);setIsLinkButtonClicked(true);}}
+                                style={[styles.linkButton, isLinkButtonClicked && styles.clickedButton]}>
+                            <Image source={link} style={styles.linkImageButton}/>
+                            </TouchableOpacity>
 
-                        <Text>
-                            {JSON.parse(option.closestPlayer)[0]}
+                        <Text style={styles.closestPlayer}>
+                            Joueur lié : {JSON.parse(option.closestPlayer)[0]}
                         </Text>
 
-                        <Pressable
+                        <TouchableOpacity
                             onPress={() => dispatch(toggleAutoLink())}
-                            style={styles.pressable}>
-                            <Text>
+                            style={styles.AutoLink}>
+                            <Text style={[styles.textSty, isAutoLinkModeHighlighted && styles.highlightedText]} onPress={() => {
+                            dispatch(toggleAutoLink());
+                            setIsAutoLinkModeHighlighted(!isAutoLinkModeHighlighted);}}>
                                 AutoLink Mode
                             </Text>
-                        </Pressable>
-
+                        </TouchableOpacity>
                         <Pressable
                             onPress={() => deleteBallon(dispatch, position)}
-                            style={styles.pressable}>
-                            <Text>
-                                POUBELLE
-                            </Text>
+                            style={styles.deleteS}>
+                            <Image source={trash} style={styles.linkImageButton}/>
                         </Pressable>
+                        </View>
                     </>
                 )}    
             </View>
