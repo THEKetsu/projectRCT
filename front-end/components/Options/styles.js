@@ -10,6 +10,7 @@ let styles =  StyleSheet.create({
     boldText: {
         fontWeight: 'bold',
     },
+
     container: {
         backgroundColor: '#D3D3D3',
         borderRadius: 10,
@@ -126,15 +127,26 @@ let styles =  StyleSheet.create({
         alignItems: 'flex-start',
     },
     linkButton: {
-        backgroundColor: 'rgb(65, 105, 225)',
-        padding: 10,
+        margin: 10,
+        backgroundColor: 'gray',
+        padding: 15,
         justifyContent: 'center',
         alignItems: 'center',
-        borderRadius: 5,
+        borderRadius: 100,
         marginBottom: 10,
-        width: '50%',
     },
-
+    closestPlayer:{
+        fontSize: 13,
+        fontWeight: 'bold',
+    },
+    deleteS:{
+        margin: 10,
+        borderRadius: 100,
+    },
+    linkImageButton:{
+        width: 25,
+        height: 25,
+    },
     textStyle: {
         fontSize: 13,
         color: 'black',
@@ -144,7 +156,39 @@ let styles =  StyleSheet.create({
     missingBall:{
         justifyContent: 'center',
         alignItems: 'center',
-    }
+    },
+    elementW:{
+        flexDirection: 'column',
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+    },
+    textSty:{
+        fontSize: 13,
+        color: 'black',
+        fontWeight: 'italic',
+        textAlign: 'flex-start',
+    },
+    highlightedText:{
+        fontSize: 13,
+        color: 'black',
+        fontWeight: 'bold',
+        textAlign: 'flex-start',
+    },
+    clickedButton: {
+        margin: 10,
+        backgroundColor: 'red',
+        padding: 15,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 100,
+        marginBottom: 10,
+    },
+    AutoLink:{
+        flexDirection: 'row',
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+        margin: 10,
+    },
 });
 
 export default styles;
