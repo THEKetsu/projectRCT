@@ -19,8 +19,12 @@ export default function CreateStrategy () {
   const backButtonSize = screenWidth * 0.03;
   
   const AddStrategytoDB = async () => {
+    if (strategyName === '') {
+      alert('Veuillez entrer un nom de stratégie');
+      return;
+    }
     addStrategyToDB(strategyName);
-    navigation.navigate('Home');
+    navigation.navigate('SelectStrategy');
 };
 
 

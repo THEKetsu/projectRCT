@@ -1,9 +1,8 @@
-import { $CombinedState } from "@reduxjs/toolkit";
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { addDoc, collection, getDocs, getFirestore } from "firebase/firestore";
-import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
+import { getFirestore, addDoc, collection, deleteDoc, doc, getDocs, DocumentData } from "firebase/firestore";
 import field from '../assets/rct_field.png';
+import { onSnapshot} from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: "AIzaSyBVvf6fMTS4V32uV-h-pqWxrU20PG7Tgz0",
@@ -15,23 +14,24 @@ const firebaseConfig = {
   appId: "1:410477988070:web:0b5fe2be2a948f10c15327",
   measurementId: "G-D1FYQHSFHK"
 };
+
 const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
-export const db = getFirestore(app);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
 const retrieveStrategies = async () => {
   try {
-      const strategies: any[] = [];
-      const querySnapshot = await getDocs(collection(db, 'Strategy'));
-      querySnapshot.forEach(doc => {
-          strategies.push(doc.data());
-      });
+    const strategies: DocumentData[] = [];
+    const querySnapshot = await getDocs(collection(db, 'Strategy'));
+    querySnapshot.forEach(doc => {
+      strategies.push(doc.data());
+    });
 
-      console.log('Retrieved strategies: ', strategies);
-      return strategies;
+    console.log('Retrieved strategies: ', strategies);
+    return strategies;
   } catch (error) {
-      console.error('Error retrieving strategies: ', error);
-      return [];
+    console.error('Error retrieving strategies: ', error);
+    return [];
   }
 };
 
@@ -47,13 +47,13 @@ const getNextId = async () => {
     return maxId + 1;
   } catch (error) {
     console.error('Error getting next ID: ', error);
-    return null; // Retourner null en cas d'erreur
+    return null;
   }
 };
 
 const addStrategyToDB = async (name: string) => {
   try {
-    const nextId = await getNextId(); // Appel asynchrone à getNextId
+    const nextId = await getNextId();
     if (nextId !== null) {
       const newItem = {
         id: nextId,
@@ -72,10 +72,51 @@ const addStrategyToDB = async (name: string) => {
   }
 };
 
+const deleteStrategy = async (id: any) => {
+  try {
+    if (id !== null) {
+      const querySnapshot = await getDocs(collection(db, 'Strategy'));
+      
+      let firestoreId: string | null = null;
+      querySnapshot.forEach(doc => {
+          if (doc.data().id === id) {
+              firestoreId = doc.id;
+          }
+      });
 
-export { getNextId, addStrategyToDB, retrieveStrategies};
+      // Vérifier si l'ID Firestore a été trouvé
+      if (!firestoreId) {
+          console.error('Firestore ID not found for selected item');
+          return;
+      }
+      await deleteDoc(doc(db, 'Strategy', firestoreId));
+      // cherche parmis tous les stratégies celle qui a l'id correspondant et supprime la bonne stratégie
+
+      
+      console.log('Strategy deleted successfully');
+    } else {
+      console.error('Strategy with ID ', id, ' not found');
+    }
+  } catch (error) {
+    console.error('Error deleting strategy: ', error);
+  }
+}
 
 
 
 
+const subscribeToStrategies = (callback: (strategies: any[]) => void) => {
+  return onSnapshot(collection(db, 'Strategy'), (snapshot) => {
+    const strategies: any[] = [];
+    snapshot.forEach((doc) => {
+      strategies.push(doc.data());
+    });
+    callback(strategies);
+  });
+};
 
+
+
+export { subscribeToStrategies };
+
+export { getNextId, addStrategyToDB, retrieveStrategies, deleteStrategy, auth };
