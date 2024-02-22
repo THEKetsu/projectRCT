@@ -16,6 +16,7 @@
     "@types/react-redux": "^7.1.30",
     "expo": "~49.0.15",
     "expo-av": "^13.6.0",
+    "expo-font": "^11.10.3",
     "expo-status-bar": "~1.6.0",
     "firebase": "^10.8.0",
     "point-in-polygon": "^1.1.0",

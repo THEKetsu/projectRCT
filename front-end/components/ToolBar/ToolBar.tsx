@@ -198,7 +198,8 @@ const windowWidth = Dimensions.get('window').width;
 const styles = StyleSheet.create({
     bottomBarContainer: {
         flex: 1,
-        flexDirection: "column"
+        flexDirection: "column",
+        
     },
     bottomBarContainer_false_collapsed: {
         flexGrow: 0,
