@@ -1353,7 +1353,6 @@ export function Field() {
 
     const simulateRefresh = (positionI: number, debugZoom: boolean) => {
 
-
         if(!debugZoom){
             proportionAll(proportion);
             setTranslationInc([translationIncrement[0],

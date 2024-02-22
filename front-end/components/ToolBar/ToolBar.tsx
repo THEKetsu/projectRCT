@@ -55,6 +55,8 @@ export default function ToolBar() {
         setSelectedPosition(item)
         dispatch(setPositionIndex(item))
 
+        dispatch(triggerRefresh())
+
         console.log("handlePress", item)
     }
 
@@ -117,7 +119,7 @@ export default function ToolBar() {
                 </TouchableOpacity>
                 <View style={styles.poseContainer}>
                     <View style={styles.positionContainer}>
-                        <ScrollView horizontal={true} showsHorizontalScrollIndicator={true}>
+                        <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
                             <View style={{flexDirection: "row"}}>
                                 {positionIndexList.map((item, index) => (
                                     <TouchableOpacity
