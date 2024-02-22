@@ -56,6 +56,7 @@ const styles = StyleSheet.create({
     container: {
         backgroundColor: '#5FB07B',
         width: '100%',
-        height: '110%',
+        height: '100%',
+        overflow: 'hidden'
     },
 });
