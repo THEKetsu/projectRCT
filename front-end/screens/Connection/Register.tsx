@@ -52,6 +52,7 @@ export default function Register () {
   
   const screenWidth = Dimensions.get('window').width;
   const starSize = screenWidth * 0.02; // Adjust this factor according to your preference
+  const backButtonSize = screenWidth * 0.02;
   return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
         <ImageBackground  source={require('../../assets/login.png')} 
@@ -59,13 +60,13 @@ export default function Register () {
           <View style={styles.title}>
             <Text style={styles.titleText}>Inscri<Text style={styles.redText}>ption</Text></Text>
           </View>
-          <TouchableOpacity style={styles.leftButton} onPress={() => navigation.goBack()}>
+          <TouchableOpacity style={[styles.leftButton, { width: backButtonSize, height: backButtonSize }]} onPress={() => navigation.goBack()}>
                 <Image source={require('../../assets/left_arrow.png')} style={styles.leftButtonImage} />
           </TouchableOpacity>
           <View style={styles.starContainer}>
-            <Image source={require('../assets/star.png')} style={[styles.starImage, { width: starSize, height: starSize }]} />
-            <Image source={require('../assets/star.png')} style={[styles.starImage, { width: starSize, height: starSize }]} />
-            <Image source={require('../assets/star.png')} style={[styles.starImage, { width: starSize, height: starSize }]} />
+            <Image source={require('../../assets/star.png')} style={[styles.starImage, { width: starSize, height: starSize }]} />
+            <Image source={require('../../assets/star.png')} style={[styles.starImage, { width: starSize, height: starSize }]} />
+            <Image source={require('../../assets/star.png')} style={[styles.starImage, { width: starSize, height: starSize }]} />
           </View>
           <View style={styles.overlay}>
               <TextInput

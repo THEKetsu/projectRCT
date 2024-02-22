@@ -31,15 +31,24 @@ export default function Success () {
   if (!loaded) {
     return null;
   }
+  
+  const screenWidth = Dimensions.get('window').width;
+  const starSize = screenWidth * 0.02; // Adjust this factor according to your preference
+  const backButtonSize = screenWidth * 0.02;
   return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
         <ImageBackground  source={require('../../assets/login.png')} 
           style={{width: "100%", height: "100%"}}>
-          <TouchableOpacity style={styles.leftButton} onPress={() => navigation.goBack()}>
-            <Image source={require('../../assets/left_arrow.png')} style={styles.leftButtonImage} />
+          <TouchableOpacity style={[styles.leftButton, { width: backButtonSize, height: backButtonSize }]} onPress={() => navigation.goBack()}>
+            <Image source={require('../../assets/left_arrow.png')} style={{ width: backButtonSize, height: backButtonSize }} />
           </TouchableOpacity>
           <View style={styles.title}>
             <Text style={styles.titleText}>Mot de pa<Text style={styles.redText}>sse oublié</Text></Text>
+          </View>
+          <View style={styles.starContainer}>
+            <Image source={require('../../assets/star.png')} style={[styles.starImage, { width: starSize, height: starSize }]} />
+            <Image source={require('../../assets/star.png')} style={[styles.starImage, { width: starSize, height: starSize }]} />
+            <Image source={require('../../assets/star.png')} style={[styles.starImage, { width: starSize, height: starSize }]} />
           </View>
           <View style={styles.overlay}>
             <TextInput

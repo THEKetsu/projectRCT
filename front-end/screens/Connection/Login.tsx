@@ -50,6 +50,7 @@ export default function Login () {
   
   const screenWidth = Dimensions.get('window').width;
   const starSize = screenWidth * 0.02; // Adjust this factor according to your preference
+  const backButtonSize = screenWidth * 0.02;
   return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
         <ImageBackground  source={require('../../assets/login.png')} 
@@ -57,13 +58,13 @@ export default function Login () {
           <View style={styles.title}>
             <Text style={styles.titleText}>Conn<Text style={styles.redText}>exion</Text></Text>
           </View>
-          <TouchableOpacity style={styles.leftButton} onPress={() => navigation.goBack()}>
-                <Image source={require('../../assets/left_arrow.png')} style={styles.leftButtonImage} />
+          <TouchableOpacity style={[styles.leftButton, { width: backButtonSize, height: backButtonSize }]} onPress={() => navigation.goBack()}>
+                <Image source={require('../../assets/left_arrow.png')} style={{ width: backButtonSize, height: backButtonSize }} />
           </TouchableOpacity>
           <View style={styles.starContainer}>
-            <Image source={require('../assets/star.png')} style={[styles.starImage, { width: starSize, height: starSize }]} />
-            <Image source={require('../assets/star.png')} style={[styles.starImage, { width: starSize, height: starSize }]} />
-            <Image source={require('../assets/star.png')} style={[styles.starImage, { width: starSize, height: starSize }]} />
+            <Image source={require('../../assets/star.png')} style={[styles.starImage, { width: starSize, height: starSize }]} />
+            <Image source={require('../../assets/star.png')} style={[styles.starImage, { width: starSize, height: starSize }]} />
+            <Image source={require('../../assets/star.png')} style={[styles.starImage, { width: starSize, height: starSize }]} />
           </View>
           <View style={styles.overlay}>
               <TextInput
@@ -174,13 +175,17 @@ const styles = StyleSheet.create({
     fontFamily: "roboto",
   },
   forgotPasswordButton: {
+    width: "15%",
+    height: "5.5%",
     position: 'absolute',
+    justifyContent: 'center',
     alignSelf: 'center',
     top: '70%',
   },
   forgotPasswordText: {
     color: '#fff',
     textDecorationLine: 'underline',
+    textAlign: "center",
     fontSize: 18,
     fontFamily: "roboto",
   },
@@ -198,10 +203,6 @@ const styles = StyleSheet.create({
     top: 40, // Décaler vers le bas
     left: 30, // Décaler vers la droite
     zIndex: 999, // Assure que le bouton est au-dessus de tout autre contenu
-  },
-  leftButtonImage: {
-      width: 40,
-      height: 40,
   },
   buttonActive: {
     backgroundColor: '#fff', // Change button color to white when both fields are valid
