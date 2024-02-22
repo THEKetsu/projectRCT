@@ -45,6 +45,7 @@ export default function ToolBar() {
     });
 
     useEffect((): void => {
+        setSelectedPosition(position.positionIndex)
         if (position.positionIndex != 0 && !positionIndexList.some((item) => item === position.positionIndex)) {
             setPositionIndexList((prevPositions: number[]) => [...prevPositions, position.positionIndex]);
         }
@@ -53,6 +54,8 @@ export default function ToolBar() {
     const handlePress = (item: number) => {
         setSelectedPosition(item)
         dispatch(setPositionIndex(item))
+
+        console.log("handlePress", item)
     }
 
     const handleCreateNewPosition = () => {
@@ -67,10 +70,11 @@ export default function ToolBar() {
         setSelectedPosition(positionIndexList.length)
 
         dispatch(setPositionIndex(positionIndexList.length))
+
+        console.log("handleCreateNewPosition", positionIndexList.length)
     }
 
     const handleDeletePosition = () => {
-        console.log(selectedPosition)
         if (selectedPosition > 0) {
             setPositionIndexList((prevPositions) => {
                 return prevPositions.filter((position) => position !== selectedPosition)
@@ -84,6 +88,8 @@ export default function ToolBar() {
             dispatch(setPositionList(JSON.stringify([[1, [], []]])))
             triggerRefresh()
         }
+
+        console.log("handleDeletePosition", position.positionIndex)
     }
 
     return (

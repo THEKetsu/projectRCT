@@ -167,13 +167,9 @@ export function Field() {
                 simulateRefresh(position.positionIndex,false);
             }
 
-
             if (dynamicPositionList.length >= position.positionIndex ) {
-
                 animate(position.positionIndex);
             }
-
-
         }
     }, [numAnimation]);
 
@@ -870,7 +866,7 @@ export function Field() {
                 });
 
                 const foundIndex = returnPublicInstance.returnActionList.findIndex(
-                    (number: any[][]) => number[0] === position.positionIndex
+                    (number) => number[0] === position.positionIndex
                   );
 
                 if(foundIndex != -1){
@@ -1235,8 +1231,11 @@ export function Field() {
                 [indexC + 2, newList, prevPos[indexC][2]],
             ]);
 
-            dispatch(setPositionIndex(indexC + 1))
             dispatch(setPositionList(JSON.stringify(dynamicPositionList)))
+            dispatch(setPlayerPaths("[]"))
+            setCurrentDraw([]);
+            setNumCCC(numCCC + 1)
+            console.log("animateSuite", indexC + 1)
         }
     };
 
@@ -1278,10 +1277,6 @@ export function Field() {
 
             setcheckForEnd((prevC) => [...prevC, true]);
 
-            //Here i want to check if there the number of false is equal to the number of true
-            //If it is filter to only have the true one.
-
-
         }
     };
 
@@ -1294,8 +1289,10 @@ export function Field() {
             }
 
             setNumAnimation(numAnimation+1);
+            console.log("checkEndingAnimation", position.positionIndex + 1)
             dispatch(setPositionIndex(position.positionIndex + 1));
             dispatch(selectZoomMode())
+
         }
     };
 
@@ -1354,7 +1351,7 @@ export function Field() {
         }
     };
 
-    const simulateRefresh = (positionI: number,debugZoom: boolean) => {
+    const simulateRefresh = (positionI: number, debugZoom: boolean) => {
 
 
         if(!debugZoom){
@@ -1366,6 +1363,8 @@ export function Field() {
                 translationIncrement[1]]);
         }
         setAll();
+
+        console.log(positionI)
 
         center = [((superSvg_Field[0][0] + superSvg_Field[0][2] + superSvg_Field[0][4] + superSvg_Field[0][5]) / 4), ((superSvg_Field[0][1] + superSvg_Field[0][3] + superSvg_Field[0][3] + superSvg_Field[0][6]) / 4)]
         let svg_Mode = proportionSVG(player, ((superSvg_Field[0][5] - superSvg_Field[0][0]) / (svg_fieldUNCHANGED[5] - svg_fieldUNCHANGED[0])))
