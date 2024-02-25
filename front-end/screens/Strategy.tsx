@@ -39,19 +39,15 @@ export default function Strategy() {
     const handleItemSelected = (selectedItem: any | null) => {
         setSelectedItem(selectedItem.name);
     };
-    const animate = (animate : any) => {
-        return animate;
-        // Implémentez la logique de l'animation ici
-    };
-    const indexanimate = 0;
-    
+
     return (
         <View style={styles.container}>
-            {isDrawerOpen && <DrawerLeft onClose={handleCloseDrawer} isOpen={isDrawerOpen} onItemSelected={handleItemSelected} />}
-            {!isDrawerOpen && <TopWidget onPlayButtonPress={handlePressPlayButton} selectedItem={selectedItem} />}
+            {isDrawerOpen &&
+                <DrawerLeft onClose={handleCloseDrawer} isOpen={isDrawerOpen} onItemSelected={handleItemSelected}/>}
+            {!isDrawerOpen && <TopWidget onPlayButtonPress={handlePressPlayButton} selectedItem={selectedItem}/>}
             <GestureHandlerRootView style={{flex: 1}}>
-            <Field  />
-            <ToolBar/>
+                <Field/>
+                <ToolBar/>
             </GestureHandlerRootView>
         </View>
     )

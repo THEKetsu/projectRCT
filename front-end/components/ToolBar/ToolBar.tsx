@@ -40,24 +40,23 @@ export default function ToolBar() {
     };
 
     const barHeight = animation.interpolate({
-        inputRange: [0, 1], // Plage des valeurs à interpréter
-        outputRange: [0, (dimHeight * 27.9) / 100], // Hauteur initiale et finale de la barre 28 valeur de base
+        inputRange: [0, 1],
+        outputRange: [0, (dimHeight * 27.9) / 100],
     });
 
     useEffect((): void => {
+        console.log("ToolBar", position.positionIndex)
         setSelectedPosition(position.positionIndex)
-        if (position.positionIndex != 0 && !positionIndexList.some((item) => item === position.positionIndex)) {
+        if (position.positionIndex != 0 && !positionIndexList.some((item: number): boolean => item === position.positionIndex)) {
             setPositionIndexList((prevPositions: number[]) => [...prevPositions, position.positionIndex]);
         }
     }, [position.positionIndex])
 
     const handlePress = (item: number) => {
         setSelectedPosition(item)
+
         dispatch(setPositionIndex(item))
-
         dispatch(triggerRefresh())
-
-        console.log("handlePress", item)
     }
 
     const handleCreateNewPosition = () => {
@@ -66,11 +65,8 @@ export default function ToolBar() {
         buffPL.push([positionIndexList.length + 1, buffPL[positionIndexList.length-1][1], buffPL[positionIndexList.length-1][2]])
 
         dispatch(setPositionList(JSON.stringify(buffPL)))
-
         setPositionIndexList([...positionIndexList, positionIndexList.length])
-
         setSelectedPosition(positionIndexList.length)
-
         dispatch(setPositionIndex(positionIndexList.length))
 
         console.log("handleCreateNewPosition", positionIndexList.length)
@@ -90,8 +86,6 @@ export default function ToolBar() {
             dispatch(setPositionList(JSON.stringify([[1, [], []]])))
             triggerRefresh()
         }
-
-        console.log("handleDeletePosition", position.positionIndex)
     }
 
     return (
