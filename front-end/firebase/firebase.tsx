@@ -1,7 +1,6 @@
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import {Auth, getAuth} from "firebase/auth";
 import { getFirestore, addDoc, collection, deleteDoc, doc, getDocs, DocumentData } from "firebase/firestore";
-import field from '../assets/rct_field.png';
 import { onSnapshot} from 'firebase/firestore';
 
 const firebaseConfig = {
@@ -16,8 +15,9 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+
+export const auth: Auth = getAuth(app);
+export const db = getFirestore(app);
 
 const retrieveStrategies = async () => {
   try {
@@ -119,4 +119,4 @@ const subscribeToStrategies = (callback: (strategies: any[]) => void) => {
 
 export { subscribeToStrategies };
 
-export { getNextId, addStrategyToDB, retrieveStrategies, deleteStrategy, auth };
+export { getNextId, addStrategyToDB, retrieveStrategies, deleteStrategy };

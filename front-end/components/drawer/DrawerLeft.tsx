@@ -9,8 +9,8 @@ import house from '../../assets/house.png';
 import field from '../../assets/rct_field.png';
 import share from '../../assets/share.png';
 import importAllData from './JsonFile';
-import {db} from '../../firebase/firebase';
 import {addDoc, collection, deleteDoc, doc, getDocs, onSnapshot, updateDoc} from "firebase/firestore";
+import {db} from "../../firebase/firebase";
 
 const retrieveStrategies = async () => {
     try {
@@ -135,20 +135,20 @@ const DrawerLeft = ({isOpen, onClose, onItemSelected}: {
      */
         // Dans la fonction handleAddItem
     const handleAddItem = async () => {
-        try {
-            const newItem = {
-                id: getNextId(), // Utiliser getNextId() pour obtenir le prochain ID
-                name: 'Nouvel élément',
-                image: field,
-                timestamp: Date.now(),
-                data: []
-            };
-            const docRef = await addDoc(collection(db, 'Strategy'), newItem);
-            console.log('Document written with ID: ', docRef.id);
-        } catch (error) {
-            console.error('Error adding document: ', error);
-        }
-    };
+            try {
+                const newItem = {
+                    id: getNextId(), // Utiliser getNextId() pour obtenir le prochain ID
+                    name: 'Nouvel élément',
+                    image: field,
+                    timestamp: Date.now(),
+                    data: []
+                };
+                const docRef = await addDoc(collection(db, 'Strategy'), newItem);
+                console.log('Document written with ID: ', docRef.id);
+            } catch (error) {
+                console.error('Error adding document: ', error);
+            }
+        };
 
     /**
      * Updates the name property of the item with the given id in the data array.
