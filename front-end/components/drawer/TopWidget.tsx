@@ -90,10 +90,7 @@ const TopWidget = ({onPlayButtonPress, selectedItem}: {
             setfoundI(foundIndex);
 
             if (returnPublicInstance.returnActionList.length > 0 && foundIndex != -1) {
-                console.log("###", returnPublicInstance.returnActionList);
-
                 eraseAction = returnPublicInstance.returnActionList[foundIndex][1][returnPublicInstance.returnActionList[foundIndex][1].length - 1];
-                console.log("#||", eraseAction);
 
                 setDynamicPositionList(parsePositionList(position.positionList));
 
@@ -104,7 +101,7 @@ const TopWidget = ({onPlayButtonPress, selectedItem}: {
         }
     }
 
-    const deletePlayer = (currentID: string) => {
+    function deletePlayer (currentID: string) {
         let indexID = dynamicPositionList[position.positionIndex][1].findIndex((joueur) => joueur.id === currentID);
 
         if (indexID != -1) {
@@ -137,7 +134,7 @@ const TopWidget = ({onPlayButtonPress, selectedItem}: {
     const restorePlayer = (myPlayer: Player) => {
         let restoredPlayer = Player.createPlayer(myPlayer.position, myPlayer.id, myPlayer.myArray, myPlayer.svg_player, myPlayer.speed);
         const newPositionList: [number, Player[], Ballon[]][] = dynamicPositionList;
-        setDynamicPositionList((prevPos) => {
+        setDynamicPositionList(() => {
             let i = newPositionList[position.positionIndex][1].findIndex((j) => j.id === restoredPlayer.id)
             if (newPositionList[position.positionIndex] && i == -1) {
                 newPositionList[position.positionIndex][1].push(restoredPlayer);
@@ -156,7 +153,7 @@ const TopWidget = ({onPlayButtonPress, selectedItem}: {
         let restoredBallon = Ballon.createBallon(myBallon.position, myBallon.svg_ballon, myBallon.idJoueur);
         const newPositionList: [number, Player[], Ballon[]][] = dynamicPositionList;
 
-        setDynamicPositionList((prevPos) => {
+        setDynamicPositionList(() => {
             if (newPositionList[position.positionIndex][2].length < 1) {
                 newPositionList[position.positionIndex][2] = [restoredBallon];
             } else {
