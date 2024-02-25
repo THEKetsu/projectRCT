@@ -38,7 +38,6 @@ type numberMaillot = {
     textContent: string;
     textSize: number;
 }
-
 export function Field() {
     let [px1, py1] = [0, 0];
     let svg_fieldUNCHANGED = [0, 1136.77, 212.877, 2.62354, 920.021, 1131.04, 1136.77]
@@ -228,6 +227,7 @@ export function Field() {
             return center[isXCoordinate ? 0 : 1] + scaledDiff;
         });
     };
+    
     const proportionSVG = (svgArray: number[], proportionScale: number) => {
         return svgArray.map((value) => value * proportionScale);
     };
@@ -643,6 +643,8 @@ export function Field() {
     const handlePlayerPress = (id: string) => {
         setPathDrawing(true);
 
+        
+
         dynamicPositionList[positionLogic.positionIndex][1].map((joueur) => {
             if (joueur.id === id) {
                 setCurrentID(joueur.id + 'P');
@@ -674,10 +676,12 @@ export function Field() {
                         ];
                     });
                 } else {
-                    setPlayerPaths((prevPaths) => [
+                    setPlayerPaths((prevPaths) => {
+                        console.log(prevPaths);
+                    return([
                         ...prevPaths,
                         {id: joueur.id + 'P', path: beginPath},
-                    ]);
+                    ])});
                 }
 
                 let mcenter = [((superField[0][0] + superField[0][2] + superField[0][4] + superField[0][5]) / 4), ((superField[0][1] + superField[0][3] + superField[0][3] + superField[0][6]) / 4)]
