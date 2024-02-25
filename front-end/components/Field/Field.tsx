@@ -31,30 +31,8 @@ import {FreeDraw, Option, PlayerPath, Position, ShirtDigit, Toolbar} from '../..
 import Options from "../Options/Options";
 import RightDrawer from '../Options/RightDrawer';
 
-<<<<<<< HEAD
-type PlayerPath = {
-    id: string;
-    path: string;
-};
-
-type freeDraw = {
-    position: number[];
-    path: string;
-    id: number;
-    numbers: number[][];
-}
-
-type numberMaillot = {
-    id: string;
-    position: number[];
-    textContent: string;
-    textSize: number;
-}
-export function Field() {
-=======
 export function Field({ }) {
     const position: Position = useAppSelector((state) => state.position);
->>>>>>> 9109f5dfca688ad06092dfd27739b817f2c7b47f
     let [px1, py1] = [0, 0];
     let svg_fieldUNCHANGED = [0, 1136.77, 212.877, 2.62354, 920.021, 1131.04, 1136.77]
     let lineSize = [3, 10];
@@ -264,7 +242,6 @@ export function Field({ }) {
             return center[isXCoordinate ? 0 : 1] + scaledDiff;
         });
     };
-    
     const proportionSVG = (svgArray: number[], proportionScale: number) => {
         return svgArray.map((value) => value * proportionScale);
     };
@@ -637,13 +614,7 @@ export function Field({ }) {
     const handlePlayerPress = (id: string) => {
         setPathDrawing(true);
 
-<<<<<<< HEAD
-        
-
-        dynamicPositionList[positionLogic.positionIndex][1].map((joueur) => {
-=======
         dynamicPositionList[position.positionIndex][1].map((joueur: Player): void => {
->>>>>>> 9109f5dfca688ad06092dfd27739b817f2c7b47f
             if (joueur.id === id) {
                 dispatch(selectPlayer(`${joueur.id}P`))
                 joueur.speedUp();
@@ -660,22 +631,6 @@ export function Field({ }) {
 
                 dispatch(setPlayerPaths(JSON.stringify(newPaths)))
 
-<<<<<<< HEAD
-                        return [
-                            ...j0.slice(0, positionLogic.positionIndex),
-                            [j0[positionLogic.positionIndex][0], [...updatedPlayer, updatedPlayerData], j0[positionLogic.positionIndex][2]],
-                            ...j0.slice(positionLogic.positionIndex + 1),
-                        ];
-                    });
-                } else {
-                    setPlayerPaths((prevPaths) => {
-                        console.log(prevPaths);
-                    return([
-                        ...prevPaths,
-                        {id: joueur.id + 'P', path: beginPath},
-                    ])});
-                }
-=======
                 setDynamicPositionList((j0) => {
                     const save: Player[] = j0[position.positionIndex][1].filter((c) => c.id === joueur.id);
                     const updatedPlayer: Player[] = j0[position.positionIndex][1].filter((c) => c.id !== joueur.id);
@@ -687,7 +642,6 @@ export function Field({ }) {
                         ...j0.slice(position.positionIndex + 1),
                     ];
                 });
->>>>>>> 9109f5dfca688ad06092dfd27739b817f2c7b47f
 
                 let mcenter = [((superField[0][0] + superField[0][2] + superField[0][4] + superField[0][5]) / 4), ((superField[0][1] + superField[0][3] + superField[0][3] + superField[0][6]) / 4)]
 
