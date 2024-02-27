@@ -20,6 +20,7 @@ const fieldSize = dimWidth * 0.05;
 // @ts-ignore
 export default function SelectStrategy ({ navigation }) {
 const [strategies, setStrategies] = useState<any[]>([]);
+const [filteredStrategies, setFilteredStrategies] = useState<any[]>([]); // Nouvel état pour stocker les stratégies filtrées
 useEffect(() => {
     const unsubscribe = subscribeToStrategies((updatedStrategies: any[]) => {
       setStrategies(updatedStrategies);
@@ -31,7 +32,9 @@ useEffect(() => {
      useEffect(() => {
          fetchData();
      }, []);
- 
+     useEffect(() => {
+      setFilteredStrategies(strategies); // Initialise les stratégies filtrées avec toutes les stratégies disponibles
+    }, [strategies]); // Met à jour les stratégies filtrées lorsque les stratégies initiales changent
      const fetchData = async () => {
          try {
              const strategiesData = await retrieveStrategies();
@@ -50,6 +53,13 @@ useEffect(() => {
              console.error('Error deleting item:', error);
          }
      };
+
+     const handleFilter = (text: string) => {
+      const filteredData = strategies.filter((strategy) =>
+        strategy.name.toLowerCase().includes(text.toLowerCase())
+      );
+      setFilteredStrategies(filteredData);
+    };
 
 
 
@@ -117,12 +127,13 @@ useEffect(() => {
                   underlineColorAndroid="transparent"
                   onChangeText={(text) => {
                     NameStrat(text);
+                    handleFilter(text);
                   }}
               />
                 </View>
                 <View style={styles.listContainer}>
                 <FlatList
-                    data={strategies}
+                    data={filteredStrategies} // Utilise les stratégies filtrées pour afficher dans la FlatList
                     renderItem={renderItem}
                     keyExtractor={item => item.id}
                     numColumns={Math.floor(dimWidth / (dimWidth * 0.3))} // Adjust the width of each item according to your UI
