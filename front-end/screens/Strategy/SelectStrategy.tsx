@@ -65,10 +65,12 @@ useEffect(() => {
         >
           <Image source={require('../../assets/Field_Stack.png')} style={styles.fieldImage} />
           <Text style={styles.cellText}>{item.name}</Text>
-          <TouchableOpacity onPress={() => handleDeleteItem(item.id)}>
+          <TouchableOpacity style={styles.deleteButton} onPress={() => handleDeleteItem(item.id)}>
             <Feather name={"trash"} size={20} color={"red"} />
           </TouchableOpacity>
-          <Octicons name={"pencil"} size={20} color={"grey"} />
+          <TouchableOpacity style={styles.pencilButton}>
+            <Octicons name={"pencil"} size={20} color={"grey"} />
+          </TouchableOpacity>
         </TouchableOpacity>
       );
   };
@@ -121,6 +123,7 @@ useEffect(() => {
                     renderItem={renderItem}
                     keyExtractor={item => item.id}
                     numColumns={Math.floor(dimWidth / (dimWidth * 0.3))} // Adjust the width of each item according to your UI
+                    showsVerticalScrollIndicator={false}
                 />
                 </View>
                 <Button onPress={() => navigation.navigate("Strategy")} title={"GO TO STRATEGY"}/>
@@ -214,6 +217,7 @@ const styles = StyleSheet.create({
         alignItems: 'center', // Centrer les éléments verticalement
         paddingHorizontal: 10, // Ajouter un espacement horizontal interne
         marginTop:'5%', // Ajuster l'écart par rapport au titre
+        marginBottom:'2%'
     },
     input: {
         flex: 1, // Utiliser tout l'espace disponible
@@ -227,5 +231,11 @@ const styles = StyleSheet.create({
         borderWidth: 2,
         borderColor: 'red',
       },
+    pencilButton: {
+
+    },
+    deleteButton:{
+      
+    }
       
 });
