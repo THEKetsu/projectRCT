@@ -65,13 +65,16 @@ useEffect(() => {
         >
           <Image source={require('../../assets/Field_Stack.png')} style={styles.fieldImage} />
           <Text style={styles.cellText}>{item.name}</Text>
+          <View style={styles.actionButtonContainer}>
           <TouchableOpacity style={styles.deleteButton} onPress={() => handleDeleteItem(item.id)}>
-            <Feather name={"trash"} size={20} color={"red"} />
+            <Feather name={"trash"} size={40} color={"red"} />
           </TouchableOpacity>
           <TouchableOpacity style={styles.pencilButton}>
-            <Octicons name={"pencil"} size={20} color={"grey"} />
+            <Octicons name={"pencil"} size={40} color={"grey"} />
           </TouchableOpacity>
+          </View>
         </TouchableOpacity>
+          
       );
   };
     const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
@@ -232,10 +235,20 @@ const styles = StyleSheet.create({
         borderColor: 'red',
       },
     pencilButton: {
+      position:"relative",
+      marginHorizontal:"25%"
 
     },
     deleteButton:{
-      
+      position:"relative",
+      marginHorizontal:"25%"
+    },
+    actionButtonContainer:{
+      flex:1,
+      flexDirection:"row",
+      marginTop:"2%",
+      alignItems:"center",
+      justifyContent:"center"
     }
       
 });
