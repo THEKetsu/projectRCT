@@ -93,6 +93,7 @@ export default function Home ({ navigation }) {
                     renderItem={renderItem}
                     keyExtractor={item => item.id}
                     numColumns={3}
+                    showsVerticalScrollIndicator={false}
                     />
                 </View>
                 <Button onPress={() => navigation.navigate("Strategy")} title={"GO TO STRATEGY"}/>
