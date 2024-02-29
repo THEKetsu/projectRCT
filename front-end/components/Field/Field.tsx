@@ -30,6 +30,7 @@ import {comparePositions, isValidString, parsePositionList} from '../../utils/fu
 import {FreeDraw, Option, PlayerPath, Position, ShirtDigit, Toolbar} from '../../utils/interfaces';
 import Options from "../Options/Options";
 import RightDrawer from '../Options/RightDrawer';
+import { toLinearSpace } from 'react-native-reanimated/lib/typescript/reanimated2/Colors';
 
 export function Field({}) {
     const position: Position = useAppSelector((state) => state.position);
@@ -68,6 +69,7 @@ export function Field({}) {
     let ballon_svg = [34.60405, 5.044065000000001, 34.411260000000006, 3.9079690000000005, 33.86994000000001, 2.8599220000000005, 33.0551, 2.0450950000000003, 32.240260000000006, 1.2302784000000002, 31.1922, 0.6890104, 30.056130000000003, 0.49626980000000004, 24.591970000000003, -0.43016350000000003, 14.296230000000003, -0.8537243000000001, 6.722664000000001, 6.7231190000000005, -0.8509748000000001, 14.3, -0.43077970000000004, 24.59366, 0.4956744, 30.056130000000003, 0.6889324, 31.19337, 1.2314523, 32.24221, 2.0479290000000003, 33.05718, 2.8644070000000004, 33.872150000000005, 3.914339, 34.412690000000005, 5.052008000000001, 34.60392000000001, 6.965920000000001, 34.930220000000006, 8.903751999999999, 35.096230000000006, 10.845289000000001, 35.1, 16.260530000000003, 35.1, 23.003890000000002, 33.749950000000005, 28.377050000000004, 28.377050000000004, 35.95241000000001, 20.803510000000003, 35.53043, 10.506483000000001, 34.60405, 5.044065000000001, 5.494138, 31.944380000000002, 4.909944, 31.845060000000004, 4.371055, 31.5666, 3.9520390000000005, 31.147610000000004, 3.5330230000000005, 30.72862, 3.254576, 30.189770000000003, 3.1552170000000004, 29.605550000000004, 2.69204, 26.99424, 2.572336, 24.333530000000007, 2.799147, 21.691150000000004, 13.408590000000002, 32.300450000000005, 10.766236000000001, 32.527300000000004, 8.105513, 32.40757, 5.494138, 31.944380000000002, 23.901670000000006, 13.106860000000001, 21.48185, 15.525120000000001, 22.55162, 16.594890000000003, 22.685130000000004, 16.718390000000003, 22.79225, 16.867500000000003, 22.86661, 17.033250000000002, 22.94097, 17.19913, 22.981140000000003, 17.37827, 22.984650000000002, 17.560010000000002, 22.988030000000002, 17.74162, 22.95488, 17.92219, 22.88689, 18.0908, 22.818900000000003, 18.25928, 22.717630000000003, 18.41242, 22.589060000000003, 18.540860000000002, 22.46049, 18.669300000000003, 22.307220000000004, 18.77044, 22.138610000000003, 18.8383, 21.970000000000002, 18.90616, 21.78943, 18.939180000000004, 21.60769, 18.93554, 21.426080000000002, 18.931900000000002, 21.24694, 18.8916, 21.081190000000003, 18.817110000000003, 20.915440000000004, 18.742620000000002, 20.76646, 18.635369999999998, 20.64309, 18.50186, 19.57488, 17.43365, 17.433390000000003, 19.575010000000002, 18.50329, 20.64491, 18.636800000000004, 20.76828, 18.74405, 20.91726, 18.818540000000002, 21.08301, 18.89316, 21.248760000000004, 18.93346, 21.4279, 18.9371, 21.609510000000004, 18.94074, 21.79125, 18.907590000000003, 21.971820000000005, 18.83986, 22.140430000000002, 18.772000000000002, 22.309040000000003, 18.67086, 22.462180000000004, 18.54229, 22.590750000000003, 18.413850000000004, 22.719320000000003, 18.260839999999998, 22.82072, 18.09223, 22.88871, 17.92362, 22.95657, 17.743180000000002, 22.98985, 17.56144, 22.986340000000006, 17.3797, 22.982960000000002, 17.200560000000003, 22.942790000000006, 17.034810000000004, 22.868430000000004, 16.868930000000002, 22.79394, 16.719820000000002, 22.68695, 16.59645, 22.553440000000002, 15.52486, 21.481980000000004, 13.10491, 23.901800000000005, 12.980786, 24.032450000000004, 12.831767000000001, 24.136840000000003, 12.666641, 24.208990000000004, 12.501515000000001, 24.281140000000004, 12.323623000000001, 24.319490000000002, 12.143443000000001, 24.321830000000006, 11.963263000000001, 24.324170000000002, 11.784435000000002, 24.29037, 11.617515000000001, 24.22251, 11.450595000000002, 24.15452, 11.298962999999999, 24.053900000000002, 11.171550000000002, 23.9265, 11.044124000000002, 23.7991, 10.943504000000003, 23.64752, 10.875618000000003, 23.480600000000003, 10.807719000000002, 23.313680000000005, 10.773932000000002, 23.134800000000006, 10.776246, 22.954620000000006, 10.778547000000001, 22.77444, 10.816910000000002, 22.596600000000002, 10.889047, 22.431500000000003, 10.961197000000002, 22.2664, 11.065665000000001, 22.11729, 11.196302000000001, 21.99327, 13.617890000000001, 19.575010000000002, 12.548016000000002, 18.505240000000004, 12.311299, 18.248880000000003, 12.182989000000001, 17.910880000000002, 12.189983000000002, 17.56209, 12.196977000000002, 17.2133, 12.338742, 16.880760000000002, 12.585547000000002, 16.63415, 12.832352000000002, 16.38767, 13.1651, 16.246230000000004, 13.513890000000002, 16.23947, 13.862680000000001, 16.232840000000003, 14.200550000000002, 16.361410000000003, 14.45665, 16.598270000000003, 15.52655, 17.66817, 17.66635, 15.525120000000001, 16.59645, 14.45522, 16.359460000000002, 14.199120000000002, 16.230890000000002, 13.861250000000002, 16.237520000000004, 13.51246, 16.244280000000003, 13.163670000000002, 16.38572, 12.831000000000001, 16.63233, 12.584195000000001, 16.878809999999998, 12.337390000000003, 17.211479999999998, 12.195638000000002, 17.560270000000003, 12.188644000000002, 17.909060000000004, 12.181637, 18.24706, 12.309947000000001, 18.50329, 12.546651, 19.57488, 13.61815, 21.99483, 11.198356, 22.118850000000002, 11.067719000000002, 22.267960000000002, 10.963251000000001, 22.433060000000005, 10.891101, 22.59816, 10.818964000000001, 22.77613, 10.780614000000002, 22.956310000000002, 10.778300000000002, 23.136490000000006, 10.775999000000002, 23.315240000000003, 10.809786, 23.482160000000004, 10.877672, 23.64908, 10.945558, 23.80079, 11.046178000000001, 23.928189999999997, 11.173604000000003, 24.055590000000002, 11.301017, 24.15621, 11.452649000000001, 24.22407, 11.619556000000003, 24.29193, 11.786476, 24.325730000000004, 11.965291, 24.32339, 12.145471, 24.321180000000002, 12.325651, 24.282830000000004, 12.503543000000002, 24.21068, 12.668669000000003, 24.138530000000003, 12.833782000000003, 24.034010000000002, 12.982788000000001, 23.903360000000006, 13.106860000000001, 23.901670000000006, 32.300580000000004, 13.408980000000001, 21.69102, 2.799693, 22.49429, 2.7254500000000004, 23.331360000000004, 2.683265, 24.207170000000005, 2.683265, 26.017160000000004, 2.6896480000000005, 27.82351, 2.847702, 29.60724, 3.155763, 30.19107, 3.2554339999999997, 30.729660000000003, 3.534011, 31.148390000000006, 3.9530010000000004, 31.566990000000004, 4.371978, 31.845190000000002, 4.910672000000001, 31.94451, 5.494619, 32.407700000000006, 8.105942, 32.527300000000004, 10.766613, 32.300580000000004, 13.408980000000001];
     let xBallon_Array = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62, 64, 66, 68, 70, 72, 74, 76, 78, 80, 82, 84, 86, 88, 90, 92, 94, 96, 98, 100, 102, 104, 106, 108, 110, 112, 114, 116, 118, 120, 122, 124, 126, 128, 130, 132, 134, 136, 138, 140, 142, 144, 146, 148, 150, 152, 154, 156, 158, 160, 162, 164, 166, 168, 170, 172, 174, 176, 178, 180, 182, 184, 186, 188, 190, 192, 194, 196, 198, 200, 202, 204, 206, 208, 210, 212, 214, 216, 218, 220, 222, 224, 226, 228, 230, 232, 234, 236, 238, 240, 242, 244, 246, 248, 250, 252, 254, 256, 258, 260, 262, 264, 266, 268, 270, 272, 274, 276, 278, 280, 282, 284, 286, 288, 290, 292, 294, 296, 298, 300, 302, 304, 306, 308, 310, 312, 314, 316, 318, 320, 322, 324, 326, 328, 330, 332, 334, 336, 338, 340, 342, 344, 346, 348, 350, 352, 354, 355, 357, 359, 361, 363, 365, 367, 369, 371, 373, 375, 377, 379, 381, 383, 385, 387]
     const xArrayPlayer = [0, 2, 4, 6, 8, 10, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39, 41, 43, 45, 47, 49, 51, 53, 55, 57, 59, 60, 62, 64, 66, 68, 70, 72, 74, 76, 78, 80, 82, 84, 86, 88, 90, 92, 94, 96, 98, 100, 102, 104, 106, 108, 109, 111, 113, 115, 117, 119, 122, 123, 125, 127, 129, 131, 133, 135, 137, 139, 141, 143, 145, 147, 149, 151, 153, 155, 157, 159, 162, 163, 165, 167, 169, 171, 173, 175, 177, 179, 181];
+    const [superAnimation, setSuperAnimation] = useState<boolean>(false);
     let animationEnCours = false;
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [prevPourcent, setPrevPourcent] = useState([0, 0]);
@@ -95,7 +97,8 @@ export function Field({}) {
     const [svgBallon, setSvgBallon] = useState<React.ReactNode>();
     const [pathDrawing, setPathDrawing] = useState(false);
     const [isFirstLoad, setIsFirstLoad] = useState<boolean>(true)
-
+    const [reloadingMode,setReloadingMode] = useState(false);
+    let saveBallonID = "";
     let myBase = [svgSize.width / 2, svgSize.height / 2];
 
     const panRef = useRef<PanGestureHandler>(null);
@@ -114,23 +117,45 @@ export function Field({}) {
 
     useEffect(() => {
         if (returnPublicInstance.indexAnimation != 0) {
+            setReloadingMode(false);
             animate(position.positionIndex);
         }
     }, [returnPublicInstance.indexAnimation]);
+
+    useEffect(() => {
+        if (returnPublicInstance.reloadAnimation != 0) {
+            setReloadingMode(true);
+            setSuperAnimation(false);
+            animate(position.positionIndex);
+        }
+    }, [returnPublicInstance.reloadAnimation]);
 
     useEffect(() => {
         const numberOfFalse = checkForEnd.filter(value => value === false).length;
         const numberOfTrue = checkForEnd.length - numberOfFalse;
 
         if (numberOfFalse === numberOfTrue && numberOfFalse != 0) {
-            checkEndingAnimation();
+            checkEndingAnimation(true);
         }
 
     }, [checkForEnd]);
 
     useEffect(() => {
+       
+        // if(dynamicPositionList.length > JSON.parse(position.positionList).length){
+            
+        //     dispatch(setPositionList(JSON.stringify(dynamicPositionList)))
+        // }
+       
+
+    }, [dynamicPositionList]);
+
+
+    useEffect(() => {
+
         if (position.positionList != "[]" && JSON.parse(position.positionList)[0][0] != 0) {
             setDynamicPositionList(parsePositionList(position.positionList))
+            
             setNumCCC(numCCC + 1);
         }
     }, [position.positionList]);
@@ -139,11 +164,11 @@ export function Field({}) {
         dispatch(setPlayerPaths("[]"))
         setCurrentDraw([]);
         setNumCCC(numCCC + 1);
+        
     }, [position.positionIndex]);
 
     useEffect(() => {
-        console.log(numAnimation)
-        if (dynamicPositionList.length > 0 && numAnimation >= 0) {
+        if (dynamicPositionList.length > 0 && numAnimation >= 0 && dynamicPositionList.length - 1 >= position.positionIndex) {
             simulateRefresh(position.positionIndex, false);
         }
     }, [numCCC]);
@@ -169,7 +194,7 @@ export function Field({}) {
     }, [option.refreshAnimation])
 
     useEffect(() => {
-        if (dynamicPositionList.length > 0) {
+        if (dynamicPositionList.length > 0 && dynamicPositionList.length - 1 >= position.positionIndex) {
             if (numAnimation > 0) {
                 simulateRefresh(position.positionIndex, true);
             } else {
@@ -177,7 +202,8 @@ export function Field({}) {
             }
 
             if (!isFirstLoad) {
-                if (dynamicPositionList.length >= position.positionIndex) {
+                if (dynamicPositionList.length - 1 >= position.positionIndex) {
+                    
                     animate(position.positionIndex);
                 }
             } else {
@@ -317,10 +343,14 @@ export function Field({}) {
     };
 
     const onGestureEvent = (event: PanGestureHandlerGestureEvent) => {
-        if (pathDrawing) {
+        if(dynamicPositionList.length - 1 >= position.positionIndex){
+
+        
+        if (toolbar.drawMode) {
             const {translationX, translationY} = event.nativeEvent;
 
-            JSON.parse(option.playerPaths).map((chemin: PlayerPath) => {
+            let newPaths = JSON.parse(option.playerPaths);
+           newPaths.map((chemin: PlayerPath) => {
                 if (chemin.id === option.selectedPlayer) {
                     const index = dynamicPositionList[position.positionIndex][1].findIndex(player => player.id + 'P' === chemin.id);
 
@@ -352,7 +382,8 @@ export function Field({}) {
                                 let buffPlayerPaths = JSON.parse(option.playerPaths)
                                 buffPlayerPaths = buffPlayerPaths.filter((p: PlayerPath) => p.id !== option.selectedPlayer)
 
-                                dispatch(setPlayerPaths(JSON.stringify(buffPlayerPaths)))
+                                newPaths = buffPlayerPaths;
+                                //dispatch(setPlayerPaths(JSON.stringify(buffPlayerPaths)))
                             } else {
                                 dynamicPositionList[position.positionIndex][1][index].arrayPush([pourcentX, pourcentY]);
 
@@ -364,13 +395,15 @@ export function Field({}) {
                                     }
                                     return prev;
                                 })
-
-                                dispatch(setPlayerPaths(JSON.stringify(buffPlayerPaths)))
+                                newPaths = buffPlayerPaths;
+                                //dispatch(setPlayerPaths(JSON.stringify(buffPlayerPaths)))
                             }
                         }
                     }
                 }
             });
+            dispatch(setPlayerPaths(JSON.stringify(newPaths)));
+
 
             if (option.selectedPlayer == '' && freeID != -1) {
                 currentDraw.map((free) => {
@@ -415,6 +448,8 @@ export function Field({}) {
             }
         } else if (toolbar.zoomMode) {
             const {translationX, translationY} = event.nativeEvent;
+
+           
 
             if ((event.nativeEvent.state === State.ACTIVE && (translationX > -1000 && translationX < 1000 &&
                 translationY > -1000 && translationY < 1000) && (translationPrev[0] != translationX && translationPrev[1] != translationY)) || translationX == 100) {
@@ -514,13 +549,18 @@ export function Field({}) {
                 }
             }
         }
+    }
     };
 
     const onHandlerStateChange = (event: PanGestureHandlerGestureEvent) => {
+        if(dynamicPositionList.length - 1 >= position.positionIndex){
+
+        
         if (event.nativeEvent.state === State.END) {
             setTranslationPrev([0, 0]);
             setPathDrawing(false);
             setgrabEnCours(false);
+            setPrevPourcent([0,0]);
             setFreeID(-1);
             setTranslationPrevPlayer([1.0, 1.0]);
             setNumCCC(numCCC + 1)
@@ -535,6 +575,7 @@ export function Field({}) {
             })
             dispatch(selectPlayer(""))
             setPrevPourcent([0, 0]);
+        }
         }
     };
 
@@ -620,9 +661,16 @@ export function Field({}) {
                 joueur.pathArraySetup([]);
 
                 const existingIndex = JSON.parse(option.playerPaths).findIndex((p: PlayerPath): boolean => p.id === joueur.id + 'P');
-                const newPaths: PlayerPath[] = JSON.parse(option.playerPaths)
+                const newPaths: PlayerPath[] = JSON.parse(option.playerPaths);
+                if(existingIndex == -1){
+                    newPaths.push({id:joueur.id+'P',path:beginPath});
+                }else{
+                    
+                    newPaths[existingIndex].path = beginPath;
+                }
 
-                newPaths[existingIndex].path = beginPath
+                
+                
 
                 dispatch(setPlayerPaths(JSON.stringify(newPaths)))
 
@@ -638,24 +686,7 @@ export function Field({}) {
                     ];
                 });
 
-                let mcenter = [((superField[0][0] + superField[0][2] + superField[0][4] + superField[0][5]) / 4), ((superField[0][1] + superField[0][3] + superField[0][3] + superField[0][6]) / 4)]
-
-                diffSVGAll(mcenter);
-                proportionAll(proportion);
-                setAll();
-
-                let svg_Mode = proportionSVG(player, ((superSvg_Field[0][5] - superSvg_Field[0][0]) / (svg_fieldUNCHANGED[5] - svg_fieldUNCHANGED[0])))
-                dynamicPositionList[position.positionIndex][1].map((joueur) => {
-                    svg_Mode = diffSVG(svg_Mode, getCenter(svg_Mode), xArrayPlayer, getPourcentageCenter(joueur.position[0], joueur.position[1]))
-                    joueur.svgValue(svg_Mode);
-                });
-
-                svg_Mode = proportionSVG(ballon_svg, ((superSvg_Field[0][5] - superSvg_Field[0][0]) / (svg_fieldUNCHANGED[5] - svg_fieldUNCHANGED[0])))
-                dynamicPositionList[position.positionIndex][2].map((ball) => {
-                    svg_Mode = diffSVG(svg_Mode, getCenterBallon(svg_Mode), xBallon_Array, getPourcentageCenter(ball.position[0], ball.position[1]))
-                    ball.svgValue(svg_Mode);
-                });
-                showPlayer(false, position.positionIndex);
+                setNumCCC(numCCC+1);               
             }
         });
     };
@@ -666,6 +697,19 @@ export function Field({}) {
         let ballonShown: boolean = false;
         let dispatchAt = false;
         let newPaths: PlayerPath[] = JSON.parse(option.playerPaths);
+        let indexesToDelete : number[] = [];
+        
+
+        newPaths.forEach((path, index) => {
+            const found = dynamicPositionList[indexC][1].some(player => player.id === path.id);
+            if (!found) {
+              indexesToDelete.push(index);
+            }
+          });
+          //On supprime les dessins qui n'ont pas de correspondance (c'est sensé être fait au replaceID pourtant...)
+          indexesToDelete.forEach(index => {
+            newPaths.splice(index, 1);
+          });
 
         setSvgPlayers([]);
         setSvgBallon([]);
@@ -674,6 +718,7 @@ export function Field({}) {
             let color: string;
             let colorSpeed: string;
             let getXY: number[] = getPourcentageCenter(joueur.position[0], joueur.position[1]);
+
 
             if (joueur.id[0] == 'B') {
                 color = "#0024A6";
@@ -690,14 +735,14 @@ export function Field({}) {
             }
 
             if (dynamicPositionList[indexC][2].length > 0) {
-                if (joueur.id == dynamicPositionList[indexC][2][0].idJoueur && !grab) {
+                if (joueur.id == dynamicPositionList[indexC][2][0].idJoueur && !grab && !animationEnCours) {
                     ballonShown = true;
                     moveBallon = getCenter(joueur.svg_player);
                     dynamicPositionList[indexC][2][0].positionChange(joueur.position);
                 }
             }
 
-            if (joueur.myArray.length > 0 && !animationEnCours && !grab) {
+            if (joueur.myArray.length > 0 && !superAnimation && !animationEnCours && !grab && joueur.myArray[0][0] != -100 && joueur.myArray[0][1] != -100) {
 
                 let drawnPath = ``;
                 for (let i = 0; i < joueur.myArray.length; i++) {
@@ -708,8 +753,8 @@ export function Field({}) {
                     drawnPath = `${drawnPath}L${getXY[0]} ${getXY[1]}`
                 }
 
-                const existingIndex = JSON.parse(option.playerPaths).findIndex((p: PlayerPath) => p.id === joueur.id + 'P');
-
+                const existingIndex = newPaths.findIndex((p: PlayerPath) => p.id === joueur.id + 'P');
+                
                 if (existingIndex != -1) {
                     newPaths[existingIndex].path = drawnPath
                     dispatchAt = true;
@@ -717,20 +762,18 @@ export function Field({}) {
                     newPaths.push({id: joueur.id + 'P', path: drawnPath});
                     dispatchAt = true;
                 }
-            } else if (animationEnCours) {
+            } else if (superAnimation || animationEnCours) {
                 newPaths = [];
                 dispatchAt = true;
             }
 
-            if (!JSON.parse(option.playerPaths).some((p: PlayerPath): boolean => p.id === joueur.id + "P")) {
+
+            if (!newPaths.some((p: PlayerPath): boolean => p.id === joueur.id + "P")) {
                 let beginPath: string = `M${getXY[0]} ${getXY[1]}`;
 
-                dispatch(setPlayerPaths(
-                    JSON.stringify([
-                        ...JSON.parse(option.playerPaths),
-                        {id: joueur.id + 'P', path: beginPath}
-                    ])
-                ))
+                newPaths.push({id: joueur.id + 'P', path: beginPath});
+                dispatchAt = true;
+
             }
 
             const svgPlayer = [
@@ -781,10 +824,11 @@ export function Field({}) {
                 setSvgBallon(svgBall[0]);
             });
         } else {
+          
             showBallon(moveBallon);
         }
-
         if (!animationEnCours) {
+            
             closestPlayerToBallon();
         }
 
@@ -803,7 +847,7 @@ export function Field({}) {
 
             move = [move[0] + distX / 2, move[1] + distY / 3];
 
-            if (!animationEnCours && !grabEnCours) {
+            if ( !superAnimation && !grabEnCours) {
                 dynamicPositionList[position.positionIndex][2][0].svgValue(diffSVG(dynamicPositionList[position.positionIndex][2][0].svg_ballon, move, xBallon_Array, getCenterBallon(dynamicPositionList[position.positionIndex][2][0].svg_ballon)));
             }
 
@@ -1047,21 +1091,34 @@ export function Field({}) {
         }
     }
 
-    const [isLinekd, setIsLinked] = useState(false);
 
     const animate = (indexC: number): void => {
+      
         let waitForLink = false;
         if (dynamicPositionList[indexC].length > 0) {
             if (dynamicPositionList[indexC][2].length > 0) {
 
                 let currentValue = 1000;
-                let indexJ = dynamicPositionList[indexC][1].findIndex((j) => j.id === JSON.parse(option.closestPlayer)[0]);
+                let indexJ = -1;
+                //option.closestPlayer n'étant pas assez rapide pendant la boucle d'animation on utilise un let
+                //cependant le let est rafraichie à chaque nouvelle position, de ce fait il nous faut utiliser l'option pour la première position lancé
+                if(superAnimation){
+                    indexJ = dynamicPositionList[indexC][1].findIndex((j) => j.id === closestID[0]);
+                }else{
+                    indexJ = dynamicPositionList[indexC][1].findIndex((j) => j.id === JSON.parse(option.closestPlayer)[0]);
+                }
+                
+               
                 if (indexJ != -1 && dynamicPositionList[indexC][2][0].idJoueur == "") {
                     let joueur = dynamicPositionList[indexC][1][indexJ];
                     let positionBallon = dynamicPositionList[indexC][2][0].position
                     currentValue = Math.abs(joueur.position[0] - positionBallon[0]) + Math.abs(joueur.position[1] - positionBallon[1]);
-
-                    if (currentValue < 0.01) {
+                    if(indexC==1){
+                        console.log("MAC",joueur.id);
+                    }
+                   
+                    if (currentValue < 0.03) {
+                        
                         waitForLink = true;
                     }
                 }
@@ -1074,8 +1131,11 @@ export function Field({}) {
             dispatch(unselectAll())
             setPathDrawing(false);
 
+            
+            setSuperAnimation(true);
             animationEnCours = true;
 
+            
             let atLeastOneChange = false;
             let listJoueurModify: [string, number[]][] = [];
             let ballonMove = false;
@@ -1093,12 +1153,15 @@ export function Field({}) {
 
                 if (dynamicPositionList[indexC][2].length > 0) {
                     if (dynamicPositionList[indexC][2][0].idJoueur != "" && dynamicPositionList[indexC + 1][2].length > 0) {
-                        if (dynamicPositionList[indexC][2][0].position != dynamicPositionList[indexC + 1][2][0].position) {
+                    
+                        if (dynamicPositionList[indexC][2][0].position != dynamicPositionList[indexC + 1][2][0].position 
+                            && dynamicPositionList[indexC][2][0].idJoueur != dynamicPositionList[indexC + 1][2][0].idJoueur ) {
                             let indexIDJoueur = dynamicPositionList[indexC][1].findIndex((joueur) => joueur.id === dynamicPositionList[indexC][2][0].idJoueur);
+                            
                             if (indexIDJoueur != -1) {
-                                if (dynamicPositionList[indexC][1][indexIDJoueur].myArray.length <= 1) {
-                                    ballonMove = true;
-                                }
+                               
+                                ballonMove = true;
+                                
                             }
                         }
                     }
@@ -1110,10 +1173,14 @@ export function Field({}) {
                     if (playerB && !comparePositions(positionA, playerB[1])) {
                         listJoueurModify.push([id, playerB[1]]);
                     }
-                });
+                 });
             }
 
+            //Case player hold ball or there is no continuation
+            
+
             if (ballonMove) {
+                saveBallonID =  dynamicPositionList[indexC][2][0].idJoueur;
                 dynamicPositionList[indexC][2][0].idChange("");
                 let listNumb = [[-100, -100], [dynamicPositionList[indexC][2][0].position[0], 1 - dynamicPositionList[indexC][2][0].position[1]]];
                 let addCx = 1;
@@ -1167,7 +1234,13 @@ export function Field({}) {
                 let getXYListEnd = getPourcentageCenter(newAnimationPathBallon[newAnimationPathBallon.length - 1][0], 1 - newAnimationPathBallon[newAnimationPathBallon.length - 1][1]);
                 setAnimationPathBallon([getXYListStart, getXYListEnd]);
                 prioAnimation(listNumb, 0, atLeastOneChange, listJoueurModify, indexC);
+                console.log("---> GO BALLON");
             } else {
+                if(!atLeastOneChange && indexC == dynamicPositionList.length - 1){
+                    setSuperAnimation(false);
+                    animationEnCours = false;
+                    
+                }
                 animateSuite(atLeastOneChange, listJoueurModify, indexC);
             }
         } else {
@@ -1198,6 +1271,7 @@ export function Field({}) {
                     dispatch(setPlayerPaths(JSON.stringify(buffPlayerPaths)))
                 }
             } else if (modifyIndex != -1) {
+                atLeastOneChange = true; //Un changement dans la position suivante
                 let listNumb: number[][] = [[-100, -100], [joueur.position[0], 1 - joueur.position[1]]];
                 let addCx: number = 1;
                 let addCy: number = 1;
@@ -1251,7 +1325,6 @@ export function Field({}) {
                 goAnimation(joueur, 0, indexCheck, indexC);
             }
         });
-
         if (dynamicPositionList.length == indexC + 1 && atLeastOneChange) {
             const newList: Player[] = [];
 
@@ -1266,15 +1339,30 @@ export function Field({}) {
                 }
             });
 
+
+            let testPos = dynamicPositionList;
+            if(saveBallonID != ""){
+                testPos[indexC][2][0].idChange(saveBallonID);
+            }
             setDynamicPositionList((prevPos: [number, Player[], Ballon[]][]) => [
                 ...prevPos,
                 [indexC + 2, newList, prevPos[indexC][2]],
             ]);
 
+           
+            testPos.push([indexC + 2, newList, testPos[indexC][2]]);
+            
+            
+
             dispatch(setPlayerPaths("[]"))
             setCurrentDraw([]);
-            setNumCCC(numCCC + 1)
-            dispatch(setPositionList(JSON.stringify(dynamicPositionList)))
+            dispatch(setPositionList(JSON.stringify(testPos)));
+            //setNumCCC(numCCC + 1)
+           
+        }else if(!atLeastOneChange){
+            //Aucun changement on passe.
+            console.log("PAS DE CHANGEMENT MAN");
+            checkEndingAnimation(false);
         }
     };
 
@@ -1312,29 +1400,69 @@ export function Field({}) {
             } else {
                 j.positionChange([j.myArray[1][0], 1 - j.myArray[1][1]]);
                 j.pathArraySetup([]);
+              
             }
 
             setcheckForEnd((prevC) => [...prevC, true]);
 
-            dispatch(setPositionList(JSON.stringify(dynamicPositionList)))
+            //dispatch(setPositionList(JSON.stringify(dynamicPositionList)))
         }
     };
 
 
-    const checkEndingAnimation = () => {
-        if (dynamicPositionList.length - 1 > position.positionIndex) {
-            console.log("HELLO")
-            if (dynamicPositionList[position.positionIndex][2].length > 0) {
-                dynamicPositionList[position.positionIndex][2][0].idChange(option.inputPlayerId);
-            }
+    const checkEndingAnimation = (atLeastOneChange:boolean) => {
 
-            if (numAnimation > 0) {
-                setNumAnimation(numAnimation + 1);
-            } else {
-                setNumAnimation(numAnimation * -1 + 1);
+        if(dynamicPositionList.length - 2 >= position.positionIndex ){
+            if(dynamicPositionList[position.positionIndex].length > 0){
+
+                if(dynamicPositionList[position.positionIndex][1].some((j) => j.myArray.length > 0 &&
+                j.myArray[0][0] == -100 && j.myArray[0][1] == -100)){
+                    let newPaths = dynamicPositionList;
+                    newPaths[position.positionIndex][1].map((joueur) => {
+                        //Si l'array est imaginaire on le supprime
+                        if(joueur.myArray.length > 0){
+                            if(joueur.myArray[0][0] == -100 && joueur.myArray[0][1] == -100){
+                                joueur.myArray = [];
+                            }
+                        }
+                    });
+
+                    dispatch(setPositionList(JSON.stringify(newPaths)));
+                }
             }
-            dispatch(setPositionIndex(position.positionIndex + 1));
+        }
+        
+        if (dynamicPositionList.length - 2>= position.positionIndex && !reloadingMode) {
+     
+            console.log("change ? Flag 4",atLeastOneChange);
+            if(atLeastOneChange){
+                setSuperAnimation(true);
+                if (numAnimation > 0) {
+                    setNumAnimation(numAnimation + 1);
+                } else {
+                    setNumAnimation(numAnimation * -1 + 1);
+                }
+                dispatch(setPositionIndex(position.positionIndex + 1));
+                
+            }else{
+                setSuperAnimation(false)
+                 if (numAnimation > 0) {
+                    setNumAnimation(numAnimation + 1);
+                } else {
+                    setNumAnimation(numAnimation * -1 + 1);
+                }
+                dispatch(setPositionIndex(position.positionIndex + 1));
+            }
+            
+        }else if(reloadingMode){
+            setSuperAnimation(false);
+            animationEnCours = false;
+            setNumCCC(numCCC+1);
             dispatch(selectZoomMode())
+        }else{
+            dispatch(selectZoomMode())
+            setSuperAnimation(false);
+            animationEnCours = false;
         }
     };
 
@@ -1343,6 +1471,7 @@ export function Field({}) {
 
         if (j.length > index) {
             if (j[index][0] != -100) {
+                atLeastOneChange = true;
                 center = [((superSvg_Field[0][0] + superSvg_Field[0][2] + superSvg_Field[0][4] + superSvg_Field[0][5]) / 4), ((superSvg_Field[0][1] + superSvg_Field[0][3] + superSvg_Field[0][3] + superSvg_Field[0][6]) / 4)]
                 let svg_Mode = proportionSVG(ballon_svg, ((superSvg_Field[0][5] - superSvg_Field[0][0]) / (svg_fieldUNCHANGED[5] - svg_fieldUNCHANGED[0])))
 
@@ -1362,15 +1491,19 @@ export function Field({}) {
                 dynamicPositionList[position.positionIndex][2][0].positionChange([j[1][0], 1 - j[1][1]]);
                 setAnimationPathBallon([]);
             }
+            if(listJoueurModify.length == 0){
+                atLeastOneChange = false;
+            }
             animateSuite(atLeastOneChange, listJoueurModify, indexC);
         }
     };
 
+    let closestID: [string, number[]] = ["",[]];
     const closestPlayerToBallon = () => {
         if (dynamicPositionList[position.positionIndex][1].length > 0 && dynamicPositionList[position.positionIndex][2].length > 0) {
             let positionBallon = dynamicPositionList[position.positionIndex][2][0].position;
             let closestValue = 1000;
-            let closestID: [string, number[]] = ["", positionBallon];
+            closestID = ["", positionBallon];
             let currentValue = 1000;
             dynamicPositionList[position.positionIndex][1].map((joueur) => {
                 currentValue = Math.abs(joueur.position[0] - positionBallon[0]) + Math.abs(joueur.position[1] - positionBallon[1]);
@@ -1390,6 +1523,10 @@ export function Field({}) {
                 }
             });
             dispatch(setClosestPlayer(JSON.stringify(closestID)))
+
+            if(superAnimation){
+                console.log(closestID);
+            }
         }
     };
 
@@ -1405,20 +1542,25 @@ export function Field({}) {
         }
         setAll();
 
-        center = [((superSvg_Field[0][0] + superSvg_Field[0][2] + superSvg_Field[0][4] + superSvg_Field[0][5]) / 4), ((superSvg_Field[0][1] + superSvg_Field[0][3] + superSvg_Field[0][3] + superSvg_Field[0][6]) / 4)]
-        let svg_Mode = proportionSVG(player, ((superSvg_Field[0][5] - superSvg_Field[0][0]) / (svg_fieldUNCHANGED[5] - svg_fieldUNCHANGED[0])))
-        dynamicPositionList[positionI][1].map((joueur: Player) => {
-            svg_Mode = diffSVG(svg_Mode, getCenter(svg_Mode), xArrayPlayer, getPourcentageCenter(joueur.position[0], joueur.position[1]))
-            joueur.svgValue(svg_Mode);
-        });
+        if(dynamicPositionList[positionI].length > 0){
+            center = [((superSvg_Field[0][0] + superSvg_Field[0][2] + superSvg_Field[0][4] + superSvg_Field[0][5]) / 4), ((superSvg_Field[0][1] + superSvg_Field[0][3] + superSvg_Field[0][3] + superSvg_Field[0][6]) / 4)]
+            let svg_Mode = proportionSVG(player, ((superSvg_Field[0][5] - superSvg_Field[0][0]) / (svg_fieldUNCHANGED[5] - svg_fieldUNCHANGED[0])))
+    
+            dynamicPositionList[positionI][1].map((joueur: Player) => {
+                        svg_Mode = diffSVG(svg_Mode, getCenter(svg_Mode), xArrayPlayer, getPourcentageCenter(joueur.position[0], joueur.position[1]))
+                        joueur.svgValue(svg_Mode);
+             });
+             svg_Mode = proportionSVG(ballon_svg, ((superSvg_Field[0][5] - superSvg_Field[0][0]) / (svg_fieldUNCHANGED[5] - svg_fieldUNCHANGED[0])))
+             dynamicPositionList[positionI][2].map((ball: Ballon) => {
+                svg_Mode = diffSVG(svg_Mode, getCenterBallon(svg_Mode), xBallon_Array, getPourcentageCenter(ball.position[0], ball.position[1]))
+                ball.svgValue(svg_Mode);
+            });
 
-        svg_Mode = proportionSVG(ballon_svg, ((superSvg_Field[0][5] - superSvg_Field[0][0]) / (svg_fieldUNCHANGED[5] - svg_fieldUNCHANGED[0])))
-        dynamicPositionList[positionI][2].map((ball: Ballon) => {
-            svg_Mode = diffSVG(svg_Mode, getCenterBallon(svg_Mode), xBallon_Array, getPourcentageCenter(ball.position[0], ball.position[1]))
-            ball.svgValue(svg_Mode);
-        });
+            showPlayer(false, positionI);
 
-        showPlayer(false, positionI);
+        }
+        
+        
 
         dispatch(setPositionList(JSON.stringify(dynamicPositionList)))
     };

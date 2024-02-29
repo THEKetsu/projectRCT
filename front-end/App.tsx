@@ -18,7 +18,7 @@ export default function App() {
     return (
         <NavigationContainer>
             <Provider store={store}>
-                <Stack.Navigator initialRouteName={"Home"}>
+                <Stack.Navigator initialRouteName={"Strategy"}>
                     <Stack.Screen name={"Home"} component={Home} options={{headerShown: false, gestureEnabled: false}}/>
                     <Stack.Screen name={"Register"} component={Register}
                                   options={{headerShown: false, gestureEnabled: false}}/>

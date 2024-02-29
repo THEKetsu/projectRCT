@@ -174,7 +174,11 @@ const TopWidget = ({onPlayButtonPress, selectedItem}: {
     const launchAnimate = () => {
         returnPublicInstance.indexAnimation = returnPublicInstance.indexAnimation + 1;
         dispatch(triggerRefreshAnimation());
-        console.log("Change indexAnimation : ", returnPublicInstance.indexAnimation);
+    }
+
+    const launchSingleAnimate = () => {
+        returnPublicInstance.reloadAnimation = returnPublicInstance.reloadAnimation + 1;
+        dispatch(triggerRefreshAnimation());
     }
 
     return (
@@ -191,9 +195,14 @@ const TopWidget = ({onPlayButtonPress, selectedItem}: {
                 </TouchableOpacity>
                 <TouchableOpacity
                     style={styles.topWidgetButton}
-                    onPress={retrieveReduxPosition}>
+                    onPress={launchSingleAnimate}>
                     <Image source={reload} style={styles.PlayButton}/>
                 </TouchableOpacity>
+                {/* <TouchableOpacity
+                    style={styles.topWidgetButton}
+                    onPress={retrieveReduxPosition}>
+                    <Image source={reload} style={styles.PlayButton}/>
+                </TouchableOpacity> */}
             </View>
         </View>
     );

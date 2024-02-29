@@ -68,14 +68,14 @@ export default function Options({animate, setIsOpen}) {
                                 <Text style={styles.titleTeam}>Equipe</Text>
                                 <View style={styles.teamButton}>
                                     <TouchableOpacity
-                                        onPress={() => setSelectedTeam('blue')}
+                                        onPress={() => setSelectedTeam('B')}
                                         style={[
                                             styles.buttonLeft,
                                             selectedTeam === 'B' && styles.selectedButton,
                                         ]}
                                     />
                                     <TouchableOpacity
-                                        onPress={() => setSelectedTeam('red')}
+                                        onPress={() => setSelectedTeam('R')}
                                         style={[
                                             styles.buttonRight,
                                             selectedTeam === 'R' && styles.selectedButton,
@@ -84,9 +84,9 @@ export default function Options({animate, setIsOpen}) {
                                 </View>
                                 <Text style={styles.titleTeam}>Poste</Text>
                                 <TextInput
-                                    placeholder="Enter Player ID [B/R][Number] ex: B6"
-                                    value={option.inputPlayerId}
-                                    onChangeText={(text) => AddPlayer(text)}
+                                    placeholder="Entrez le numéro du joueur"
+                                    value={option.inputPlayerId.substring(1)}
+                                    onChangeText={(text) => dispatch(setInputPlayerId(selectedTeam+text))}
                                     style={styles.input}
                                 />
                             </View>
@@ -95,40 +95,51 @@ export default function Options({animate, setIsOpen}) {
                     {toolbar.playerMode && (option.selectedPlayer != '') && (option.selectedPlayer[option.selectedPlayer.length - 1] != 'P')
                         && (
                             <>
-                                <TextInput
+                                {/* <TextInput
                                     placeholder="Enter Player ID [B/R][Number] ex: B6"
                                     value={option.inputPlayerId}
                                     onChangeText={(text) => dispatch(setInputPlayerId(text))}
 
+                                /> */}
+                                <View style={styles.playerList}>
+                                <View style={styles.teamButton}>
+                                <Pressable
+                                    onPress={() => replacePlayerID(`B${option.selectedPlayer.substring(1)}`, dispatch, position, option)}
+                                    style={[
+                                        styles.buttonLeft,
+                                        option.selectedPlayer[0] === 'B' && styles.selectedButton,
+                                    ]}
                                 />
+                                
+
+                                <Pressable
+                                    onPress={() => replacePlayerID(`R${option.selectedPlayer.substring(1)}`, dispatch, position, option)}
+                                    style={[
+                                        styles.buttonRight,
+                                        option.selectedPlayer[0] === 'R' && styles.selectedButton,
+                                    ]}
+                                />
+        
+                                </View>
+
                                 <TextInput
                                     placeholder={option.selectedPlayer.slice(1)}
                                     onChangeText={text => setChangeId(text)}
                                     onSubmitEditing={() => replacePlayerID(`${option.selectedPlayer[0]}${changeId}`, dispatch, position, option)}
                                     style={styles.input}
                                 />
+                                
+                                
+
 
                                 <Pressable
                                     onPress={() => deletePlayer(dispatch, position, option)}
                                 >
                                     <Image source={trash} style={styles.linkImageButton}/>
                                 </Pressable>
+                                </View>
 
-                                <Pressable
-                                    onPress={() => replacePlayerID(`B${option.selectedPlayer.substring(1)}`, dispatch, position, option)}
-                                >
-                                    <Text>
-                                        BLUE
-                                    </Text>
-                                </Pressable>
-
-                                <Pressable
-                                    onPress={() => replacePlayerID(`R${option.selectedPlayer.substring(1)}`, dispatch, position, option)}
-                                >
-                                    <Text>
-                                        RED
-                                    </Text>
-                                </Pressable>
+                                
                             </>
                         )
                     }
@@ -154,7 +165,7 @@ export default function Options({animate, setIsOpen}) {
                                 </TouchableOpacity>
 
                                 <Text style={styles.closestPlayer}>
-                                    Joueur lié :{JSON.parse(option.closestPlayer)[0]}
+                                    Joueur le plus proche :{JSON.parse(option.closestPlayer)[0]}
                                 </Text>
 
                         <TouchableOpacity

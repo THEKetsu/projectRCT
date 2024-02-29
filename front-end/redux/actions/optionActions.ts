@@ -54,6 +54,7 @@ export function replacePlayerID (text: string, dispatch: Dispatch<any>, position
         if (indexID != -1) {
             if (buffPositionList[position.positionIndex][2].length > 0) {
                 if (buffPositionList[position.positionIndex][2][0].idJoueur === buffPositionList[position.positionIndex][1][indexID].id) {
+                    
                     buffPositionList[position.positionIndex][2][0].idChange(text)
                     dispatch(setPositionList(JSON.stringify(buffPositionList)))
                 }
