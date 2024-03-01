@@ -6,6 +6,8 @@ import Feather from "react-native-vector-icons/Feather";
 import Octicons from "react-native-vector-icons/Octicons";
 import { retrieveStrategies, subscribeToStrategies } from '../../firebase/firebase';
 import { deleteStrategy } from '../../firebase/firebase';
+import { collection, doc, getDocs, updateDoc } from 'firebase/firestore';
+import { db } from '../../firebase/firebase';
 const dimWidth = Dimensions.get('window').width;
 const dimHeight = Dimensions.get('window').height;
 const starSize = dimWidth * 0.02; // Adjust this factor according to your preference
@@ -13,14 +15,13 @@ const backButtonSize = dimWidth * 0.02;
 const fieldSize = dimWidth * 0.05;
 
  
-
-  
-  
-
 // @ts-ignore
 export default function SelectStrategy ({ navigation }) {
-const [strategies, setStrategies] = useState<any[]>([]);
-const [filteredStrategies, setFilteredStrategies] = useState<any[]>([]); // Nouvel état pour stocker les stratégies filtrées
+  const [strategies, setStrategies] = useState<any[]>([]);
+  const [filteredStrategies, setFilteredStrategies] = useState<any[]>([]); // Nouvel état pour stocker les stratégies filtrées
+  const [editingItemId, setEditingItemId] = useState<number | null>(null);
+  const [editingItemName, setEditingItemName] = useState('');
+
 useEffect(() => {
     const unsubscribe = subscribeToStrategies((updatedStrategies: any[]) => {
       setStrategies(updatedStrategies);
@@ -29,12 +30,23 @@ useEffect(() => {
     // Nettoyer l'abonnement lorsque le composant est démonté
     return () => unsubscribe();
   }, []);
+  useEffect(() => {
+    console.log('Strategies updated:', strategies);
+    if (strategies.length === 0) {
+      fetchData();
+    } else {
+      setFilteredStrategies(strategies); // Initialise les stratégies filtrées avec toutes les stratégies disponibles
+    }
+  }, [strategies]); 
      useEffect(() => {
-         fetchData();
-     }, []);
-     useEffect(() => {
+      console.log('Strategies updated:', strategies);
+      if (strategies.length < 0) {
+        const strategiesData = retrieveStrategies();
+        setFilteredStrategies(strategiesData);
+      }
       setFilteredStrategies(strategies); // Initialise les stratégies filtrées avec toutes les stratégies disponibles
     }, [strategies]); // Met à jour les stratégies filtrées lorsque les stratégies initiales changent
+
      const fetchData = async () => {
          try {
              const strategiesData = await retrieveStrategies();
@@ -62,9 +74,36 @@ useEffect(() => {
     };
 
 
+    const handleEditItem = async (id: number, name: string) => {
+      try {
+        // Récupérer l'ID du document Firebase correspondant à l'ID de la stratégie
+        const querySnapshot = await getDocs(collection(db, 'Strategy'));
+        let firestoreId: string | null = null;
+        querySnapshot.forEach(doc => {
+          if (doc.data().id === id) {
+            firestoreId = doc.id;
+          }
+        });
+    
+        // Vérifier si l'ID Firestore a été trouvé
+        if (!firestoreId) {
+          console.error('Firestore ID not found for selected item');
+          return;
+        }
+    
+        // Mettre à jour le nom de la stratégie
+        const strategyRef = doc(db, 'Strategy', firestoreId);
+        await updateDoc(strategyRef, { name: name });
+    
+        // Recharger les données
+        fetchData();
+      } catch (error) {
+        console.error('Error updating item:', error);
+      }
+    };
 
 
-  const renderItem = ({ item }) => {
+  const renderItem = ({ item  }) => {
     return (
         <TouchableOpacity
           onPress={() => handleItemClick(item.id)} // Appel de la fonction lorsqu'un élément est cliqué
@@ -74,12 +113,27 @@ useEffect(() => {
           ]}
         >
           <Image source={require('../../assets/Field_Stack.png')} style={styles.fieldImage} />
-          <Text style={styles.cellText}>{item.name}</Text>
+          {editingItemId === item.id ? (
+        <TextInput
+          value={editingItemName}
+          onChangeText={setEditingItemName}
+        />
+        ) : (
+        <Text style={styles.cellText}>{item.name}</Text>)}
           <View style={styles.actionButtonContainer}>
           <TouchableOpacity style={styles.deleteButton} onPress={() => handleDeleteItem(item.id)}>
             <Feather name={"trash"} size={40} color={"red"} />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.pencilButton}>
+          <TouchableOpacity style={styles.pencilButton} onPress={() => {
+          if (editingItemId === item.id) {
+            handleEditItem(item.id, editingItemName);
+            setEditingItemId(null);
+            setEditingItemName('');
+          } else {
+            setEditingItemId(item.id);
+            setEditingItemName(item.name);
+          }
+        }}>
             <Octicons name={"pencil"} size={40} color={"grey"} />
           </TouchableOpacity>
           </View>
@@ -87,6 +141,8 @@ useEffect(() => {
           
       );
   };
+
+
     const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
     const [stratName, NameStrat] = useState('');
     const [loaded] = useFonts({

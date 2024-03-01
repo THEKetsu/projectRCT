@@ -23,7 +23,7 @@ export default function CreateStrategy () {
       alert('Veuillez entrer un nom de stratégie');
       return;
     }
-    addStrategyToDB(strategyName);
+    addStrategyToDB(strategyName, []);
     navigation.navigate('SelectStrategy');
 };
 
