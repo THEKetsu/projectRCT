@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getFirestore, addDoc, collection, deleteDoc, doc, getDocs, DocumentData, updateDoc, arrayRemove, arrayUnion } from "firebase/firestore";
+import { getFirestore, addDoc, collection, deleteDoc, doc, getDocs, DocumentData, updateDoc, arrayRemove, arrayUnion, getDoc } from "firebase/firestore";
 import field from '../assets/rct_field.png';
 import { onSnapshot} from 'firebase/firestore';
 
@@ -34,7 +34,7 @@ const addStrategyToDB = async (name: string, scenarios: any[]) => {
         scenarios: scenarios // Ajouter les scénarios à la stratégie
       };
       const docRef = await addDoc(collection(db, 'Strategy'), newItem);
-      console.log('Document written with ID: ', docRef.id);
+      //console.log('Document written with ID: ', docRef.id);
     } else {
       console.error('Failed to get next ID');
     }
@@ -52,7 +52,7 @@ const retrieveStrategies = async () => {
       strategies.push(doc.data());
     });
 
-    console.log('Retrieved strategies: ', strategies);
+    //console.log('Retrieved strategies: ', strategies);
     return strategies;
   } catch (error) {
     console.error('Error retrieving strategies: ', error);
@@ -82,7 +82,7 @@ const deleteStrategy = async (id: any) => {
       // Supprimer la stratégie
       await deleteDoc(doc(db, 'Strategy', firestoreId));
       
-      console.log('Strategy deleted successfully');
+      //console.log('Strategy deleted successfully');
     } else {
       console.error('Strategy with ID ', id, ' not found');
     }
@@ -121,6 +121,39 @@ const subscribeToStrategies = (callback: (strategies: any[]) => void) => {
   });
 };
 
+const loadStrategyFromDB = async (id: any) => {
+  try {
+    if (id !== null) {
+      const querySnapshot = await getDocs(collection(db, 'Strategy'));
+      let firestoreId: string | null = null;
+      querySnapshot.forEach(doc => {
+          if (doc.data().id === id) {
+              firestoreId = doc.id;
+          }
+      });
 
+      // Vérifier si l'ID Firestore a été trouvé
+      if (!firestoreId) {
+          console.error('Firestore ID not found for selected item');
+          return;
+      }
+      
+      const docRef = doc(db, 'Strategy', firestoreId);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        //console.log('Document data:', docSnap.data());
+        return docSnap.data();
+      } else {
+        console.error('No such document!');
+        return null;
+      }
+    } else {
+      console.error('Strategy with ID ', id, ' not found');
+    }
+  } catch (error) {
+    console.error('Error getting document:', error);
+    return null;
+  }
+}
 export { subscribeToStrategies };
-export { getNextId, addStrategyToDB, retrieveStrategies, deleteStrategy, auth, db };
+export { getNextId, addStrategyToDB, retrieveStrategies, deleteStrategy, loadStrategyFromDB };

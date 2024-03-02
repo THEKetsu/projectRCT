@@ -16,6 +16,7 @@ import {setPositionIndex, setPositionList} from "../../redux/actions/positionAct
 import {FreeDraw, Option, PlayerPath, Position, ShirtDigit, Toolbar} from '../../utils/interfaces';
 import {parse} from "react-native-svg";
 import {parsePositionList} from "../../utils/functions";
+import { DocumentData } from 'firebase/firestore';
 
 /**
  * Renders the TopWidget component.
@@ -24,10 +25,24 @@ import {parsePositionList} from "../../utils/functions";
  * @param {string | null} selectedItem - The selected item or null
  * @return {JSX.Element} JSX element representing the TopWidget component
  */
-const TopWidget = ({onPlayButtonPress, selectedItem}: {
+const TopWidget = ({onPlayButtonPress, selectedItem,strategy}: {
     onPlayButtonPress: (info: string) => void,
-    selectedItem: string | null
+    selectedItem: string | null,
+    strategy : Promise<DocumentData | null | undefined>
 }) => {
+    const [strategyData, setStrategyData] = useState<DocumentData | null | undefined>(null);
+
+    useEffect(() => {
+        if (strategy) { // Vérifier si la promesse n'est pas null
+            // Mettre à jour l'état lorsque la promesse est résolue
+            strategy.then((data) => {
+                setStrategyData(data); // Mettre à jour l'état avec les données de la promesse
+            }).catch((error) => {
+                console.error("Erreur lors de la récupération de la stratégie :", error);
+            });
+        }
+    }, [strategy]);
+    //console.log("STRATEGY",strategyData);
     const position: Position = useAppSelector((state) => state.position)
     const dispatch = useAppDispatch()
     const [dynamicPositionList, setDynamicPositionList] = useState<[number, Player[], Ballon[]][]>([]);

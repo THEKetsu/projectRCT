@@ -24,6 +24,7 @@ const dimHeight = Dimensions.get('window').height;
 const starSize = dimWidth * 0.02; // Adjust this factor according to your preference
 const backButtonSize = dimWidth * 0.02;
 const fieldSize = dimWidth * 0.05;
+import { returnPublicInstance } from '../../classes/ReturnPublicManager';
 
  
 // @ts-ignore
@@ -173,6 +174,7 @@ useEffect(() => {
         return null;
     }
     const handleItemClick = (id: number) => {
+      returnPublicInstance.IdStrategy = id;
       console.log('Item clicked:', id);
       setSelectedItemId(id); // Mettre à jour l'ID de l'élément sélectionné lorsqu'il est cliqué
       navigation.navigate("Strategy");

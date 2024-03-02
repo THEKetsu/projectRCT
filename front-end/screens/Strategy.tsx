@@ -1,16 +1,26 @@
 import {StyleSheet, View} from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {GestureHandlerRootView} from "react-native-gesture-handler";
 import {Field} from "../components/Field/Field";
 import ToolBar from "../components/ToolBar/ToolBar";
 import DrawerLeft from '../components/drawer/DrawerLeft';
 import TopWidget from '../components/drawer/TopWidget';
-
-
+import { returnPublicInstance } from '../classes/ReturnPublicManager';
+import { loadStrategyFromDB } from '../firebase/firebase';
 export default function Strategy() {
     const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
     const [selectedItem, setSelectedItem] = useState<string | null>(null);
 
+    const [strategy, setStrategy] = useState<any | null>(null);
+
+    useEffect(() => {    
+    //console.log(returnPublicInstance.IdStrategy);
+    if (returnPublicInstance.IdStrategy !== 0){
+       const strategy = loadStrategyFromDB(returnPublicInstance.IdStrategy);
+       //console.log("Test",strategy);
+       setStrategy(strategy);
+    }
+    }, [returnPublicInstance.IdStrategy]);
     /**
      * Handle the press event on the play button.
      *
@@ -43,8 +53,8 @@ export default function Strategy() {
     return (
         <View style={styles.container}>
             {isDrawerOpen &&
-                <DrawerLeft onClose={handleCloseDrawer} isOpen={isDrawerOpen} onItemSelected={handleItemSelected}/>}
-            {!isDrawerOpen && <TopWidget onPlayButtonPress={handlePressPlayButton} selectedItem={selectedItem}/>}
+                <DrawerLeft onClose={handleCloseDrawer} isOpen={isDrawerOpen} onItemSelected={handleItemSelected} strategy={strategy}/>}
+            {!isDrawerOpen && <TopWidget onPlayButtonPress={handlePressPlayButton} selectedItem={selectedItem} strategy={strategy}/>}
             <GestureHandlerRootView style={{flex: 1}}>
                 <Field/>
                 <ToolBar/>
