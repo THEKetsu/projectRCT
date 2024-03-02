@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase/app";
-import {Auth, getAuth} from "firebase/auth";
-import { getFirestore, addDoc, collection, deleteDoc, doc, getDocs, DocumentData } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
+import { getFirestore, addDoc, collection, deleteDoc, doc, getDocs, DocumentData, updateDoc, arrayRemove, arrayUnion } from "firebase/firestore";
+import field from '../assets/rct_field.png';
 import { onSnapshot} from 'firebase/firestore';
 
 const firebaseConfig = {
@@ -19,6 +20,30 @@ const app = initializeApp(firebaseConfig);
 export const auth: Auth = getAuth(app);
 export const db = getFirestore(app);
 
+
+// Fonction pour ajouter une stratégie avec des scénarios
+const addStrategyToDB = async (name: string, scenarios: any[]) => {
+  try {
+    const nextId = await getNextId();
+    if (nextId !== null) {
+      const newItem = {
+        id: nextId,
+        name: name,
+        image: field,
+        timestamp: Date.now(),
+        scenarios: scenarios // Ajouter les scénarios à la stratégie
+      };
+      const docRef = await addDoc(collection(db, 'Strategy'), newItem);
+      console.log('Document written with ID: ', docRef.id);
+    } else {
+      console.error('Failed to get next ID');
+    }
+  } catch (error) {
+    console.error('Error adding document: ', error);
+  }
+};
+
+// Fonction pour récupérer les stratégies avec leurs scénarios
 const retrieveStrategies = async () => {
   try {
     const strategies: DocumentData[] = [];
@@ -35,43 +60,7 @@ const retrieveStrategies = async () => {
   }
 };
 
-const getNextId = async () => {
-  try {
-    const strategies = await retrieveStrategies();
-    let maxId = 0;
-    strategies.forEach((strategy) => {
-      if (strategy.id > maxId) {
-        maxId = strategy.id;
-      }
-    });
-    return maxId + 1;
-  } catch (error) {
-    console.error('Error getting next ID: ', error);
-    return null;
-  }
-};
-
-const addStrategyToDB = async (name: string) => {
-  try {
-    const nextId = await getNextId();
-    if (nextId !== null) {
-      const newItem = {
-        id: nextId,
-        name: name,
-        image: field,
-        timestamp: Date.now(),
-        data: []
-      };
-      const docRef = await addDoc(collection(db, 'Strategy'), newItem);
-      console.log('Document written with ID: ', docRef.id);
-    } else {
-      console.error('Failed to get next ID');
-    }
-  } catch (error) {
-    console.error('Error adding document: ', error);
-  }
-};
-
+// Fonction pour supprimer une stratégie et ses scénarios
 const deleteStrategy = async (id: any) => {
   try {
     if (id !== null) {
@@ -89,10 +78,10 @@ const deleteStrategy = async (id: any) => {
           console.error('Firestore ID not found for selected item');
           return;
       }
+
+      // Supprimer la stratégie
       await deleteDoc(doc(db, 'Strategy', firestoreId));
-      // cherche parmis tous les stratégies celle qui a l'id correspondant et supprime la bonne stratégie
-
-
+      
       console.log('Strategy deleted successfully');
     } else {
       console.error('Strategy with ID ', id, ' not found');
@@ -102,21 +91,36 @@ const deleteStrategy = async (id: any) => {
   }
 }
 
+const getNextId = async () => {
+  try {
+    const strategies = await retrieveStrategies();
+    let maxId = 0;
+    strategies.forEach((strategy: any) => {
+      if (strategy.id > maxId) {
+        maxId = strategy.id;
+      }
+    });
+    return maxId + 1;
+  } catch (error) {
+    console.error('Error getting next ID: ', error);
+    return null;
+  }
+};
 
 
 
+
+// Abonnement aux modifications de la collection "Strategies"
 const subscribeToStrategies = (callback: (strategies: any[]) => void) => {
-  return onSnapshot(collection(db, 'Strategy'), (snapshot) => {
+  return onSnapshot(collection(db, 'Strategies'), (snapshot) => {
     const strategies: any[] = [];
-    snapshot.forEach((doc) => {
-      strategies.push(doc.data());
+    snapshot.forEach(doc => {
+      strategies.push({ id: doc.id, ...doc.data() });
     });
     callback(strategies);
   });
 };
 
 
-
 export { subscribeToStrategies };
-
-export { getNextId, addStrategyToDB, retrieveStrategies, deleteStrategy };
+export { getNextId, addStrategyToDB, retrieveStrategies, deleteStrategy, auth, db };
