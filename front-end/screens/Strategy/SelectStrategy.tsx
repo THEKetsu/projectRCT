@@ -104,6 +104,15 @@ useEffect(() => {
 
 
   const renderItem = ({ item  }) => {
+
+
+
+
+
+
+
+
+
     return (
         <TouchableOpacity
           onPress={() => handleItemClick(item.id)} // Appel de la fonction lorsqu'un élément est cliqué
@@ -153,7 +162,9 @@ useEffect(() => {
         return null;
     }
     const handleItemClick = (id: number) => {
-        setSelectedItemId(id); // Mettre à jour l'ID de l'élément sélectionné lorsqu'il est cliqué
+      console.log('Item clicked:', id);
+      setSelectedItemId(id); // Mettre à jour l'ID de l'élément sélectionné lorsqu'il est cliqué
+      navigation.navigate("Strategy");
     };
     
     return (
