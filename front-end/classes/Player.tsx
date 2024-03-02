@@ -49,5 +49,9 @@ export default class Player {
     }
   }
 
+  speedChange(value: number): void{
+    this.speed = value;
+  }
+
 }
 

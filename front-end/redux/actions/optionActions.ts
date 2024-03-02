@@ -81,6 +81,26 @@ export function replacePlayerID (text: string, dispatch: Dispatch<any>, position
     }
 }
 
+export function modifySpeed(dispatch: Dispatch<any>, position: Position, option: Option, speedValue: number){
+    let indexID: number = JSON.parse(position.positionList)[position.positionIndex][1].findIndex((joueur: Player): boolean => joueur.id === option.selectedPlayer);
+
+    if(indexID != -1){
+        let newPositionList: [number, Player[], Ballon[]][] = JSON.parse(position.positionList);
+        newPositionList[position.positionIndex][1].map((j, index) => {
+            let objectIntoPlayer = Player.createPlayer(j.position, j.id, j.myArray, j.svg_player, j.speed);
+            newPositionList[position.positionIndex][1][index] = objectIntoPlayer;
+          });
+        // let object = newPositionList[position.positionIndex][1][indexID];
+        // let newPlayer = Player.createPlayer(object.position,object.id,object.myArray,object.svg_player,speedValue);
+        // newPositionList[position.positionIndex][1][indexID] = newPlayer;
+        
+        newPositionList[position.positionIndex][1][indexID].speedChange(speedValue);
+ 
+        dispatch(setPositionList(JSON.stringify(newPositionList)));
+        dispatch(triggerRefresh());
+    }
+}
+
 export function deletePlayer (dispatch: Dispatch<any>, position: Position, option: Option) {
     let indexID: number = JSON.parse(position.positionList)[position.positionIndex][1].findIndex((joueur: Player): boolean => joueur.id === option.selectedPlayer);
 

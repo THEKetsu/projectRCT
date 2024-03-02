@@ -31,6 +31,7 @@ import {FreeDraw, Option, PlayerPath, Position, ShirtDigit, Toolbar} from '../..
 import Options from "../Options/Options";
 import RightDrawer from '../Options/RightDrawer';
 import { toLinearSpace } from 'react-native-reanimated/lib/typescript/reanimated2/Colors';
+import { equal } from 'assert';
 
 export function Field({}) {
     const position: Position = useAppSelector((state) => state.position);
@@ -90,6 +91,7 @@ export function Field({}) {
     const [currentDraw, setCurrentDraw] = useState<FreeDraw[]>([]);
     const [superField, setSuperField] = useState(superSvg_Field);
     const [numCCC, setNumCCC] = useState(0);
+    const [numReload, setNumReload] = useState(0);
     const [numAnimation, setNumAnimation] = useState(0);
     const [freeID, setFreeID] = useState(-1);
     const [dynamicPositionList, setDynamicPositionList] = useState<[number, Player[], Ballon[]][]>([]);
@@ -174,6 +176,12 @@ export function Field({}) {
     }, [numCCC]);
 
     useEffect(() => {
+        if (dynamicPositionList.length > 0 && dynamicPositionList.length - 1 >= position.positionIndex) {
+            simulateRefresh(position.positionIndex, false);
+        }
+    }, [numReload]);
+
+    useEffect(() => {
         if (option.refresh != null) {
             if (option.refresh > 0) {
                 setNumCCC(numCCC + 1)
@@ -197,10 +205,9 @@ export function Field({}) {
         if (dynamicPositionList.length > 0 && dynamicPositionList.length - 1 >= position.positionIndex) {
             if (numAnimation > 0) {
                 simulateRefresh(position.positionIndex, true);
-            } else {
+            } else if (numAnimation < 0) {
                 simulateRefresh(position.positionIndex, false);
             }
-
             if (!isFirstLoad) {
                 if (dynamicPositionList.length - 1 >= position.positionIndex) {
                     
@@ -719,6 +726,10 @@ export function Field({}) {
             let colorSpeed: string;
             let getXY: number[] = getPourcentageCenter(joueur.position[0], joueur.position[1]);
 
+        
+            if (typeof joueur.speed === 'string') {
+                joueur.speed = parseInt(joueur.speed, 10);
+              }
 
             if (joueur.id[0] == 'B') {
                 color = "#0024A6";
@@ -979,6 +990,7 @@ export function Field({}) {
 
         showPlayer(false, position.positionIndex);
         setNumCCC(numCCC + 1)
+        
     };
 
     const setupPlayerAdding = (event: HandlerStateChangeEvent<TapGestureHandlerEventPayload>) => {
@@ -1093,7 +1105,6 @@ export function Field({}) {
 
 
     const animate = (indexC: number): void => {
-      
         let waitForLink = false;
         if (dynamicPositionList[indexC].length > 0) {
             if (dynamicPositionList[indexC][2].length > 0) {
@@ -1113,10 +1124,7 @@ export function Field({}) {
                     let joueur = dynamicPositionList[indexC][1][indexJ];
                     let positionBallon = dynamicPositionList[indexC][2][0].position
                     currentValue = Math.abs(joueur.position[0] - positionBallon[0]) + Math.abs(joueur.position[1] - positionBallon[1]);
-                    if(indexC==1){
-                        console.log("MAC",joueur.id);
-                    }
-                   
+
                     if (currentValue < 0.03) {
                         
                         waitForLink = true;
@@ -1234,7 +1242,6 @@ export function Field({}) {
                 let getXYListEnd = getPourcentageCenter(newAnimationPathBallon[newAnimationPathBallon.length - 1][0], 1 - newAnimationPathBallon[newAnimationPathBallon.length - 1][1]);
                 setAnimationPathBallon([getXYListStart, getXYListEnd]);
                 prioAnimation(listNumb, 0, atLeastOneChange, listJoueurModify, indexC);
-                console.log("---> GO BALLON");
             } else {
                 if(!atLeastOneChange && indexC == dynamicPositionList.length - 1){
                     setSuperAnimation(false);
@@ -1361,7 +1368,6 @@ export function Field({}) {
            
         }else if(!atLeastOneChange){
             //Aucun changement on passe.
-            console.log("PAS DE CHANGEMENT MAN");
             checkEndingAnimation(false);
         }
     };
@@ -1434,7 +1440,6 @@ export function Field({}) {
         
         if (dynamicPositionList.length - 2>= position.positionIndex && !reloadingMode) {
      
-            console.log("change ? Flag 4",atLeastOneChange);
             if(atLeastOneChange){
                 setSuperAnimation(true);
                 if (numAnimation > 0) {
@@ -1455,9 +1460,12 @@ export function Field({}) {
             }
             
         }else if(reloadingMode){
+           
             setSuperAnimation(false);
             animationEnCours = false;
-            setNumCCC(numCCC+1);
+
+            
+            setNumReload(numReload +1);
             dispatch(selectZoomMode())
         }else{
             dispatch(selectZoomMode())
@@ -1524,9 +1532,7 @@ export function Field({}) {
             });
             dispatch(setClosestPlayer(JSON.stringify(closestID)))
 
-            if(superAnimation){
-                console.log(closestID);
-            }
+    
         }
     };
 

@@ -1,10 +1,11 @@
-import React, { Dispatch, useState } from "react";
-import { Pressable, Text, TextInput, View, TouchableOpacity, Image} from "react-native";
+import React, { Dispatch, useEffect, useState } from "react";
+import { Pressable, Text, TextInput, View, TouchableOpacity, Image, Picker } from "react-native";
 import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
 import {
     deleteBallon,
     deletePlayer,
     linkToPlayer,
+    modifySpeed,
     replacePlayerID,
     selectPlayer,
     setInputPlayerId,
@@ -30,9 +31,10 @@ export default function Options({animate, setIsOpen}) {
     const toolbar: Toolbar = useAppSelector((state) => state.toolbar);
     const position: Position = useAppSelector((state) => state.position);
     const option: Option = useAppSelector((state) => state.option);
+    const [selectedValue, setSelectedValue] = useState(1)
 
     let reminderText = "Se déplacer";
-
+    
     if (toolbar.ballMode) {
         reminderText = "Ballon mode activé";
     } else if (toolbar.playerMode) {
@@ -49,6 +51,13 @@ export default function Options({animate, setIsOpen}) {
         dispatch(selectPlayer(`${selectedTeam}${text}`));
         dispatch(setInputPlayerId(""));
     }
+
+    const handleValueChange = (itemValue: number) => {
+        setSelectedValue(itemValue);
+        console.log("itemVALUE:::",itemValue);
+        modifySpeed(dispatch, position, option,itemValue);
+      };
+    
 
     return (
         <View style={styles.optioncontainer}>
@@ -128,9 +137,18 @@ export default function Options({animate, setIsOpen}) {
                                     onSubmitEditing={() => replacePlayerID(`${option.selectedPlayer[0]}${changeId}`, dispatch, position, option)}
                                     style={styles.input}
                                 />
-                                
-                                
 
+                                
+                                <Picker
+                                        selectedValue={selectedValue}
+                                        onValueChange={handleValueChange}
+                                    >
+                                        <Picker.Item label="1" value={1} />
+                                        <Picker.Item label="2" value={2} />
+                                        <Picker.Item label="3" value={3} />
+                                </Picker>
+                                
+                                
 
                                 <Pressable
                                     onPress={() => deletePlayer(dispatch, position, option)}
