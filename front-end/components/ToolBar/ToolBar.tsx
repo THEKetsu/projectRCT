@@ -19,7 +19,7 @@ const dimWidth = Dimensions.get('window').width;
 const dimHeight = Dimensions.get('window').height;
 
 export default function ToolBar() {
-    const [positionIndexList, setPositionIndexList] = useState<number[]>([0, 1]);
+    const [positionIndexList, setPositionIndexList] = useState<number[]>([0]);
     const [collapsed, setCollapsed] = useState(false)
     const [animation] = useState(new Animated.Value(0))
     const [selectedPosition, setSelectedPosition] = useState<number>(0)
@@ -51,6 +51,17 @@ export default function ToolBar() {
             setPositionIndexList((prevPositions: number[]) => [...prevPositions, position.positionIndex]);
         }
     }, [position.positionIndex])
+
+    useEffect((): void => {
+        if (position.positionList != "[]" && JSON.parse(position.positionList)[0][0] != 0) {
+            let myLenght = JSON.parse(position.positionList).length;
+            let listI = [];
+            for(let i = 0; i < myLenght; i++){
+                listI.push(i);
+            }
+            setPositionIndexList(listI);
+        }
+    }, [position.positionList])
 
     const handlePress = (item: number) => {
         setSelectedPosition(item)

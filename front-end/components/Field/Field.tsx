@@ -34,7 +34,22 @@ import { toLinearSpace } from 'react-native-reanimated/lib/typescript/reanimated
 import { equal } from 'assert';
 import { saveDataToDB } from '../../firebase/firebase';
 
-export function Field({ data }: { data: [] }) {
+export function Field({ data }: { data: string}) {
+
+    type TransformedData = {
+        position: number;
+        data: {
+          id: string;
+          position: [number, number];
+          array: number[]; 
+        }[];
+        ballon: {
+          position: [number, number];
+          idJoueur: string;
+        }[];
+      }[];
+
+
     const position: Position = useAppSelector((state) => state.position);
     let [px1, py1] = [0, 0];
     let svg_fieldUNCHANGED = [0, 1136.77, 212.877, 2.62354, 920.021, 1131.04, 1136.77]
@@ -113,21 +128,8 @@ export function Field({ data }: { data: [] }) {
 
     const toolbar: Toolbar = useAppSelector((state) => state.toolbar)
     const option: Option = useAppSelector((state) => state.option)
-    function transformData(data) {
-        return data.map(item => {
-            return {
-                position: item.position,
-                data: item.data.map(player => {
-                    return {
-                        id: player.id,
-                        position: player.position,
-                        array: player.array || []
-                    };
-                }),
-                ballon: item.ballon || []
-            };
-        });
-    }
+
+ 
     
     
 // by default
@@ -136,9 +138,54 @@ export function Field({ data }: { data: [] }) {
     }, []);
     // for real data loading
     useEffect(() => {
-        if (data != null && data != undefined  ) {
-            console.log("data", transformData(data));
-            retrievePlayer(transformData(data));
+        if (data != null && data != undefined && data.length > 0 ) {
+            
+            let newD = JSON.parse(data);
+
+            let gigaPosition :  [number, Player[], Ballon[]][] = [];
+            newD.map((thePosition) => {
+                let myPlayersData: Player[] = [];
+                let myBallonData: Ballon[] = [];
+
+                thePosition[1].map((joueur) => {
+                    console.log("Leurs Speed",joueur.speed);
+                    let newJoueur = Player.createPlayer(joueur.position,joueur.id,joueur.myArray,player,joueur.speed)
+                    myPlayersData.push(newJoueur);
+                });
+
+                
+                thePosition[2].map((ballon) => {
+                    let newBallon = Ballon.createBallon(ballon.position,ballon_svg,ballon.idJoueur);
+                    myBallonData = [newBallon];
+                });
+
+                let positionCurrent: [number, Player[], Ballon[]] = [
+                    thePosition[0],
+                    [...myPlayersData],
+                    [...myBallonData]
+                ];
+
+                gigaPosition.push(positionCurrent);
+    
+               
+                myPlayersData = [];
+                myBallonData = [];
+
+            });
+            setDynamicPositionList(gigaPosition);
+            setNumCCC(numCCC + 1);
+
+            setPositionList(JSON.stringify(gigaPosition));
+
+
+
+            //console.log("data", transformData(data));
+            //retrievePlayer(transformData(data));
+        }else if(data != null && data != undefined && data.length == 0){
+            setDynamicPositionList([[1,[],[]]]);
+            setNumCCC(numCCC + 1);
+
+            setPositionList(JSON.stringify([[1,[],[]]]));
         }
     }, [data]);
 
@@ -167,8 +214,7 @@ export function Field({ data }: { data: [] }) {
 
     }, [checkForEnd]);
 
-    useEffect(() => {
-    }, []);
+
 
 
     useEffect(() => {
@@ -637,7 +683,7 @@ export function Field({ data }: { data: [] }) {
     center = [((superSvg_Field[0][0] + superSvg_Field[0][2] + superSvg_Field[0][4] + superSvg_Field[0][5]) / 4), ((superSvg_Field[0][1] + superSvg_Field[0][3] + superSvg_Field[0][3] + superSvg_Field[0][6]) / 4)]
 
     const retrievePlayer = (data : any) => {
-        if (data )
+        //if (data )
         data.map(myPosition => {
             let myPlayersData: Player[] = [];
             let myBallonData: Ballon[] = [];
