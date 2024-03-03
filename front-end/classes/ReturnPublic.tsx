@@ -4,6 +4,7 @@ export class ReturnPublic {
     public reloadAnimation : number = 0;
     public returnActionList: [any[]][] = [];
     public IdStrategy : number = 0;
+    public IdScenario : string = "";
     constructor() {
       // You can initialize the array or perform any other setup here
     }

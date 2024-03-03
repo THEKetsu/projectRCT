@@ -3,6 +3,7 @@ import { getAuth } from "firebase/auth";
 import { getFirestore, addDoc, collection, deleteDoc, doc, getDocs, DocumentData, updateDoc, arrayRemove, arrayUnion, getDoc } from "firebase/firestore";
 import field from '../assets/rct_field.png';
 import { onSnapshot} from 'firebase/firestore';
+import { returnPublicInstance } from "../classes/ReturnPublicManager";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBVvf6fMTS4V32uV-h-pqWxrU20PG7Tgz0",
@@ -155,5 +156,42 @@ const loadStrategyFromDB = async (id: any) => {
     return null;
   }
 }
+
+const saveDataToDB = async (data) => {
+  const id_Strategy = returnPublicInstance.IdStrategy;
+  const id_Scenario = returnPublicInstance.IdScenario;
+  try {
+    const querySnapshot = await getDocs(collection(db, 'Strategy'));
+    querySnapshot.forEach(async doc => {
+      const strategyData = doc.data();
+      if (strategyData.id === id_Strategy) {
+        const updatedScenarios = strategyData.scenarios.map(scenario => {
+          if (scenario.id === id_Scenario) {
+            console.log('Scenario found:', scenario);
+            scenario.data = JSON.stringify(data); // Convertir le tableau en chaîne de caractères
+          }
+          return scenario;
+        });
+        
+        const updatedData = {
+          ...strategyData,
+          scenarios: updatedScenarios
+        };
+
+        await updateDoc(doc.ref, updatedData);
+      }
+    });
+  } catch (error) {
+    console.error('Error saving data to DB:', error);
+  }
+};
+
+
+
+
+
+
+
+
 export { subscribeToStrategies };
-export { getNextId, addStrategyToDB, retrieveStrategies, deleteStrategy, loadStrategyFromDB };
+export { getNextId, addStrategyToDB, retrieveStrategies, deleteStrategy, loadStrategyFromDB, saveDataToDB };

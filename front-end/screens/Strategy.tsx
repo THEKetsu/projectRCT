@@ -10,6 +10,7 @@ import { loadStrategyFromDB } from '../firebase/firebase';
 export default function Strategy() {
     const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
     const [selectedItem, setSelectedItem] = useState<string | null>(null);
+    const [scenario, setScenario] = useState<[]| null>([]);
 
     const [strategy, setStrategy] = useState<any | null>(null);
 
@@ -47,16 +48,19 @@ export default function Strategy() {
      * @return {void}
      */
     const handleItemSelected = (selectedItem: any | null) => {
-        setSelectedItem(selectedItem.name);
+            returnPublicInstance.IdScenario = selectedItem.id;
+            setSelectedItem(selectedItem.name);
+            setScenario(selectedItem);
+
     };
 
     return (
         <View style={styles.container}>
             {isDrawerOpen &&
-                <DrawerLeft onClose={handleCloseDrawer} isOpen={isDrawerOpen} onItemSelected={handleItemSelected} strategy={strategy}/>}
+            <DrawerLeft onClose={handleCloseDrawer} isOpen={isDrawerOpen} onItemSelected={handleItemSelected} strategy={strategy}/>}
             {!isDrawerOpen && <TopWidget onPlayButtonPress={handlePressPlayButton} selectedItem={selectedItem} strategy={strategy}/>}
             <GestureHandlerRootView style={{flex: 1}}>
-                <Field/>
+                <Field data={scenario.data}/>
                 <ToolBar/>
             </GestureHandlerRootView>
         </View>

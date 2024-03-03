@@ -13,7 +13,7 @@ import {
 import {returnPublicInstance} from '../../classes/ReturnPublicManager';
 import pointInPolygon from 'point-in-polygon';
 import Player from '../../classes/Player';
-import data from '../../assets/data2.json'
+import data_from_json from '../../assets/data2.json'
 import Ballon from '../../classes/Ballon';
 import {useAppDispatch, useAppSelector} from "../../hooks/reduxHooks";
 import {setPositionIndex, setPositionList} from "../../redux/actions/positionActions";
@@ -32,8 +32,9 @@ import Options from "../Options/Options";
 import RightDrawer from '../Options/RightDrawer';
 import { toLinearSpace } from 'react-native-reanimated/lib/typescript/reanimated2/Colors';
 import { equal } from 'assert';
+import { saveDataToDB } from '../../firebase/firebase';
 
-export function Field({}) {
+export function Field({ data }: { data: [] }) {
     const position: Position = useAppSelector((state) => state.position);
     let [px1, py1] = [0, 0];
     let svg_fieldUNCHANGED = [0, 1136.77, 212.877, 2.62354, 920.021, 1131.04, 1136.77]
@@ -112,10 +113,34 @@ export function Field({}) {
 
     const toolbar: Toolbar = useAppSelector((state) => state.toolbar)
     const option: Option = useAppSelector((state) => state.option)
-
+    function transformData(data) {
+        return data.map(item => {
+            return {
+                position: item.position,
+                data: item.data.map(player => {
+                    return {
+                        id: player.id,
+                        position: player.position,
+                        array: player.array || []
+                    };
+                }),
+                ballon: item.ballon || []
+            };
+        });
+    }
+    
+    
+// by default
     useEffect(() => {
-        retrievePlayer();
+        retrievePlayer(data_from_json);
     }, []);
+    // for real data loading
+    useEffect(() => {
+        if (data != null && data != undefined  ) {
+            console.log("data", transformData(data));
+            retrievePlayer(transformData(data));
+        }
+    }, [data]);
 
     useEffect(() => {
         if (returnPublicInstance.indexAnimation != 0) {
@@ -143,14 +168,7 @@ export function Field({}) {
     }, [checkForEnd]);
 
     useEffect(() => {
-       
-        // if(dynamicPositionList.length > JSON.parse(position.positionList).length){
-            
-        //     dispatch(setPositionList(JSON.stringify(dynamicPositionList)))
-        // }
-       
-
-    }, [dynamicPositionList]);
+    }, []);
 
 
     useEffect(() => {
@@ -618,7 +636,8 @@ export function Field({}) {
 
     center = [((superSvg_Field[0][0] + superSvg_Field[0][2] + superSvg_Field[0][4] + superSvg_Field[0][5]) / 4), ((superSvg_Field[0][1] + superSvg_Field[0][3] + superSvg_Field[0][3] + superSvg_Field[0][6]) / 4)]
 
-    const retrievePlayer = () => {
+    const retrievePlayer = (data : any) => {
+        if (data )
         data.map(myPosition => {
             let myPlayersData: Player[] = [];
             let myBallonData: Ballon[] = [];
@@ -1105,6 +1124,10 @@ export function Field({}) {
 
 
     const animate = (indexC: number): void => {
+
+
+
+    
         let waitForLink = false;
         if (dynamicPositionList[indexC].length > 0) {
             if (dynamicPositionList[indexC][2].length > 0) {
@@ -1369,6 +1392,7 @@ export function Field({}) {
         }else if(!atLeastOneChange){
             //Aucun changement on passe.
             checkEndingAnimation(false);
+
         }
     };
 
@@ -1457,20 +1481,22 @@ export function Field({}) {
                     setNumAnimation(numAnimation * -1 + 1);
                 }
                 dispatch(setPositionIndex(position.positionIndex + 1));
+        
             }
             
         }else if(reloadingMode){
-           
             setSuperAnimation(false);
             animationEnCours = false;
-
-            
             setNumReload(numReload +1);
             dispatch(selectZoomMode())
+            saveDataToDB(dynamicPositionList);
+
         }else{
             dispatch(selectZoomMode())
             setSuperAnimation(false);
             animationEnCours = false;
+            saveDataToDB(dynamicPositionList);
+
         }
     };
 
