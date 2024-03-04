@@ -36,9 +36,12 @@ export default function Options({animate, setIsOpen}) {
     let reminderText = "Se déplacer";
     
     if (toolbar.ballMode) {
-        reminderText = "Ballon mode activé";
+        reminderText = "Mode Ballon";
     } else if (toolbar.playerMode) {
         reminderText = "Gestion des joueurs";
+    }
+    else if (toolbar.drawMode){
+        reminderText="Mode Dessin";
     }
     const AddPlayer = (text: string) => {
         const regex = /^[1-9](?:[0-9])?$/;
@@ -175,7 +178,7 @@ export default function Options({animate, setIsOpen}) {
                             <>
                     <View style={styles.elementW}>
                             <Text >
-                                Liéer avec un joueur
+                                Lier avec un joueur
                             </Text>
                                     <TouchableOpacity onPress={() => { linkToPlayer(true, dispatch, position, option);setIsLinkButtonClicked(true);}}
                                     style={[styles.linkButton, isLinkButtonClicked && styles.clickedButton]}>
