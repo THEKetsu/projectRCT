@@ -33,6 +33,7 @@ export default function SelectStrategy ({ navigation }) {
   const [filteredStrategies, setFilteredStrategies] = useState<any[]>([]); // Nouvel état pour stocker les stratégies filtrées
   const [editingItemId, setEditingItemId] = useState<number | null>(null);
   const [editingItemName, setEditingItemName] = useState('');
+  const [blocked, setBlocked] = useState(false)
 
 useEffect(() => {
     const unsubscribe = subscribeToStrategies((updatedStrategies: any[]) => {
@@ -109,6 +110,7 @@ useEffect(() => {
     
         // Recharger les données
         fetchData();
+        setBlocked(false);
       } catch (error) {
         console.error('Error updating item:', error);
       }
@@ -116,15 +118,6 @@ useEffect(() => {
 
 
   const renderItem = ({ item  }) => {
-
-
-
-
-
-
-
-
-
     return (
         <TouchableOpacity
           onPress={() => handleItemClick(item.id)} // Appel de la fonction lorsqu'un élément est cliqué
@@ -146,13 +139,16 @@ useEffect(() => {
             <Feather name={"trash"} size={40} color={"red"} />
           </TouchableOpacity>
           <TouchableOpacity style={styles.pencilButton} onPress={() => {
+            setBlocked(true)
           if (editingItemId === item.id) {
             handleEditItem(item.id, editingItemName);
             setEditingItemId(null);
             setEditingItemName('');
+            
           } else {
             setEditingItemId(item.id);
             setEditingItemName(item.name);
+            
           }
         }}>
             <Octicons name={"pencil"} size={40} color={"grey"} />
@@ -174,10 +170,12 @@ useEffect(() => {
         return null;
     }
     const handleItemClick = (id: number) => {
+      if (blocked != true){
       returnPublicInstance.IdStrategy = id;
       console.log('Item clicked:', id);
       setSelectedItemId(id); // Mettre à jour l'ID de l'élément sélectionné lorsqu'il est cliqué
       navigation.navigate("Strategy");
+      }
     };
 
     return (
@@ -226,7 +224,7 @@ useEffect(() => {
                     showsVerticalScrollIndicator={false}
                 />
                 </View>
-                <Button onPress={() => navigation.navigate("Strategy")} title={"GO TO STRATEGY"}/>
+                {/* <Button onPress={() => navigation.navigate("Strategy")} title={"GO TO STRATEGY"}/> */}
             </ImageBackground>
 
         </View>
