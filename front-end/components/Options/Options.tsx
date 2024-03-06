@@ -176,7 +176,7 @@ export default function Options({animate, setIsOpen}) {
                             <>
                     <View style={styles.elementW}>
                             <Text >
-                                Liéer avec un joueur
+                                Lier avec un joueur
                             </Text>
                                     <TouchableOpacity onPress={() => { linkToPlayer(true, dispatch, position, option);setIsLinkButtonClicked(true);}}
                                     style={[styles.linkButton, isLinkButtonClicked && styles.clickedButton]}>

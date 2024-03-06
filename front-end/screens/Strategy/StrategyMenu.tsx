@@ -31,7 +31,7 @@ export default function StrategyMenu () {
               <TouchableOpacity onPress={() => navigation.navigate('CreateStrategy')} style={styles.button} activeOpacity={0.7}>
                   <Text style={[styles.buttonText, { fontWeight: 'bold' }]}>Créer</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => navigation.navigate('LoadStrategy')} style={[styles.button, styles.button2]} activeOpacity={0.7}>
+              <TouchableOpacity onPress={() => navigation.navigate('SelectStrategy')} style={[styles.button, styles.button2]} activeOpacity={0.7}>
                   <Text style={[styles.buttonText, { fontWeight: 'bold' }]}>Charger</Text>
               </TouchableOpacity>
               <TouchableOpacity onPress={() => console.log("test")} style={[styles.button, styles.button3]} activeOpacity={0.7}>
