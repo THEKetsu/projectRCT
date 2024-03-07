@@ -62,7 +62,7 @@ const DrawerLeft = ({isOpen, onClose, onItemSelected, strategy}: {
     const [selectedButtonText, setSelectedButtonText] = useState<string | null>(null);
     const [editingItemId, setEditingItemId] = useState<string | null>(null); // ID de l'élément en cours de modification
     const [dataScenario, setDataScnenario] = useState<any[]>([]);
-
+    
     // useEffect(() => {
     //     const fetchData = async () => {
     //         const allData = strategyData;
@@ -421,7 +421,7 @@ const handleFinishEditing = async (newName: string, itemId: string) => {
 
                     <View style={styles.bottomDrawerLeft}>
                         <TouchableOpacity style={styles.buttonBottomDrawerLeft}>
-                            <Image source={house} style={styles.plusButtonImage as StyleProp<ImageStyle>}/>
+                            <Image source={house} style={styles.plusButtonImage as StyleProp<ImageStyle>} />
                         </TouchableOpacity>
                         <View style={styles.textBottom}>
                             <Text style={styles.textBottomContent}>Match du Jeudi Aprem</Text>

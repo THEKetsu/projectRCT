@@ -40,7 +40,7 @@ export default function Options({animate, setIsOpen}) {
     } else if (toolbar.playerMode) {
         reminderText = "Gestion des joueurs";
     }
-    else if (toolbar.drawMode){
+    else if toolbar.drawMode){
         reminderText="Mode Dessin";
     }
     const AddPlayer = (text: string) => {
