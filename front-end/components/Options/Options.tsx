@@ -36,13 +36,12 @@ export default function Options({animate, setIsOpen}) {
     let reminderText = "Se déplacer";
     
     if (toolbar.ballMode) {
-        reminderText = "Mode Ballon";
+        reminderText = "Gestion du ballon";
     } else if (toolbar.playerMode) {
         reminderText = "Gestion des joueurs";
-    }
-    // else if toolbar.drawMode){
-    //     reminderText="Mode Dessin";
-    // }
+    } else if(toolbar.drawMode) {
+        reminderText = "Mode Dessin"
+    } 
     const AddPlayer = (text: string) => {
         const regex = /^[1-9](?:[0-9])?$/;
 
@@ -57,7 +56,6 @@ export default function Options({animate, setIsOpen}) {
 
     const handleValueChange = (itemValue: number) => {
         setSelectedValue(itemValue);
-        console.log("itemVALUE:::",itemValue);
         modifySpeed(dispatch, position, option,itemValue);
       };
     
