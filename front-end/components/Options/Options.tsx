@@ -40,9 +40,9 @@ export default function Options({animate, setIsOpen}) {
     } else if (toolbar.playerMode) {
         reminderText = "Gestion des joueurs";
     }
-    else if toolbar.drawMode){
-        reminderText="Mode Dessin";
-    }
+    // else if toolbar.drawMode){
+    //     reminderText="Mode Dessin";
+    // }
     const AddPlayer = (text: string) => {
         const regex = /^[1-9](?:[0-9])?$/;
 
