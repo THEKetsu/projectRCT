@@ -13,6 +13,7 @@ import {DocumentData, addDoc, collection, deleteDoc, doc, getDocs, onSnapshot, u
 import {db} from "../../firebase/firebase";
 import Strategy from '../../screens/Strategy';
 import { v4 as uuidv4 } from 'uuid';
+import { useNavigation } from '@react-navigation/native';
 
 const retrieveStrategies = async () => {
     try {
@@ -62,6 +63,7 @@ const DrawerLeft = ({isOpen, onClose, onItemSelected, strategy}: {
     const [selectedButtonText, setSelectedButtonText] = useState<string | null>(null);
     const [editingItemId, setEditingItemId] = useState<string | null>(null); // ID de l'élément en cours de modification
     const [dataScenario, setDataScnenario] = useState<any[]>([]);
+    const navigation = useNavigation();
     
     // useEffect(() => {
     //     const fetchData = async () => {
@@ -420,7 +422,7 @@ const handleFinishEditing = async (newName: string, itemId: string) => {
                     </View>
 
                     <View style={styles.bottomDrawerLeft}>
-                        <TouchableOpacity style={styles.buttonBottomDrawerLeft}>
+                        <TouchableOpacity style={styles.buttonBottomDrawerLeft} onPress={() => navigation.goBack()}>
                             <Image source={house} style={styles.plusButtonImage as StyleProp<ImageStyle>} />
                         </TouchableOpacity>
                         <View style={styles.textBottom}>

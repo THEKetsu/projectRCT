@@ -234,12 +234,17 @@ const styles = StyleSheet.create({
         alignItems: "center",
         flexDirection: "row",
     },
-    retract_and_position: {},
+    retract_and_position: {
+        width: dimWidth,
+    },
     retract_and_position_false_collapsed: {
         position: 'absolute',
-        bottom: 0
+        bottom: 0,
+        width: dimWidth,
     },
-    retract_and_position_true_collapsed: {},
+    retract_and_position_true_collapsed: {
+        width: dimWidth,
+    },
     poseContainer: {
         flex: 1,
         flexDirection: 'column',

@@ -139,11 +139,12 @@ export default function Options({animate, setIsOpen}) {
                                     style={styles.input}
                                 />
 
-                                
+                                <Text style={styles.titleTeam}>Vitesse du Joueur</Text>
                                 <Picker
                                         selectedValue={selectedValue}
                                         onValueChange={handleValueChange}
                                     >
+                                        
                                         <Picker.Item label="1" value={1} />
                                         <Picker.Item label="2" value={2} />
                                         <Picker.Item label="3" value={3} />
@@ -187,7 +188,7 @@ export default function Options({animate, setIsOpen}) {
                                     Joueur le plus proche :{JSON.parse(option.closestPlayer)[0]}
                                 </Text>
 
-                        <TouchableOpacity
+                        {/* <TouchableOpacity
                             onPress={() => dispatch(toggleAutoLink())}
                             style={styles.AutoLink}>
                             <Text style={[styles.textSty, isAutoLinkModeHighlighted && styles.highlightedText]} onPress={() => {
@@ -195,7 +196,7 @@ export default function Options({animate, setIsOpen}) {
                             setIsAutoLinkModeHighlighted(!isAutoLinkModeHighlighted);}}>
                                 AutoLink Mode
                             </Text>
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
                         <Pressable
                             onPress={() => deleteBallon(dispatch, position)}
                             style={styles.deleteS}>

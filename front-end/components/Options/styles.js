@@ -144,8 +144,9 @@ let styles =  StyleSheet.create({
         borderRadius: 100,
     },
     linkImageButton:{
+        marginTop: '5%',
         width: 25,
-        height: 25,
+        height: 30,
     },
     textStyle: {
         fontSize: 13,
