@@ -22,6 +22,7 @@ export default function Strategy() {
        setStrategy(strategy);
     }
     }, [returnPublicInstance.IdStrategy]);
+    
     /**
      * Handle the press event on the play button.
      *

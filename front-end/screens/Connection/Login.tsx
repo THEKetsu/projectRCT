@@ -34,7 +34,8 @@ export default function Login () {
     }
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
-        console.log(userCredential);
+        console.log("USER CREDENTIAL ",userCredential);
+        console.log("USER PASSWORD",password);
         const email = userCredential.user.email;
         console.log(email)
         if (email != null){

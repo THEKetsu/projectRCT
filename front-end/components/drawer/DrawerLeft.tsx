@@ -64,25 +64,24 @@ const DrawerLeft = ({isOpen, onClose, onItemSelected, strategy}: {
     const [editingItemId, setEditingItemId] = useState<string | null>(null); // ID de l'élément en cours de modification
     const [dataScenario, setDataScnenario] = useState<any[]>([]);
     const navigation = useNavigation();
-    
-    // useEffect(() => {
-    //     const fetchData = async () => {
-    //         const allData = strategyData;
-    //         if (allData != null && allData != undefined) {
-    //         if (allData.scenarios != null && allData.scenarios != undefined) {
-    //             setDataScnenario(allData.scenarios);
-    //         }
-    //     }
-    //     };
-    //     fetchData();
-    // }, [strategyData]);
+    const [strategiesName, setStrategiesName] = useState<string[]>([]);
+    const [localStrategy, setLocalStrategy] = useState<DocumentData | null | undefined>(null);
+
+    useEffect(() => {
+        if (localStrategy && localStrategy.scenarios) {
+            setDataScnenario(localStrategy.scenarios);
+        }
+    }, [localStrategy]);
 
     useEffect(() => {
         const fetchData = async () => {
             if (strategy) {
                 try {
                     const data = await strategy;
-                    setStrategyData(data);
+                    // recupere le nom de la stratégie et le stocke dans le state
+                    setStrategiesName(data.name);
+                    setLocalStrategy(strategy);
+
     
                     if (data && data.scenarios) {
                         setDataScnenario(data.scenarios);
@@ -208,13 +207,6 @@ const handleDeleteSelectedItem = async (id: string) => {
     }
 };
 
-
-
-
-
-
-    
-
     /**
      * Function to handle adding an item.
      *
@@ -261,18 +253,94 @@ const handleDeleteSelectedItem = async (id: string) => {
 
     
     
+/**
+ * Met à jour le nom du scénario dans Firestore.
+ *
+ * @param {string} name - Le nouveau nom du scénario
+ * @param {string} scenarioId - L'identifiant du scénario à mettre à jour
+ * @return {void}
+ */
+const updateLocalStrategy = (updatedStrategy: any) => {
+    setStrategyData(updatedStrategy);
+};
+const updateScenarioNameInFirestore = async (name: string, scenarioId: string) => {
+    try {
+        const querySnapshot = await getDocs(collection(db, 'Strategy'));
+        let strategyDocumentId: string | null = null;
+
+        // Recherche du document de la stratégie contenant ce scénario
+        querySnapshot.forEach(doc => {
+            const strategyData = doc.data();
+            if (strategyData && strategyData.scenarios) {
+                const scenarioIndex = strategyData.scenarios.findIndex((scenario: any) => scenario.id === scenarioId);
+                if (scenarioIndex !== -1) {
+                    strategyDocumentId = doc.id;
+                }
+            }
+        });
+
+        // Mettre à jour le nom du scénario dans Firestore
+        if (strategyDocumentId) {
+            const scenarioRef = doc(db, 'Strategy', strategyDocumentId);
+            const updatedScenarios = strategyData.scenarios.map((scenario: any) => {
+                if (scenario.id === scenarioId) {
+                    return { ...scenario, name };
+                }
+                return scenario;
+            });
+
+            await updateDoc(scenarioRef, { scenarios: updatedScenarios });
+
+            // Mettre à jour les données localement
+            setDataScnenario(updatedScenarios);
+
+            // Mettre à jour la stratégie localement
+            const updatedStrategy = { ...strategyData, scenarios: updatedScenarios };
+            updateLocalStrategy(updatedStrategy);
+        }
+    } catch (error) {
+        console.error('Erreur lors de la mise à jour du nom du scénario dans Firestore :', error);
+    }
+};
 
 
-    /**
-     * Updates the name property of the item with the given id in the data array.
-     *
-     * @param {string} name - the new name to be updated
-     * @param {string} id - the id of the item to be updated
-     * @return {void}
-     */
-    const handleTextInputChange = async (name: string, id: string) => {
-        setDataScnenario(prevData => prevData.map(item => item.id === id ? {...item, name: name} : item));
-    };
+/**
+ * Met à jour le nom du scénario localement.
+ *
+ * @param {string} name - Le nouveau nom du scénario
+ * @param {string} id - L'identifiant du scénario à mettre à jour
+ * @return {void}
+ */
+const handleTextInputChange = (name: string, id: string) => {
+    // Mettre à jour localement uniquement, la mise à jour de Firebase sera déclenchée par onblur
+    setDataScnenario(prevData =>
+        prevData.map(item =>
+            item.id === id ? { ...item, name } : item
+        )
+    );
+};
+
+/**
+ * Gère la fin de l'édition du nom du scénario.
+ *
+ * @param {string} newName - Le nouveau nom du scénario
+ * @param {string} itemId - L'identifiant du scénario édité
+ * @return {void}
+ */
+const handleFinishEditing = async (newName: string, itemId: string) => {
+    try {
+        // Mettre à jour le nom du scénario dans Firestore
+        await updateScenarioNameInFirestore(newName, itemId);
+    } catch (error) {
+        console.error('Erreur lors de la mise à jour du nom du scénario :', error);
+    }
+};
+
+// Dans le composant, le TextInput doit appeler handleTextInputChange lors de l'édition,
+// et handleFinishEditing lors de la fin de l'édition avec onBlur.
+
+
+
 
     /**
      * Handles the start of editing for a specific item.
@@ -324,29 +392,6 @@ const handleDeleteSelectedItem = async (id: string) => {
      */
     /**
  * Handles the finish editing action.
- *
- * @param {string} newName - The new name of the item
- * @param {string} itemId - The ID of the item being edited
- * @return {void}
- */
-const handleFinishEditing = async (newName: string, itemId: string) => {
-    try {
-        // Update the item name in Firestore
-        await updateItemNameInFirestore(newName, itemId);
-
-        // Update the item name in the local state
-        setDataScnenario(prevData =>
-            prevData.map(item =>
-                item.id === itemId ? {...item, name: newName} : item
-            )
-        );
-
-        // Reset the editing item ID
-        setEditingItemId(null);
-    } catch (error) {
-        console.error('Error handling finish editing: ', error);
-    }
-};
 
 
     /**
@@ -381,10 +426,10 @@ const handleFinishEditing = async (newName: string, itemId: string) => {
             <View style={styles.textView}>
                 {editingItemId === item.id ? (
                     <TextInput
-                        value={item.name}
-                        onChangeText={(text) => handleTextInputChange(text, item.id)}
-                        onBlur={() => handleFinishEditing(item.name, item.id)}
-                        autoFocus
+                    value={item.name}
+                    onChangeText={(text) => handleTextInputChange(text, item.id)}
+                    onBlur={() => handleFinishEditing(item.name, item.id)} // Appelé lorsque l'édition est terminée
+                    autoFocus
                     />
                 ) : (
                     <Text onPress={() => handleStartEditing(item.id)}>{item.name}</Text>
@@ -426,7 +471,7 @@ const handleFinishEditing = async (newName: string, itemId: string) => {
                             <Image source={house} style={styles.plusButtonImage as StyleProp<ImageStyle>} />
                         </TouchableOpacity>
                         <View style={styles.textBottom}>
-                            <Text style={styles.textBottomContent}>Match du Jeudi Aprem</Text>
+                            <Text style={styles.textBottomContent}>{strategiesName}</Text>
                         </View>
                     </View>
                 </View>
